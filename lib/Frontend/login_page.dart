@@ -296,6 +296,8 @@
 //   }
 // }
 
+import 'package:cookmate/backend/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../chef/chefdashboard.dart';
 import '../customer/customerdashboard.dart';
@@ -473,9 +475,11 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               // Show success
+                              await Auth.loginUserWithEmail(_emailController.text, _passwordController.text);
+                              if (FirebaseAuth.instance.currentUser == null) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Login Successful!'),

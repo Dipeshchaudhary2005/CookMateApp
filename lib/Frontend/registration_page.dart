@@ -1,3 +1,4 @@
+import 'package:cookmate/backend/auth.dart';
 import 'package:flutter/material.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -245,7 +246,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
                               if (!_agreeToTerms) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -257,6 +258,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 return;
                               }
                               // Handle registration
+                              bool accountCreated = await Auth.createUserWithEmail(_emailController.text,
+                                  _passwordController.text,
+                                  _nameController.text,
+                                  widget.userType);
+                              if (!accountCreated) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Registration Successful!'),
