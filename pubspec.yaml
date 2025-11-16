@@ -87,3 +87,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  # Add your image assets here
+  assets:
+    - Resource/chef.png
+    - Resource/chefHat.png

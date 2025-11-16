@@ -256,7 +256,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 );
                                 return;
                               }
-                              // Handle registration
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Registration Successful!'),
@@ -325,51 +324,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
         color: Colors.white,
         shape: BoxShape.circle,
       ),
-      child: Center(
-        child: Stack(
-          children: [
-            Positioned(
-              left: 14,
-              top: 18,
-              child: Container(
-                width: 52,
-                height: 40,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 2.5),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(26),
-                    topRight: Radius.circular(26),
-                    bottomLeft: Radius.circular(7),
-                    bottomRight: Radius.circular(7),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 20,
-              top: 25,
-              child: Container(
-                width: 40,
-                height: 7,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 1.5),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 10,
-              bottom: 20,
-              child: Container(
-                width: 20,
-                height: 20,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFB347),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ],
+      child: ClipOval(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Image.asset(
+            'Resource/chefHat.png',
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );

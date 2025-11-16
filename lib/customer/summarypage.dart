@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'ratingpage.dart';
 
 class SummaryPage extends StatefulWidget {
   const SummaryPage({super.key});
@@ -30,16 +31,57 @@ class _SummaryPageState extends State<SummaryPage> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF8BC34A),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'Comfirm',
-              style: TextStyle(color: Colors.white),
+          GestureDetector(
+            onTap: () {
+              // Show confirmation dialog
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Confirm Booking'),
+                  content: const Text('Are you sure you want to confirm this booking?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Close dialog
+                        // Show success message
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Booking confirmed successfully!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                        // Navigate to rating page after 1 second
+                        Future.delayed(const Duration(seconds: 1), () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const RatingPage()),
+                          );
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF8BC34A),
+                      ),
+                      child: const Text('Confirm'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.only(right: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF8BC34A),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'Confirm',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ),
         ],
@@ -98,11 +140,9 @@ class _SummaryPageState extends State<SummaryPage> {
                       height: 60,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        image: const DecorationImage(
-                          image: AssetImage('assets/event.png'),
-                          fit: BoxFit.cover,
-                        ),
+                        color: Colors.white,
                       ),
+                      child: const Icon(Icons.celebration, size: 30),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -180,9 +220,14 @@ class _SummaryPageState extends State<SummaryPage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
-                        image: const DecorationImage(
-                          image: AssetImage('assets/chef_ram.png'),
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'Resource/chef.png',
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(Icons.person, size: 30);
+                          },
                         ),
                       ),
                     ),

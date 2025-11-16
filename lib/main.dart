@@ -1,6 +1,6 @@
 // main.dart
 import 'package:flutter/material.dart';
-import 'Frontend/splashpage.dart';
+import 'Frontend/SplashPage.dart';
 
 
 void main() {

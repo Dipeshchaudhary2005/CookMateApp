@@ -39,7 +39,12 @@ class LandingPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 40),
-              _buildChefIllustration(),
+              Image.asset(
+                'Resource/chef.png',
+                width: 150,
+                height: 150,
+                fit: BoxFit.contain,
+              ),
               const SizedBox(height: 60),
               GestureDetector(
                 onTap: () {
@@ -72,75 +77,6 @@ class LandingPage extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildChefIllustration() {
-    return SizedBox(
-      width: 150,
-      height: 150,
-      child: Stack(
-        children: [
-          // Chef body
-          Positioned(
-            left: 35,
-            bottom: 0,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-          // Chef head
-          Positioned(
-            left: 40,
-            top: 20,
-            child: Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                color: Colors.pink[100],
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          // Chef hat
-          Positioned(
-            left: 30,
-            top: 0,
-            child: Container(
-              width: 90,
-              height: 40,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(45),
-                  topRight: Radius.circular(45),
-                ),
-              ),
-            ),
-          ),
-          // Cloche
-          Positioned(
-            right: 0,
-            top: 40,
-            child: Container(
-              width: 60,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
