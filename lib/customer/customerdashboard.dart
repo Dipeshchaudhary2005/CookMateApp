@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
+import 'bookingpage.dart';
+import 'favoritechefpage.dart';
+import 'customerprofilepage.dart';
+import 'summarypage.dart';
 
-class CustomerDashboard extends StatelessWidget {
+class CustomerDashboard extends StatefulWidget {
   const CustomerDashboard({super.key});
+
+  @override
+  State<CustomerDashboard> createState() => _CustomerDashboardState();
+}
+
+class _CustomerDashboardState extends State<CustomerDashboard> {
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -66,50 +77,62 @@ class CustomerDashboard extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Featured Chef Card
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFB8E6B8),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
-                          'assets/chef.png',
-                          fit: BoxFit.cover,
+              // Featured Chef Card - CLICKABLE TO BOOKING PAGE
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BookingPage()),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFB8E6B8),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            'Resource/chef.png',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.restaurant, size: 30);
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'CHEF MARLON',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                      const SizedBox(width: 16),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'CHEF MARLON',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Text(
-                            'discount 30% on\nspecialized cuisine',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
+                            Text(
+                              'discount 30% on\nspecialized cuisine',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -130,7 +153,7 @@ class CustomerDashboard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Cuisine Grid
+              // Cuisine Grid - EACH CARD CLICKABLE TO BOOKING PAGE
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -139,15 +162,15 @@ class CustomerDashboard extends StatelessWidget {
                 crossAxisSpacing: 12,
                 childAspectRatio: 0.75,
                 children: [
-                  _buildCuisineCard('Chef John Ray', 'assets/dish1.png'),
-                  _buildCuisineCard('Kalagar', 'assets/dish2.png'),
-                  _buildCuisineCard('Meat Specialist', 'assets/dish3.png'),
-                  _buildCuisineCard('Ms. Lani', 'assets/chef1.png'),
-                  _buildCuisineCard('Kevin Torio', 'assets/chef2.png'),
-                  _buildCuisineCard('Ron Shem', 'assets/chef3.png'),
-                  _buildCuisineCard('Morris Carl', 'assets/dish4.png'),
-                  _buildCuisineCard('Joshua', 'assets/dish5.png'),
-                  _buildCuisineCard('Dessert Chef', 'assets/dish6.png'),
+                  _buildCuisineCard('Chef John Ray', 'Resource/chef.png'),
+                  _buildCuisineCard('Kalagar', 'Resource/chef.png'),
+                  _buildCuisineCard('Meat Specialist', 'Resource/chef.png'),
+                  _buildCuisineCard('Ms. Lani', 'Resource/chef.png'),
+                  _buildCuisineCard('Kevin Torio', 'Resource/chef.png'),
+                  _buildCuisineCard('Ron Shem', 'Resource/chef.png'),
+                  _buildCuisineCard('Morris Carl', 'Resource/chef.png'),
+                  _buildCuisineCard('Joshua', 'Resource/chef.png'),
+                  _buildCuisineCard('Dessert Chef', 'Resource/chef.png'),
                 ],
               ),
             ],
@@ -158,41 +181,96 @@ class CustomerDashboard extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.purple,
         unselectedItemColor: Colors.grey,
-        currentIndex: 0,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+
+          // Navigate based on selected tab
+          switch (index) {
+            case 0:
+            // Home - Already on this page
+              break;
+            case 1:
+            // Summary - Navigate to Summary Page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SummaryPage()),
+              );
+              break;
+            case 2:
+            // Calendar - Navigate to Booking Page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const BookingPage()),
+              );
+              break;
+            case 3:
+            // Favorites
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FavoriteChefPage()),
+              );
+              break;
+            case 4:
+            // Profile
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CustomerProfilePage()),
+              );
+              break;
+          }
+        },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Summary'),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Booking'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favorites'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
   }
 
   Widget _buildCuisineCard(String name, String imagePath) {
-    return Column(
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(
-                image: AssetImage(imagePath),
-                fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: () {
+        // Navigate to booking page when chef card is clicked
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const BookingPage()),
+        );
+      },
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.restaurant, size: 40);
+                  },
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          name,
-          style: const TextStyle(fontSize: 11),
-          textAlign: TextAlign.center,
-          maxLines: 2,
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            name,
+            style: const TextStyle(fontSize: 11),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+          ),
+        ],
+      ),
     );
   }
 }

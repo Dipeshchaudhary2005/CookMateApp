@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'favoritechefpage.dart';
+import '../Frontend/landingpage.dart';
 
 class CustomerProfilePage extends StatelessWidget {
   const CustomerProfilePage({super.key});
@@ -21,7 +23,11 @@ class CustomerProfilePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Settings page coming soon!')),
+              );
+            },
           ),
         ],
       ),
@@ -77,20 +83,115 @@ class CustomerProfilePage extends StatelessWidget {
               const SizedBox(height: 30),
 
               // Profile Options
-              _buildProfileOption(Icons.person, 'Edit Profile', () {}),
-              _buildProfileOption(Icons.history, 'Booking History', () {}),
-              _buildProfileOption(Icons.favorite, 'Favorite Chefs', () {}),
-              _buildProfileOption(Icons.payment, 'Payment Methods', () {}),
-              _buildProfileOption(Icons.notifications, 'Notifications', () {}),
-              _buildProfileOption(Icons.help, 'Help & Support', () {}),
-              _buildProfileOption(Icons.privacy_tip, 'Privacy Policy', () {}),
+              _buildProfileOption(
+                context,
+                Icons.person,
+                'Edit Profile',
+                    () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Edit Profile page coming soon!')),
+                  );
+                },
+              ),
+              _buildProfileOption(
+                context,
+                Icons.history,
+                'Booking History',
+                    () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Booking History page coming soon!')),
+                  );
+                },
+              ),
+              _buildProfileOption(
+                context,
+                Icons.favorite,
+                'Favorite Chefs',
+                    () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const FavoriteChefPage()),
+                  );
+                },
+              ),
+              _buildProfileOption(
+                context,
+                Icons.payment,
+                'Payment Methods',
+                    () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Payment Methods page coming soon!')),
+                  );
+                },
+              ),
+              _buildProfileOption(
+                context,
+                Icons.notifications,
+                'Notifications',
+                    () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Notifications page coming soon!')),
+                  );
+                },
+              ),
+              _buildProfileOption(
+                context,
+                Icons.help,
+                'Help & Support',
+                    () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Help & Support page coming soon!')),
+                  );
+                },
+              ),
+              _buildProfileOption(
+                context,
+                Icons.privacy_tip,
+                'Privacy Policy',
+                    () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Privacy Policy page coming soon!')),
+                  );
+                },
+              ),
               const SizedBox(height: 20),
 
               // Logout Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // Show logout confirmation dialog
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Logout'),
+                        content: const Text('Are you sure you want to logout?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancel'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              // Navigate back to landing page
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LandingPage(),
+                                ),
+                                    (route) => false, // Remove all previous routes
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                            ),
+                            child: const Text('Logout'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -111,7 +212,12 @@ class CustomerProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileOption(IconData icon, String title, VoidCallback onTap) {
+  Widget _buildProfileOption(
+      BuildContext context,
+      IconData icon,
+      String title,
+      VoidCallback onTap,
+      ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
