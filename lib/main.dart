@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'Frontend/SplashPage.dart';
+import 'package:cookmate/Frontend/splashpage.dart';
 
 
 Future<void> main () async {

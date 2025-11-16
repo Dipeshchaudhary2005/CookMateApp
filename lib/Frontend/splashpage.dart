@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'LandingPage.dart';
+import 'package:cookmate/Frontend/landingpage.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
