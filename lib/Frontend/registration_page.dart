@@ -1,3 +1,4 @@
+import 'package:cookmate/backend/auth.dart';
 import 'package:flutter/material.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -18,6 +19,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _agreeToTerms = false;
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -245,7 +247,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            if (_loading) return;
                             if (_formKey.currentState!.validate()) {
                               if (!_agreeToTerms) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -253,6 +256,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                     content: Text('Please agree to Terms & Conditions'),
                                     backgroundColor: Colors.red,
                                   ),
+                                );
+                                return;
+                              }
+                              // Handle registration
+                              _loading = true;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: const CircularProgressIndicator())
+                              );
+                              bool accountCreated = await Auth.createUserWithEmail(_emailController.text,
+                                  _passwordController.text,
+                                  _nameController.text,
+                                  widget.userType);
+                              _loading = false;
+                              if (!accountCreated){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Registration Failed!"),
+                                  backgroundColor: Colors.red,)
                                 );
                                 return;
                               }

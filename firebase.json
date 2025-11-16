@@ -1,0 +1,23 @@
+{
+  "flutter" : {
+    "platforms" : {
+      "android" : {
+        "default" : {
+          "projectId" : "cookmate-pcps2025",
+          "appId" : "1:868991271171:android:c7a2e0c2367bd7681be936",
+          "fileOutput" : "android/app/google-services.json"
+        }
+      },
+      "dart" : {
+        "lib/firebase_options.dart" : {
+          "projectId" : "cookmate-pcps2025",
+          "configurations" : {
+            "android" : "1:868991271171:android:c7a2e0c2367bd7681be936",
+            "ios" : "1:868991271171:ios:931ee17ab3d7d04c1be936",
+            "windows" : "1:868991271171:web:0f0db9fcb2f8ec691be936"
+          }
+        }
+      }
+    }
+  }
+}
