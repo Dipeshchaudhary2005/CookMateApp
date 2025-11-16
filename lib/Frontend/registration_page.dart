@@ -19,6 +19,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _agreeToTerms = false;
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -247,6 +248,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () async {
+                            if (_loading) return;
                             if (_formKey.currentState!.validate()) {
                               if (!_agreeToTerms) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -258,11 +260,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 return;
                               }
                               // Handle registration
+                              _loading = true;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: const CircularProgressIndicator())
+                              );
                               bool accountCreated = await Auth.createUserWithEmail(_emailController.text,
                                   _passwordController.text,
                                   _nameController.text,
                                   widget.userType);
-                              if (!accountCreated) return;
+                              _loading = false;
+                              if (!accountCreated){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Registration Failed!"),
+                                  backgroundColor: Colors.red,)
+                                );
+                                return;
+                              }
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Registration Successful!'),

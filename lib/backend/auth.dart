@@ -16,9 +16,12 @@ class Auth {
         'uid' : user.uid,
         'email': user.email,
         'fullName': fullName,
-        'userType': userType
+        'userType': userType,
+        'createdAt' : FieldValue.serverTimestamp()
       };
-      await FirebaseFirestore.instance.collection(StaticClass.usersCollection).add(userMap);
+      DocumentReference docref = FirebaseFirestore.instance.collection(StaticClass.usersCollection).doc(user.uid);
+      await docref.set(userMap, SetOptions(merge: true));
+
       return true;
     } on Exception catch (e) {
       if (kDebugMode){
