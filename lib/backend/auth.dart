@@ -3,11 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:cookmate/core/static.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'model/user.dart';
 
 class Auth {
-  static final GoogleSignIn _googleSignIn = GoogleSignIn();
+  static final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
   // Email/Password Registration with Phone Number
   static Future<bool> createUserWithEmail(
@@ -62,57 +63,100 @@ class Auth {
     }
   }
 
-  // Google Sign-In
+
   static Future<User?> signInWithGoogle(String userType) async {
-    try {
-      // Trigger the Google Sign-In flow
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    try{
+      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate();
 
-      if (googleUser == null) {
-        // User canceled the sign-in
-        return null;
-      }
-
+      if (googleUser != null) return null;
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = googleUser!.authentication;
 
       // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+      final credential = GoogleAuthProvider.credential(idToken: googleAuth.idToken);
 
-      // Sign in to Firebase with the Google credential
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      // Once signed in, return the UserCredential
+      var userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // Check if this is a new user
-      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
-        // Store user data in Firestore for new users
-        final userMap = <String, dynamic>{
-          'uid': userCredential.user!.uid,
-          'email': userCredential.user?.email ?? '',
-          'fullName': userCredential.user?.displayName ?? '',
-          'userType': userType,
-          'phoneNumber': userCredential.user?.phoneNumber ?? '',
-          'photoURL': userCredential.user?.photoURL ?? '',
-          'signInMethod': 'google',
-          'createdAt': FieldValue.serverTimestamp(),
-        };
+      if (userCredential.additionalUserInfo?.isNewUser ?? false){
+        var userModel = UserModel(
+          uid: userCredential.user!.uid,
+          email: userCredential.user!.email,
+          fullName: userCredential.user!.displayName,
+          userType: UserType.fromString(userType),
+          phoneNumber: userCredential.user!.phoneNumber,
+          signInMethod: 'google',
+        );
+
+        var map = userModel.toMap();
+        map[UserModel.createdAtField] = FieldValue.serverTimestamp();
 
         DocumentReference docref = FirebaseFirestore.instance
             .collection(StaticClass.usersCollection)
             .doc(userCredential.user!.uid);
-        await docref.set(userMap, SetOptions(merge: true));
+        await docref.set(map, SetOptions(merge: true));
       }
 
       return userCredential.user;
-    } catch (e) {
+    }catch (e) {
       if (kDebugMode) {
         print('Google Sign-In error: $e');
       }
       return null;
     }
   }
+
+  // // Google Sign-In
+  // static Future<User?> signInWithGoogle(String userType) async {
+  //   try {
+  //     // Trigger the Google Sign-In flow
+  //     final GoogleSignInAccount? googleUser = await _googleSignIn.;
+  //
+  //     if (googleUser == null) {
+  //       // User canceled the sign-in
+  //       return null;
+  //     }
+  //
+  //     // Obtain the auth details from the request
+  //     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+  //
+  //     // Create a new credential
+  //     final credential = GoogleAuthProvider.credential(
+  //       accessToken: googleAuth.accessToken,
+  //       idToken: googleAuth.idToken,
+  //     );
+  //
+  //     // Sign in to Firebase with the Google credential
+  //     UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+  //
+  //     // Check if this is a new user
+  //     if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+  //       // Store user data in Firestore for new users
+  //       final userMap = <String, dynamic>{
+  //         'uid': userCredential.user!.uid,
+  //         'email': userCredential.user?.email ?? '',
+  //         'fullName': userCredential.user?.displayName ?? '',
+  //         'userType': userType,
+  //         'phoneNumber': userCredential.user?.phoneNumber ?? '',
+  //         'photoURL': userCredential.user?.photoURL ?? '',
+  //         'signInMethod': 'google',
+  //         'createdAt': FieldValue.serverTimestamp(),
+  //       };
+  //
+  //       DocumentReference docref = FirebaseFirestore.instance
+  //           .collection(StaticClass.usersCollection)
+  //           .doc(userCredential.user!.uid);
+  //       await docref.set(userMap, SetOptions(merge: true));
+  //     }
+  //
+  //     return userCredential.user;
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Google Sign-In error: $e');
+  //     }
+  //     return null;
+  //   }
+  // }
 
   // Sign Out
   static Future<void> signOut() async {

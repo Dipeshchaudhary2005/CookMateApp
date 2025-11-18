@@ -1,3 +1,4 @@
+import 'package:cookmate/backend/profile.dart';
 import 'package:cookmate/core/static.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   // String userName = 'John Doe';
   // String userEmail = 'john.doe@email.com';
   // String userPhone = '+977 9876543210';
-  String userAddress = 'Novaliches, QC';
+  // String userAddress = 'Novaliches, QC';
 
   // Booking history data
   final List<Map<String, dynamic>> bookingHistory = [
@@ -118,10 +119,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
 
   // Edit Profile Dialog
   void _showEditProfileDialog() {
-    final nameController = TextEditingController(text: StaticClass.currentUser.fullName ?? "No name");
-    final emailController = TextEditingController(text: StaticClass.currentUser.email ?? "No email");
-    final phoneController = TextEditingController(text: StaticClass.currentUser.phoneNumber ?? "No phone");
-    final addressController = TextEditingController(text: StaticClass.currentUser.address ?? "No address");
+    final nameController = TextEditingController(text: StaticClass.currentUser!.fullName ?? "No name");
+    final emailController = TextEditingController(text: StaticClass.currentUser!.email ?? "No email");
+    final phoneController = TextEditingController(text: StaticClass.currentUser!.phoneNumber ?? "No phone");
+    final addressController = TextEditingController(text: StaticClass.currentUser!.userAddress ?? "No address");
 
     showDialog(
       context: context,
@@ -177,10 +178,12 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                userName = nameController.text;
-                userEmail = emailController.text;
-                userPhone = phoneController.text;
-                userAddress = addressController.text;
+                UpdateHelper.updateProfile(
+                  fullName: nameController.text,
+                  email: emailController.text,
+                  phoneNumber: phoneController.text,
+                  userAddress: addressController.text
+                );
               });
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -467,7 +470,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                           ),
                           child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
                         ),
-                        child: const Icon(Icons.edit, size: 20, color: Colors.white),
+                        // child: const Icon(Icons.edit, size: 20, color: Colors.white),
                       ),
                     ),
                   ],
@@ -481,13 +484,14 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               Text(
                 StaticClass.currentUser!.email ?? "no@email.com",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.phone, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text(userPhone, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(StaticClass.currentUser!.phoneNumber ?? "No Phone", style: const TextStyle(fontSize: 14, color: Colors.grey)),
                 ],
               ),
               Row(
@@ -495,7 +499,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 children: [
                   const Icon(Icons.location_on, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text(userAddress, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(StaticClass.currentUser!.userAddress ?? "No address", style: const TextStyle(fontSize: 14, color: Colors.grey)),
                 ],
               ),
               const SizedBox(height: 30),

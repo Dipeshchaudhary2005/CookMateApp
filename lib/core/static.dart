@@ -1,6 +1,8 @@
 
 // Create this file at: lib/core/static.dart
 
+import 'package:cookmate/backend/model/user.dart';
+
 class StaticClass {
   static const String usersCollection = 'users';
   static const String predefinedCollection = 'predefinedData';

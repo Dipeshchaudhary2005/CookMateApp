@@ -42,34 +42,8 @@ class _LoginPageState extends State<LoginPage> {
     try {
       // Call your Auth class method for Google Sign-In
       await Auth.signInWithGoogle(widget.userType);
-
-      if (FirebaseAuth.instance.currentUser != null) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Google Sign-In Successful!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Navigate based on user type
-        if (widget.userType == "Customer") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CustomerDashboard(),
-            ),
-          );
-        } else if (widget.userType == "Chef") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ChefDashboard(),
-            ),
-          );
-        }
-      }
+     if (!mounted) return;
+      await AutoLoginHelper.loadDashBoard(context);
     } catch (e) {
       if (!mounted) return;
 

@@ -12,7 +12,20 @@
           "package_name": "com.example.cookmate"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "868991271171-d3dgopj5316j2dpdd8lhsp81c6qjtv0a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cookmate",
+            "certificate_hash": "e91d3ab4ddd7bfa2ab201ee52099ca339989abd4"
+          }
+        },
+        {
+          "client_id": "868991271171-mgkvu6rupa8qvikgk25jujru882bkrna.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAu7umcOeXdRjcXL-4XixCkrFvr8PHIs5M"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "868991271171-mgkvu6rupa8qvikgk25jujru882bkrna.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "868991271171-59abv7jgjgo3vvnlouhik33o2ebs4fnq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cookmate"
+              }
+            }
+          ]
         }
       }
     }

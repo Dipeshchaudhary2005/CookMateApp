@@ -21,6 +21,8 @@ class UserModel {
   static const userTypeField = 'userType';
   static const createdAtField = 'createdAt';
   static const updatedAtField = 'updatedAt';
+  static const signInMethodField = 'signInMethod';
+  static const userAddressField = 'userAddress';
 
   String? uid;
   String? email;
@@ -29,8 +31,10 @@ class UserModel {
   UserType? userType;
   Timestamp? createdAt;
   Timestamp? updatedAt;
+  String? signInMethod;
+  String? userAddress;
 
-  UserModel({this.uid, this.email, this.fullName, this.phoneNumber, this.userType, this.updatedAt, this.createdAt});
+  UserModel({this.uid, this.email, this.fullName, this.phoneNumber, this.userType, this.updatedAt, this.createdAt, this.signInMethod, this.userAddress});
 
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{};
@@ -41,7 +45,8 @@ class UserModel {
     if (userType != null) map[UserModel.userTypeField] = userType;
     if (createdAt != null) map[UserModel.createdAtField] = createdAt;
     if (updatedAt != null) map[UserModel.updatedAtField] = updatedAt;
-
+    if (signInMethod != null) map[UserModel.signInMethodField] = signInMethod;
+    if (userAddress != null) map[UserModel.userAddressField] = userAddress;
     return map;
   }
 
@@ -61,7 +66,9 @@ class UserModel {
       phoneNumber: data[UserModel.phoneNumberField],
       userType: UserType.fromString(data[UserModel.userTypeField]),
       createdAt: data[UserModel.createdAtField],
-      updatedAt: data[UserModel.updatedAtField]
+      updatedAt: data[UserModel.updatedAtField],
+      signInMethod: data[UserModel.signInMethodField],
+      userAddress: data[UserModel.userAddressField],
     );
   }
 }
