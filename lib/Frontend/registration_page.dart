@@ -318,6 +318,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 );
                                 return;
                               }
+
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Registration Successful!'),

@@ -587,6 +587,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                           ),
                           ElevatedButton(
                             onPressed: () {
+                              // Navigate back to landing page
                               Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(

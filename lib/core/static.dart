@@ -1,6 +1,3 @@
-
-// Create this file at: lib/core/static.dart
-
 import 'package:cookmate/backend/model/user.dart';
 
 class StaticClass {
