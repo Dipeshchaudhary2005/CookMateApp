@@ -1,5 +1,6 @@
 import 'package:cookmate/backend/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class RegistrationPage extends StatefulWidget {
   final String userType;
@@ -14,6 +15,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
@@ -25,6 +27,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -141,6 +144,35 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                        decoration: InputDecoration(
+                          labelText: 'Phone Number',
+                          hintText: 'Enter your phone number',
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon: const Icon(Icons.phone_outlined),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your phone number';
+                          }
+                          if (value.length < 10) {
+                            return 'Please enter a valid phone number';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
@@ -247,8 +279,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            if (_loading) return;
+                          onPressed: _loading ? null : () async {
                             if (_formKey.currentState!.validate()) {
                               if (!_agreeToTerms) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -259,23 +290,35 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 );
                                 return;
                               }
-                              // Handle registration
-                              _loading = true;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: const CircularProgressIndicator())
+
+                              setState(() {
+                                _loading = true;
+                              });
+
+                              bool accountCreated = await Auth.createUserWithEmail(
+                                _emailController.text,
+                                _passwordController.text,
+                                _nameController.text,
+                                widget.userType,
+                                phoneNumber: _phoneController.text,
                               );
-                              bool accountCreated = await Auth.createUserWithEmail(_emailController.text,
-                                  _passwordController.text,
-                                  _nameController.text,
-                                  widget.userType);
-                              _loading = false;
-                              if (!accountCreated){
+
+                              if (!mounted) return;
+
+                              setState(() {
+                                _loading = false;
+                              });
+
+                              if (!accountCreated) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Registration Failed!"),
-                                  backgroundColor: Colors.red,)
+                                  const SnackBar(
+                                    content: Text("Registration Failed!"),
+                                    backgroundColor: Colors.red,
+                                  ),
                                 );
                                 return;
                               }
+
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Registration Successful!'),
@@ -292,7 +335,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text(
+                          child: _loading
+                              ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                              : const Text(
                             'Sign Up',
                             style: TextStyle(
                               fontSize: 16,
