@@ -153,25 +153,77 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               ),
               const SizedBox(height: 12),
 
-              // Cuisine Grid - EACH CARD CLICKABLE TO BOOKING PAGE
-              GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 3,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.75,
+              // Popular Cuisine - HORIZONTAL SCROLL
+              SizedBox(
+                height: 140,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _buildCuisineCard('Thakali set', 'Resource/chef.png'),
+                    _buildCuisineCard('Chouga', 'Resource/chef.png'),
+                    _buildCuisineCard('Momo', 'Resource/chef.png'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Chefs Near You Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildCuisineCard('Chef John Ray', 'Resource/chef.png'),
-                  _buildCuisineCard('Kalagar', 'Resource/chef.png'),
-                  _buildCuisineCard('Meat Specialist', 'Resource/chef.png'),
-                  _buildCuisineCard('Ms. Lani', 'Resource/chef.png'),
-                  _buildCuisineCard('Kevin Torio', 'Resource/chef.png'),
-                  _buildCuisineCard('Ron Shem', 'Resource/chef.png'),
-                  _buildCuisineCard('Morris Carl', 'Resource/chef.png'),
-                  _buildCuisineCard('Joshua', 'Resource/chef.png'),
-                  _buildCuisineCard('Dessert Chef', 'Resource/chef.png'),
+                  const Text(
+                    'Chefs Near You',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text('View All'),
+                  ),
                 ],
+              ),
+              const SizedBox(height: 12),
+
+              // Chefs Near You - HORIZONTAL SCROLL
+              SizedBox(
+                height: 140,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _buildChefCard('Sita Lama', 'Resource/chef.png'),
+                    _buildChefCard('Rajesh Tharu', 'Resource/chef.png'),
+                    _buildChefCard('Ram Bhatta', 'Resource/chef.png'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Choose Your Gathering Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Choose Your Gathering',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: const Text('View All'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Choose Your Gathering - HORIZONTAL SCROLL
+              SizedBox(
+                height: 140,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _buildGatheringCard('Homely Food', 'Resource/chef.png'),
+                    _buildGatheringCard('Wedding', 'Resource/chef.png'),
+                    _buildGatheringCard('Dinner Party', 'Resource/chef.png'),
+                  ],
+                ),
               ),
             ],
           ),
@@ -233,19 +285,22 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     );
   }
 
+  // Popular Cuisine Card
   Widget _buildCuisineCard(String name, String imagePath) {
     return GestureDetector(
       onTap: () {
-        // Navigate to booking page when chef card is clicked
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const BookingPage()),
         );
       },
-      child: Column(
-        children: [
-          Expanded(
-            child: Container(
+      child: Container(
+        width: 120,
+        margin: const EdgeInsets.only(right: 12),
+        child: Column(
+          children: [
+            Container(
+              height: 100,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -261,15 +316,106 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            name,
-            style: const TextStyle(fontSize: 11),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              name,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Chef Card
+  Widget _buildChefCard(String name, String imagePath) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const BookingPage()),
+        );
+      },
+      child: Container(
+        width: 120,
+        margin: const EdgeInsets.only(right: 12),
+        child: Column(
+          children: [
+            Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.person, size: 40);
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              name,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Gathering Card
+  Widget _buildGatheringCard(String name, String imagePath) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const BookingPage()),
+        );
+      },
+      child: Container(
+        width: 120,
+        margin: const EdgeInsets.only(right: 12),
+        child: Column(
+          children: [
+            Container(
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.celebration, size: 40);
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              name,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
