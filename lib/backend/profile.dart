@@ -12,7 +12,9 @@ class Profile {
       UserModel userModel = UserModel();
       userModel.fullName = fullName;
       userModel.phoneNumber = phoneNumber;
-      userModel.updatedAt = FieldValue.serverTimestamp();
+      var map = userModel.toMap();
+      map['updatedAt'] = FieldValue.serverTimestamp();
+      // userModel.updatedAt = FieldValue.serverTimestamp();
       await docRef.set(userModel.toMap(), SetOptions(merge: true));
       return true;
     } on Exception catch (e){

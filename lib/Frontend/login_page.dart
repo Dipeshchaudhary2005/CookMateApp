@@ -1,8 +1,7 @@
 import 'package:cookmate/backend/auth.dart';
+import 'package:cookmate/core/autoLoginHelper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../chef/chefdashboard.dart';
-import '../customer/customerdashboard.dart';
 import 'registration_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -12,6 +11,7 @@ class LoginPage extends StatefulWidget {
 
   @override
   State<LoginPage> createState() => _LoginPageState();
+
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -26,7 +26,12 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
-
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseAuth.instance.signOut();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,29 +177,8 @@ class _LoginPageState extends State<LoginPage> {
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              // Show success
                               await Auth.loginUserWithEmail(_emailController.text, _passwordController.text);
-                              if (FirebaseAuth.instance.currentUser == null) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Login Successful!'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-
-                              if (widget.userType == "Customer") {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const CustomerDashboard()),
-                                );
-                              } else if (widget.userType == "Chef") {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const ChefDashboard()),
-                                );
-                              }
+                              await AutoLoginHelper.loadDashBoard(context);
                             }
                           },
                           style: ElevatedButton.styleFrom(

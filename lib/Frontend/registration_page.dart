@@ -270,19 +270,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                   widget.userType);
                               _loading = false;
                               if (!accountCreated){
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Registration Failed!"),
-                                  backgroundColor: Colors.red,)
-                                );
-                                return;
+                                if (context.mounted){
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Registration Failed!"),
+                                    backgroundColor: Colors.red,)
+                                  );
+                                }
+                                  return;
                               }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Registration Successful!'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                              Navigator.pop(context);
+                              if (context.mounted){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Registration Successful!'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                                Navigator.pop(context);
+                              }
                             }
                           },
                           style: ElevatedButton.styleFrom(

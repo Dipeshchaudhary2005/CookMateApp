@@ -1,3 +1,5 @@
+import 'package:cookmate/core/static.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'favoritechefpage.dart';
 import '../Frontend/landingpage.dart';
@@ -72,12 +74,12 @@ class CustomerProfilePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'John Doe',
+              Text(
+                StaticClass.currentUser!.fullName ?? "No Name",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              const Text(
-                'john.doe@email.com',
+              Text(
+                StaticClass.currentUser!.email ?? "no@email.com",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 30),
@@ -169,7 +171,10 @@ class CustomerProfilePage extends StatelessWidget {
                         content: const Text('Are you sure you want to logout?'),
                         actions: [
                           TextButton(
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () {
+                              FirebaseAuth.instance.signOut();
+                              Navigator.pop(context);
+                            },
                             child: const Text('Cancel'),
                           ),
                           ElevatedButton(

@@ -1,3 +1,4 @@
+import 'package:cookmate/core/autoLoginHelper.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cookmate/Frontend/landingpage.dart';
@@ -14,6 +15,7 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     // Navigate to landing page after 3 seconds
+    AutoLoginHelper.loadDashBoard(context);
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
