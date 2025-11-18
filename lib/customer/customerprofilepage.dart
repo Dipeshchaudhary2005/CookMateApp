@@ -18,9 +18,9 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   final ImagePicker _picker = ImagePicker();
 
   // User data
-  String userName = 'John Doe';
-  String userEmail = 'john.doe@email.com';
-  String userPhone = '+977 9876543210';
+  // String userName = 'John Doe';
+  // String userEmail = 'john.doe@email.com';
+  // String userPhone = '+977 9876543210';
   String userAddress = 'Novaliches, QC';
 
   // Booking history data
@@ -118,10 +118,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
 
   // Edit Profile Dialog
   void _showEditProfileDialog() {
-    final nameController = TextEditingController(text: userName);
-    final emailController = TextEditingController(text: userEmail);
-    final phoneController = TextEditingController(text: userPhone);
-    final addressController = TextEditingController(text: userAddress);
+    final nameController = TextEditingController(text: StaticClass.currentUser.fullName ?? "No name");
+    final emailController = TextEditingController(text: StaticClass.currentUser.email ?? "No email");
+    final phoneController = TextEditingController(text: StaticClass.currentUser.phoneNumber ?? "No phone");
+    final addressController = TextEditingController(text: StaticClass.currentUser.address ?? "No address");
 
     showDialog(
       context: context,
@@ -481,7 +481,6 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               Text(
                 StaticClass.currentUser!.email ?? "no@email.com",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -568,6 +567,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
+                    // Show logout confirmation dialog
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
