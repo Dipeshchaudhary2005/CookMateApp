@@ -7,25 +7,29 @@ import 'package:flutter/cupertino.dart';
 
 class AutoLoginHelper {
   static Future<void> loadDashBoard(BuildContext context) async {
-    if (FirebaseAuth.instance.currentUser == null ) return;
-    User user = FirebaseAuth.instance.currentUser!;
-    final userDoc = await FirebaseFirestore.instance.collection(StaticClass.usersCollection).doc(user.uid).get();
-    StaticClass.currentUser = UserModel.fromSnapshot(userDoc);
-    if (StaticClass.currentUser == null) return;
-    switch(StaticClass.currentUser!.userType){
-      case UserType.customer:
-        if (context.mounted){
-          Navigator.pushNamed(context, AppRoutes.customerDashboardRoute);
-        }
-        break;
-      case UserType.chef:
-        if (context.mounted){
-          Navigator.pushNamed(context, AppRoutes.chefDashboardRoute);
-        }
-        break;
-      default:
-        break;
+      if (FirebaseAuth.instance.currentUser == null ) {
+       print("No user none");
+        return;
+      }
+      User user = FirebaseAuth.instance.currentUser!;
+      final userDoc = await FirebaseFirestore.instance.collection(StaticClass.usersCollection).doc(user.uid).get();
+      StaticClass.currentUser = UserModel.fromSnapshot(userDoc);
+      if (StaticClass.currentUser == null) return;
+      switch(StaticClass.currentUser!.userType){
+        case UserType.customer:
+          if (context.mounted){
+            Navigator.pushNamed(context, AppRoutes.customerDashboardRoute);
+          }
+          break;
+        case UserType.chef:
+          if (context.mounted){
+            Navigator.pushNamed(context, AppRoutes.chefDashboardRoute);
+          }
+          break;
+        default:
+          break;
 
-    }
+      }
+
   }
 }

@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "868991271171-fm14m2613ogb36ovmrs3shsdl8jd0ijd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cookmate",
+            "certificate_hash": "3d2d42a6d4658a7fb3ae46b6353de43eb8145cbb"
+          }
+        },
+        {
           "client_id": "868991271171-mgkvu6rupa8qvikgk25jujru882bkrna.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -1,9 +1,9 @@
 // main.dart
+import 'package:cookmate/backend/auth.dart';
 import 'package:cookmate/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:cookmate/Frontend/splashpage.dart';
 
 
 Future<void> main () async {
@@ -11,6 +11,7 @@ Future<void> main () async {
   await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
   );
+  await Auth.googleSignIn.initialize();
   runApp(const MyApp());
 }
 

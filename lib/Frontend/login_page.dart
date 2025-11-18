@@ -42,7 +42,10 @@ class _LoginPageState extends State<LoginPage> {
     try {
       // Call your Auth class method for Google Sign-In
       await Auth.signInWithGoogle(widget.userType);
-     if (!mounted) return;
+     if (!mounted) {
+       print("Not mounted");
+       return;
+     }
       await AutoLoginHelper.loadDashBoard(context);
     } catch (e) {
       if (!mounted) return;

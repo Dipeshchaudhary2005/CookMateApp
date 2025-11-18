@@ -8,7 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'model/user.dart';
 
 class Auth {
-  static final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  static final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
   // Email/Password Registration with Phone Number
   static Future<bool> createUserWithEmail(
@@ -66,18 +66,23 @@ class Auth {
 
   static Future<User?> signInWithGoogle(String userType) async {
     try{
-      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate();
+      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
 
-      if (googleUser != null) return null;
+
       // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = googleUser!.authentication;
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
       // Create a new credential
-      final credential = GoogleAuthProvider.credential(idToken: googleAuth.idToken);
+      final credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken
+      );
 
       // Once signed in, return the UserCredential
       var userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-
+      if (kDebugMode){
+        print(userCredential.user.toString());
+        print(FirebaseAuth.instance.currentUser.toString());
+      }
       if (userCredential.additionalUserInfo?.isNewUser ?? false){
         var userModel = UserModel(
           uid: userCredential.user!.uid,
@@ -161,7 +166,7 @@ class Auth {
   // Sign Out
   static Future<void> signOut() async {
     try {
-      await _googleSignIn.signOut();
+      await googleSignIn.signOut();
       await FirebaseAuth.instance.signOut();
     } catch (e) {
       if (kDebugMode) {
