@@ -17,9 +17,9 @@ class _SplashPageState extends State<SplashPage> {
     autoLogin();
   }
 
-  autoLogin() async{
+  Future<void> autoLogin() async {
     bool loggedIn = await Helper.loadDashBoard(context);
-    if (!loggedIn){
+    if (!loggedIn) {
       Timer(const Duration(seconds: 2), () {
         Navigator.pushReplacement(
           context,
@@ -84,10 +84,7 @@ class _SplashPageState extends State<SplashPage> {
               padding: EdgeInsets.only(bottom: 24.0),
               child: Text(
                 'Power by CookMate Inc',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.black54,
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.black54),
               ),
             ),
           ],

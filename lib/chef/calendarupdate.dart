@@ -85,17 +85,19 @@ class _CalendarPageState extends State<CalendarPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-                        .map((day) => SizedBox(
-                      width: 40,
-                      child: Text(
-                        day,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ))
+                        .map(
+                          (day) => SizedBox(
+                            width: 40,
+                            child: Text(
+                              day,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        )
                         .toList(),
                   ),
                   const SizedBox(height: 8),
@@ -193,7 +195,8 @@ class _CalendarPageState extends State<CalendarPage> {
     // Add day numbers
     for (int day = 1; day <= daysInMonth; day++) {
       final date = DateTime(selectedYear, selectedMonth, day);
-      final isSelected = date.day == selectedDate.day &&
+      final isSelected =
+          date.day == selectedDate.day &&
           date.month == selectedDate.month &&
           date.year == selectedDate.year;
       final hasEvent = day == 15 || day == 18 || day == 20;
@@ -238,7 +241,12 @@ class _CalendarPageState extends State<CalendarPage> {
     );
   }
 
-  Widget _buildEventCard(String title, String date, String time, String client) {
+  Widget _buildEventCard(
+    String title,
+    String date,
+    String time,
+    String client,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -298,7 +306,7 @@ class _CalendarPageState extends State<CalendarPage> {
       'September',
       'October',
       'November',
-      'December'
+      'December',
     ];
     return months[month - 1];
   }

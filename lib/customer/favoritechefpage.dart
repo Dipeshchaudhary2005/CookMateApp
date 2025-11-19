@@ -56,12 +56,12 @@ class FavoriteChefPage extends StatelessWidget {
   }
 
   Widget _buildChefCard(
-      String name,
-      String specialty,
-      String rating,
-      String bookings,
-      String imagePath,
-      ) {
+    String name,
+    String specialty,
+    String rating,
+    String bookings,
+    String imagePath,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -70,7 +70,7 @@ class FavoriteChefPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues( alpha: 0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 5,
           ),

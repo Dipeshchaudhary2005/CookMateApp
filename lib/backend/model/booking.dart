@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+enum BookingStatus { upcoming, ongoing, completed }
+
 class Booking {
   static const eventTypeField = 'eventType';
   static const selectedDateField = 'selectedDate';
@@ -11,8 +13,10 @@ class Booking {
   static const statusField = 'status';
   static const createdAtField = 'createdAt';
   static const updatedAtField = 'updatedAt';
+  static const uidField = 'uid';
 
   String? eventType;
+  String? uid;
   Timestamp? selectedDate;
   Timestamp? startTime;
   Timestamp? endTime;
@@ -24,9 +28,19 @@ class Booking {
 
   String? status;
 
-  Booking ({this.eventType, this.selectedDate, this.startTime, this.endTime, this.dishes, this.customerRef, this.chefRef, this.status});
+  Booking({
+    this.eventType,
+    this.selectedDate,
+    this.startTime,
+    this.endTime,
+    this.dishes,
+    this.customerRef,
+    this.chefRef,
+    this.status,
+    this.uid,
+  });
 
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     final map = <String, dynamic>{};
     map.putIfNotNull(eventTypeField, eventType);
     map.putIfNotNull(selectedDateField, selectedDate);
@@ -36,11 +50,11 @@ class Booking {
     map.putIfNotNull(customerRefField, customerRef);
     map.putIfNotNull(chefRefField, chefRef);
     map.putIfNotNull(statusField, status);
-
+    map.putIfNotNull(uidField, uid);
     return map;
   }
 
-  factory Booking.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snap){
+  factory Booking.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snap) {
     final data = snap.data();
     if (data == null) throw Exception("No data for booking");
     return Booking(
@@ -48,13 +62,13 @@ class Booking {
       selectedDate: data[selectedDateField],
       startTime: data[startTimeField],
       endTime: data[endTimeField],
-      dishes: data[dishesField],
+      dishes: List<String>.from(data[dishesField] as List),
       customerRef: data[customerRefField],
       chefRef: data[chefRefField],
-      status: data[statusField]
+      status: data[statusField],
+      uid: data[uidField],
     );
   }
-
 }
 
 extension NullableMapEntry on Map<String, dynamic> {

@@ -108,10 +108,7 @@ class _ManageMenuPageState extends State<ManageMenuPricePage> {
         },
         backgroundColor: const Color(0xFF8BC34A),
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          'Add Item',
-          style: TextStyle(color: Colors.white),
-        ),
+        label: const Text('Add Item', style: TextStyle(color: Colors.white)),
       ),
     );
   }
@@ -139,12 +136,12 @@ class _ManageMenuPageState extends State<ManageMenuPricePage> {
   }
 
   Widget _buildMenuItem(
-      String name,
-      String category,
-      String price,
-      String imagePath,
-      String cuisine,
-      ) {
+    String name,
+    String category,
+    String price,
+    String imagePath,
+    String cuisine,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -275,7 +272,9 @@ class _ManageMenuPageState extends State<ManageMenuPricePage> {
                   border: OutlineInputBorder(),
                 ),
                 items: ['Appetizers', 'Main Course', 'Desserts', 'Beverages']
-                    .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
+                    .map(
+                      (cat) => DropdownMenuItem(value: cat, child: Text(cat)),
+                    )
                     .toList(),
                 onChanged: (val) => selectedCategory = val!,
               ),
@@ -315,7 +314,11 @@ class _ManageMenuPageState extends State<ManageMenuPricePage> {
   }
 
   void _showEditMenuDialog(
-      BuildContext context, String name, String category, String price) {
+    BuildContext context,
+    String name,
+    String category,
+    String price,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

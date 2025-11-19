@@ -54,10 +54,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text(message), backgroundColor: Colors.red),
           );
         }
       } finally {
@@ -124,10 +121,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 const SizedBox(height: 8),
                 const Text(
                   'No worries! Enter your email and we\'ll send you reset instructions.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(height: 32),
                 Form(
@@ -172,21 +166,21 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           ),
                           child: _isLoading
                               ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
                               : const Text(
-                            'Send Reset Link',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
+                                  'Send Reset Link',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -232,10 +226,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       child: ClipOval(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Image.asset(
-            'Resource/chefHat.png',
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset('Resource/chefHat.png', fit: BoxFit.contain),
         ),
       ),
     );

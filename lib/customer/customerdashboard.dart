@@ -1,4 +1,3 @@
-import 'package:cookmate/backend/auth.dart';
 import 'package:cookmate/core/helper.dart';
 import 'package:flutter/material.dart';
 import 'bookingpage.dart';
@@ -20,10 +19,10 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (b, d){
+      onPopInvokedWithResult: (b, d) {
         showDialog(
-            context: context,
-            builder: (context) => Helper.confirmLogOut(context),
+          context: context,
+          builder: (context) => Helper.confirmLogOut(context),
         );
       },
       child: Scaffold(
@@ -44,10 +43,14 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
           title: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Your Location',
-                  style: TextStyle(fontSize: 12, color: Colors.grey)),
-              Text('Novaliches, QC',
-                  style: TextStyle(fontSize: 14, color: Colors.black)),
+              Text(
+                'Your Location',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              Text(
+                'Novaliches, QC',
+                style: TextStyle(fontSize: 14, color: Colors.black),
+              ),
             ],
           ),
           actions: [
@@ -92,7 +95,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const BookingPage()),
+                      MaterialPageRoute(
+                        builder: (context) => const BookingPage(),
+                      ),
                     );
                   },
                   child: Container(
@@ -153,12 +158,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   children: [
                     const Text(
                       'Popular Cuisine by Top Chef',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('View All'),
-                    ),
+                    TextButton(onPressed: () {}, child: const Text('View All')),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -183,12 +188,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   children: [
                     const Text(
                       'Chefs Near You',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('View All'),
-                    ),
+                    TextButton(onPressed: () {}, child: const Text('View All')),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -213,12 +218,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   children: [
                     const Text(
                       'Choose Your Gathering',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('View All'),
-                    ),
+                    TextButton(onPressed: () {}, child: const Text('View All')),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -252,43 +257,56 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             // Navigate based on selected tab
             switch (index) {
               case 0:
-              // Home - Already on this page
+                // Home - Already on this page
                 break;
               case 1:
-              // Summary - Navigate to Summary Page
+                // Summary - Navigate to Summary Page
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const SummaryPage()),
                 );
                 break;
               case 2:
-              // Calendar - Navigate to Booking Page
+                // Calendar - Navigate to Booking Page
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const BookingPage()),
                 );
                 break;
               case 3:
-              // Favorites
+                // Favorites
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const FavoriteChefPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const FavoriteChefPage(),
+                  ),
                 );
                 break;
               case 4:
-              // Profile
+                // Profile
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CustomerProfilePage()),
+                  MaterialPageRoute(
+                    builder: (context) => const CustomerProfilePage(),
+                  ),
                 );
                 break;
             }
           },
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Summary'),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Booking'),
-            BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favorites'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long),
+              label: 'Summary',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: 'Booking',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite),
+              label: 'Favorites',
+            ),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
         ),

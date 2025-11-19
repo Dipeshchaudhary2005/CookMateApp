@@ -59,10 +59,18 @@ class BookedDetailsPage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               _buildDetailCard([
-                _buildDetailRow(Icons.event, 'Event Type', 'Engagement Function'),
+                _buildDetailRow(
+                  Icons.event,
+                  'Event Type',
+                  'Engagement Function',
+                ),
                 _buildDetailRow(Icons.calendar_today, 'Date', '2025-02-28'),
                 _buildDetailRow(Icons.access_time, 'Time', '8:00 AM - 8:00 AM'),
-                _buildDetailRow(Icons.location_on, 'Location', 'Novaliches, QC'),
+                _buildDetailRow(
+                  Icons.location_on,
+                  'Location',
+                  'Novaliches, QC',
+                ),
               ]),
               const SizedBox(height: 20),
               // Chef Details
@@ -95,12 +103,17 @@ class BookedDetailsPage extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text('Italian Cuisine', style: TextStyle(fontSize: 14)),
+                          Text(
+                            'Italian Cuisine',
+                            style: TextStyle(fontSize: 14),
+                          ),
                           Row(
                             children: [
                               Icon(Icons.star, color: Colors.amber, size: 16),
-                              Text(' 4.8 (150+ reviews)',
-                                  style: TextStyle(fontSize: 12)),
+                              Text(
+                                ' 4.8 (150+ reviews)',
+                                style: TextStyle(fontSize: 12),
+                              ),
                             ],
                           ),
                         ],
@@ -122,7 +135,10 @@ class BookedDetailsPage extends StatelessWidget {
               const SizedBox(height: 12),
               _buildDetailCard([
                 _buildMenuItem('Appetizers', 'Spring Rolls, Bruschetta'),
-                _buildMenuItem('Main Course', 'Grilled Salmon, Beef Wellington'),
+                _buildMenuItem(
+                  'Main Course',
+                  'Grilled Salmon, Beef Wellington',
+                ),
                 _buildMenuItem('Desserts', 'Tiramisu, Chocolate Mousse'),
                 _buildMenuItem('Beverages', 'Wine, Fresh Juices'),
               ]),
@@ -204,9 +220,7 @@ class BookedDetailsPage extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: Colors.grey[700]),
           const SizedBox(width: 12),
-          Expanded(
-            child: Text(label, style: const TextStyle(fontSize: 14)),
-          ),
+          Expanded(child: Text(label, style: const TextStyle(fontSize: 14))),
           Text(
             value,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),

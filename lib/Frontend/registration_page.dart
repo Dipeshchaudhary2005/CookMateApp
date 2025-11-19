@@ -87,10 +87,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(height: 8),
                 const Text(
                   'Join us and start your cooking journey!',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(height: 24),
                 Form(
@@ -230,7 +227,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             ),
                             onPressed: () {
                               setState(() {
-                                _obscureConfirmPassword = !_obscureConfirmPassword;
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
                               });
                             },
                           ),
@@ -279,56 +277,67 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _loading ? null : () async {
-                            if (_formKey.currentState!.validate()) {
-                              if (!_agreeToTerms) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Please agree to Terms & Conditions'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                                return;
-                              }
+                          onPressed: _loading
+                              ? null
+                              : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    if (!_agreeToTerms) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Please agree to Terms & Conditions',
+                                          ),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
 
-                              setState(() {
-                                _loading = true;
-                              });
+                                    setState(() {
+                                      _loading = true;
+                                    });
 
-                              bool accountCreated = await Auth.createUserWithEmail(
-                                _emailController.text,
-                                _passwordController.text,
-                                _nameController.text,
-                                widget.userType,
-                                phoneNumber: _phoneController.text,
-                                context: context
-                              );
+                                    bool accountCreated =
+                                        await Auth.createUserWithEmail(
+                                          _emailController.text,
+                                          _passwordController.text,
+                                          _nameController.text,
+                                          widget.userType,
+                                          phoneNumber: _phoneController.text,
+                                          context: context,
+                                        );
 
-                              if (!mounted) return;
+                                    if (!mounted) return;
 
-                              setState(() {
-                                _loading = false;
-                              });
-                              if (!context.mounted) return;
-                              if (!accountCreated) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Registration Failed!"),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                                return;
-                              }
+                                    setState(() {
+                                      _loading = false;
+                                    });
+                                    if (!context.mounted) return;
+                                    if (!accountCreated) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Registration Failed!"),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Registration Successful!'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                              Navigator.pop(context);
-                            }
-                          },
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Registration Successful!',
+                                        ),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                    Navigator.pop(context);
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black87,
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -338,21 +347,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           ),
                           child: _loading
                               ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
                               : const Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
+                                  'Sign Up',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -400,10 +411,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       child: ClipOval(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Image.asset(
-            'Resource/chefHat.png',
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset('Resource/chefHat.png', fit: BoxFit.contain),
         ),
       ),
     );

@@ -1,12 +1,10 @@
 import 'package:cookmate/backend/profile.dart';
 import 'package:cookmate/core/helper.dart';
 import 'package:cookmate/core/static.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'favoritechefpage.dart';
-import '../Frontend/landingpage.dart';
 
 class CustomerProfilePage extends StatefulWidget {
   const CustomerProfilePage({super.key});
@@ -107,7 +105,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: Color(0xFF8BC34A)),
+              leading: const Icon(
+                Icons.photo_library,
+                color: Color(0xFF8BC34A),
+              ),
               title: const Text('Gallery'),
               onTap: () {
                 Navigator.pop(context);
@@ -122,10 +123,18 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
 
   // Edit Profile Dialog
   void _showEditProfileDialog() {
-    final nameController = TextEditingController(text: StaticClass.currentUser!.fullName ?? "No name");
-    final emailController = TextEditingController(text: StaticClass.currentUser!.email ?? "No email");
-    final phoneController = TextEditingController(text: StaticClass.currentUser!.phoneNumber ?? "No phone");
-    final addressController = TextEditingController(text: StaticClass.currentUser!.userAddress ?? "No address");
+    final nameController = TextEditingController(
+      text: StaticClass.currentUser!.fullName ?? "No name",
+    );
+    final emailController = TextEditingController(
+      text: StaticClass.currentUser!.email ?? "No email",
+    );
+    final phoneController = TextEditingController(
+      text: StaticClass.currentUser!.phoneNumber ?? "No phone",
+    );
+    final addressController = TextEditingController(
+      text: StaticClass.currentUser!.userAddress ?? "No address",
+    );
 
     showDialog(
       context: context,
@@ -185,7 +194,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                   fullName: nameController.text,
                   email: emailController.text,
                   phoneNumber: phoneController.text,
-                  userAddress: addressController.text
+                  userAddress: addressController.text,
                 );
               });
               Navigator.pop(context);
@@ -353,7 +362,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildPaymentMethodTile('eSewa', Icons.account_balance_wallet, true),
+            _buildPaymentMethodTile(
+              'eSewa',
+              Icons.account_balance_wallet,
+              true,
+            ),
             _buildPaymentMethodTile('Khalti', Icons.payment, false),
             _buildPaymentMethodTile('Fonepay', Icons.phone_android, false),
             const SizedBox(height: 16),
@@ -388,16 +401,16 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
       title: Text(name),
       trailing: isDefault
           ? Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: Colors.green,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Text(
-          'Default',
-          style: TextStyle(color: Colors.white, fontSize: 12),
-        ),
-      )
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                'Default',
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            )
           : null,
     );
   }
@@ -453,12 +466,16 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                       ),
                       child: _profileImage != null
                           ? ClipOval(
-                        child: Image.file(
-                          _profileImage!,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                          : const Icon(Icons.person, size: 60, color: Colors.grey),
+                              child: Image.file(
+                                _profileImage!,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : const Icon(
+                              Icons.person,
+                              size: 60,
+                              color: Colors.grey,
+                            ),
                     ),
                     Positioned(
                       bottom: 0,
@@ -471,7 +488,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                             color: Color(0xFF8BC34A),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            size: 20,
+                            color: Colors.white,
+                          ),
                         ),
                         // child: const Icon(Icons.edit, size: 20, color: Colors.white),
                       ),
@@ -494,7 +515,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 children: [
                   const Icon(Icons.phone, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text(StaticClass.currentUser!.phoneNumber ?? "No Phone", style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(
+                    StaticClass.currentUser!.phoneNumber ?? "No Phone",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
                 ],
               ),
               Row(
@@ -502,7 +526,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 children: [
                   const Icon(Icons.location_on, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text(StaticClass.currentUser!.userAddress ?? "No address", style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(
+                    StaticClass.currentUser!.userAddress ?? "No address",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
                 ],
               ),
               const SizedBox(height: 30),
@@ -524,10 +551,12 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 context,
                 Icons.favorite,
                 'Favorite Chefs',
-                    () {
+                () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const FavoriteChefPage()),
+                    MaterialPageRoute(
+                      builder: (context) => const FavoriteChefPage(),
+                    ),
                   );
                 },
               ),
@@ -541,29 +570,30 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 context,
                 Icons.notifications,
                 'Notifications',
-                    () {
+                () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Notifications page coming soon!')),
+                    const SnackBar(
+                      content: Text('Notifications page coming soon!'),
+                    ),
                   );
                 },
               ),
-              _buildProfileOption(
-                context,
-                Icons.help,
-                'Help & Support',
-                    () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Help & Support page coming soon!')),
-                  );
-                },
-              ),
+              _buildProfileOption(context, Icons.help, 'Help & Support', () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Help & Support page coming soon!'),
+                  ),
+                );
+              }),
               _buildProfileOption(
                 context,
                 Icons.privacy_tip,
                 'Privacy Policy',
-                    () {
+                () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Privacy Policy page coming soon!')),
+                    const SnackBar(
+                      content: Text('Privacy Policy page coming soon!'),
+                    ),
                   );
                 },
               ),
@@ -577,7 +607,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                     // Show logout confirmation dialog
                     showDialog(
                       context: context,
-                      builder: (context) => Helper.confirmLogOut(context)
+                      builder: (context) => Helper.confirmLogOut(context),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -601,11 +631,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   }
 
   Widget _buildProfileOption(
-      BuildContext context,
-      IconData icon,
-      String title,
-      VoidCallback onTap,
-      ) {
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onTap,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(

@@ -53,14 +53,16 @@ class ChooseUserPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LoginPage(userType: UserModel.customerField),
+                    builder: (context) =>
+                        const LoginPage(userType: UserModel.customerField),
                   ),
                 );
               },
               child: _buildUserCard(
                 icon: Icons.shopping_cart,
                 title: "I'm a Customer",
-                subtitle: "Browse recipes, create meal plans,\nand order ingredients",
+                subtitle:
+                    "Browse recipes, create meal plans,\nand order ingredients",
               ),
             ),
             const SizedBox(height: 16),
@@ -69,7 +71,8 @@ class ChooseUserPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LoginPage(userType: UserModel.chefField),
+                    builder: (context) =>
+                        const LoginPage(userType: UserModel.chefField),
                   ),
                 );
               },
@@ -84,10 +87,7 @@ class ChooseUserPage extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 24.0),
               child: Text(
                 'Power by CookMate Inc',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.black54,
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.black54),
               ),
             ),
           ],
@@ -107,10 +107,7 @@ class ChooseUserPage extends StatelessWidget {
       child: ClipOval(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Image.asset(
-            'Resource/chefHat.png',
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset('Resource/chefHat.png', fit: BoxFit.contain),
         ),
       ),
     );

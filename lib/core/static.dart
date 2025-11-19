@@ -8,7 +8,8 @@ class StaticClass {
   static const String bookingsCollection = 'bookings';
   static UserModel? currentUser;
 }
-class PredefinedCollection{
+
+class PredefinedCollection {
   static const String fieldType = 'fieldType';
   static const String listOfFields = 'list';
 

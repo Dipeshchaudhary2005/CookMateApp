@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
-
+// import 'package:flutter/foundation.dart';
 
 class UserModel {
   static const uidField = 'uid';
@@ -26,7 +25,17 @@ class UserModel {
   String? signInMethod;
   String? userAddress;
 
-  UserModel({this.uid, this.email, this.fullName, this.phoneNumber, this.userType, this.updatedAt, this.createdAt, this.signInMethod, this.userAddress});
+  UserModel({
+    this.uid,
+    this.email,
+    this.fullName,
+    this.phoneNumber,
+    this.userType,
+    this.updatedAt,
+    this.createdAt,
+    this.signInMethod,
+    this.userAddress,
+  });
 
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{};
@@ -42,16 +51,15 @@ class UserModel {
     return map;
   }
 
-
-  factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snap){
+  factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snap) {
     final data = snap.data()!;
-    if (kDebugMode){
-      data.forEach((key, value){
-        if (kDebugMode){
-            print("$key : $value");
-        }
-      });
-    }
+    // if (kDebugMode){
+    //   data.forEach((key, value){
+    //     if (kDebugMode){
+    //         print("$key : $value");
+    //     }
+    //   });
+    // }
 
     return UserModel(
       uid: data[UserModel.uidField],
@@ -66,4 +74,3 @@ class UserModel {
     );
   }
 }
-

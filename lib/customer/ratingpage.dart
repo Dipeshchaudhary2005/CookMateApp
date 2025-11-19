@@ -136,7 +136,9 @@ class _RatingPageState extends State<RatingPage> {
                   onPressed: () {
                     if (rating > 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Review submitted successfully!')),
+                        const SnackBar(
+                          content: Text('Review submitted successfully!'),
+                        ),
                       );
                       Navigator.pop(context);
                     }

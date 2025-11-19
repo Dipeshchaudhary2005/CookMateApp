@@ -8,10 +8,10 @@ class ChefDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (b,v){
+      onPopInvokedWithResult: (b, v) {
         showDialog(
-            context: context,
-            builder: (context) => Helper.confirmLogOut(context),
+          context: context,
+          builder: (context) => Helper.confirmLogOut(context),
         );
       },
       child: Scaffold(
@@ -28,10 +28,14 @@ class ChefDashboard extends StatelessWidget {
           title: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Hello Chef',
-                  style: TextStyle(fontSize: 12, color: Colors.grey)),
-              Text('Ram Bhatta',
-                  style: TextStyle(fontSize: 16, color: Colors.black)),
+              Text(
+                'Hello Chef',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              Text(
+                'Ram Bhatta',
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
             ],
           ),
           actions: [
@@ -95,25 +99,25 @@ class ChefDashboard extends StatelessWidget {
                       'Menu Items',
                       Icons.restaurant_menu,
                       Colors.white,
-                          () {},
+                      () {},
                     ),
                     _buildManageCard(
                       'Bookings',
                       Icons.calendar_today,
                       Colors.white,
-                          () {},
+                      () {},
                     ),
                     _buildManageCard(
                       'Revenue',
                       Icons.attach_money,
                       Colors.white,
-                          () {},
+                      () {},
                     ),
                     _buildManageCard(
                       'Profile',
                       Icons.person,
                       Colors.white,
-                          () {},
+                      () {},
                     ),
                   ],
                 ),
@@ -124,12 +128,12 @@ class ChefDashboard extends StatelessWidget {
                   children: [
                     const Text(
                       'Recent Bookings',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('View All'),
-                    ),
+                    TextButton(onPressed: () {}, child: const Text('View All')),
                   ],
                 ),
                 _buildBookingCard(
@@ -158,25 +162,19 @@ class ChefDashboard extends StatelessWidget {
       children: [
         Text(
           count,
-          style: const TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14),
-        ),
+        Text(label, style: const TextStyle(fontSize: 14)),
       ],
     );
   }
 
   Widget _buildManageCard(
-      String title,
-      IconData icon,
-      Color color,
-      VoidCallback onTap,
-      ) {
+    String title,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -200,10 +198,7 @@ class ChefDashboard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
           ],
@@ -213,11 +208,11 @@ class ChefDashboard extends StatelessWidget {
   }
 
   Widget _buildBookingCard(
-      String name,
-      String event,
-      String date,
-      String time,
-      ) {
+    String name,
+    String event,
+    String date,
+    String time,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -268,9 +263,13 @@ class ChefDashboard extends StatelessWidget {
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today), label: 'Bookings'),
+          icon: Icon(Icons.calendar_today),
+          label: 'Bookings',
+        ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu), label: 'Menu'),
+          icon: Icon(Icons.restaurant_menu),
+          label: 'Menu',
+        ),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
     );

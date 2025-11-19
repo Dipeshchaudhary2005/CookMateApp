@@ -14,28 +14,26 @@ class Auth {
 
   // Email/Password Registration with Phone Number
   static Future<bool> createUserWithEmail(
-      String email,
-      String password,
-      String fullName,
-      String userType, {
-        String? phoneNumber,
-        required BuildContext context
-      }) async {
+    String email,
+    String password,
+    String fullName,
+    String userType, {
+    String? phoneNumber,
+    required BuildContext context,
+  }) async {
     try {
-      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
       User user = credential.user!;
       await user.updateDisplayName(fullName);
-      final userMap = <String, dynamic> {
-        UserModel.uidField : user.uid,
-        UserModel.emailField : user.email,
-        UserModel.fullNameField : fullName,
-        UserModel.userTypeField : {userType : true},
-        UserModel.phoneNumberField : phoneNumber ?? '',
-        UserModel.signInMethodField : 'email',
-        UserModel.createdAtField : FieldValue.serverTimestamp()
+      final userMap = <String, dynamic>{
+        UserModel.uidField: user.uid,
+        UserModel.emailField: user.email,
+        UserModel.fullNameField: fullName,
+        UserModel.userTypeField: {userType: true},
+        UserModel.phoneNumberField: phoneNumber ?? '',
+        UserModel.signInMethodField: 'email',
+        UserModel.createdAtField: FieldValue.serverTimestamp(),
       };
 
       DocumentReference docref = FirebaseFirestore.instance
@@ -44,17 +42,19 @@ class Auth {
       await docref.set(userMap, SetOptions(merge: true));
 
       return true;
-    } on FirebaseAuthException catch(e){
+    } on FirebaseAuthException catch (e) {
       if (!context.mounted) return true;
-      switch (e.code){
+      switch (e.code) {
         case 'email-already-in-use':
-          var userCred = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+          var userCred = await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
           bool checked = await checkUserType(userCred, userType, true);
-          if (checked){
+          if (checked) {
             return true;
-          }
-          else {
-            if (context.mounted){
+          } else {
+            if (context.mounted) {
               Helper.showError(context, "A user already exists with the email");
             }
           }
@@ -66,7 +66,10 @@ class Auth {
           Helper.showError(context, "Too many requests. Try later.");
           break;
         case 'network-request-failed':
-          Helper.showError(context, "Network error. Check your connection or try again later");
+          Helper.showError(
+            context,
+            "Network error. Check your connection or try again later",
+          );
           break;
         default:
           Helper.showError(context, "Internal Error.");
@@ -74,25 +77,29 @@ class Auth {
       }
       return false;
     } on Exception catch (e) {
-      if (kDebugMode){
+      if (kDebugMode) {
         print(e.toString());
       }
-      if (context.mounted){
+      if (context.mounted) {
         Helper.showError(context, "Internal Error");
       }
       return false;
     }
   }
 
-  static Future<bool> checkUserType (UserCredential userCred, String userType, bool addUserTypeIfNotPresent) async{
-    final docRef = FirebaseFirestore.instance.collection(StaticClass.usersCollection)
+  static Future<bool> checkUserType(
+    UserCredential userCred,
+    String userType,
+    bool addUserTypeIfNotPresent,
+  ) async {
+    final docRef = FirebaseFirestore.instance
+        .collection(StaticClass.usersCollection)
         .doc(userCred.user!.uid);
     final doc = await docRef.get();
-    if (doc.data()![UserModel.userTypeField][userType] == true){
+    if (doc.data()![UserModel.userTypeField][userType] == true) {
       return true;
-    }
-    else {
-      if (addUserTypeIfNotPresent){
+    } else {
+      if (addUserTypeIfNotPresent) {
         await addUserType(userType, docRef);
         return true;
       }
@@ -100,13 +107,23 @@ class Auth {
     }
   }
 
-  static Future<void> addUserType (String userType, DocumentReference docRef) async {
-      Map<String, dynamic> map = {UserModel.userTypeField : {userType : true}};
-      await docRef.set(map, SetOptions(merge: true));
+  static Future<void> addUserType(
+    String userType,
+    DocumentReference docRef,
+  ) async {
+    Map<String, dynamic> map = {
+      UserModel.userTypeField: {userType: true},
+    };
+    await docRef.set(map, SetOptions(merge: true));
   }
 
   // Email/Password Login
-  static Future<bool> loginUserWithEmail(String email, String password, BuildContext context, String userType) async {
+  static Future<bool> loginUserWithEmail(
+    String email,
+    String password,
+    BuildContext context,
+    String userType,
+  ) async {
     try {
       await FirebaseAuth.instance.signOut();
       final userCred = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -116,17 +133,19 @@ class Auth {
       bool check = await checkUserType(userCred, userType, false);
       if (check) {
         return true;
-      }
-      else {
+      } else {
         await FirebaseAuth.instance.signOut();
-        if (context.mounted){
-          Helper.showError(context, "This email is not registred for $userType role");
+        if (context.mounted) {
+          Helper.showError(
+            context,
+            "This email is not registred for $userType role",
+          );
         }
       }
       return true;
-    } on FirebaseAuthException catch (e){
+    } on FirebaseAuthException catch (e) {
       if (!context.mounted) return false;
-      switch(e.code){
+      switch (e.code) {
         case 'user-disabled':
           Helper.showError(context, "This email has been disabled");
           break;
@@ -141,52 +160,56 @@ class Auth {
           Helper.showError(context, "Too many requests. Try later.");
           break;
         case 'network-request-failed':
-          Helper.showError(context, "Network error. Check your connection or try again later");
+          Helper.showError(
+            context,
+            "Network error. Check your connection or try again later",
+          );
           break;
         default:
           Helper.showError(context, "Internal Error");
           break;
       }
       return false;
-    }
-    on Exception catch (e) {
+    } on Exception catch (e) {
       if (kDebugMode) {
         print(e.toString());
       }
-      if (context.mounted){
+      if (context.mounted) {
         Helper.showError(context, "Internal Error");
-
       }
       return false;
     }
   }
 
-
-  static Future<User?> signInWithGoogle(String userType, BuildContext context) async {
-    try{
+  static Future<User?> signInWithGoogle(
+    String userType,
+    BuildContext context,
+  ) async {
+    try {
       final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
-
 
       // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
 
       // Create a new credential
       final credential = GoogleAuthProvider.credential(
-          idToken: googleAuth.idToken
+        idToken: googleAuth.idToken,
       );
 
       // Once signed in, return the UserCredential
-      var userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      if (kDebugMode){
-        print(userCredential.user.toString());
-        print(FirebaseAuth.instance.currentUser.toString());
-      }
-      if (userCredential.additionalUserInfo?.isNewUser ?? false){
+      var userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+      // if (kDebugMode){
+      //   print(userCredential.user.toString());
+      //   print(FirebaseAuth.instance.currentUser.toString());
+      // }
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
         var userModel = UserModel(
           uid: userCredential.user!.uid,
           email: userCredential.user!.email,
           fullName: userCredential.user!.displayName,
-          userType: {userType : true},
+          userType: {userType: true},
           phoneNumber: userCredential.user!.phoneNumber,
           signInMethod: 'google',
         );
@@ -198,23 +221,28 @@ class Auth {
             .collection(StaticClass.usersCollection)
             .doc(userCredential.user!.uid);
         await docref.set(map, SetOptions(merge: true));
-      }
-      else {
+      } else {
         await checkUserType(userCredential, userType, true);
       }
 
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
-      if (context.mounted){
-        switch (e.code){
+      if (context.mounted) {
+        switch (e.code) {
           case 'account-exists-with-different-credential':
-            Helper.showError(context, "Account is already registered with email and password. Try linking");
+            Helper.showError(
+              context,
+              "Account is already registered with email and password. Try linking",
+            );
             break;
           case 'invalid-credential':
             Helper.showError(context, "Invalid credentials");
             break;
           case 'user-disabled':
-            Helper.showError(context, "The user for this account have been disabled. Contact admin");
+            Helper.showError(
+              context,
+              "The user for this account have been disabled. Contact admin",
+            );
             break;
           default:
             Helper.showError(context, "Internal error");
@@ -223,8 +251,7 @@ class Auth {
       }
       await googleSignIn.signOut();
       return null;
-    }
-    catch (e) {
+    } catch (e) {
       if (kDebugMode) {
         print('Google Sign-In error: $e');
       }
@@ -336,9 +363,7 @@ class Auth {
       await FirebaseFirestore.instance
           .collection(StaticClass.usersCollection)
           .doc(uid)
-          .update({
-        UserModel.phoneNumberField: phoneNumber,
-      });
+          .update({UserModel.phoneNumberField: phoneNumber});
       return true;
     } catch (e) {
       if (kDebugMode) {

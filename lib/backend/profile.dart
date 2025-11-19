@@ -3,12 +3,20 @@ import 'package:cookmate/core/static.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cookmate/backend/model/user.dart';
+
 class UpdateHelper {
-  static Future<bool> updateProfile({String? fullName, String? phoneNumber, String? email, String? userAddress}) async {
-    try{
+  static Future<bool> updateProfile({
+    String? fullName,
+    String? phoneNumber,
+    String? email,
+    String? userAddress,
+  }) async {
+    try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) return false;
-      DocumentReference docRef = FirebaseFirestore.instance.collection(StaticClass.usersCollection).doc(user.uid);
+      DocumentReference docRef = FirebaseFirestore.instance
+          .collection(StaticClass.usersCollection)
+          .doc(user.uid);
       UserModel userModel = UserModel();
       userModel.fullName = fullName;
       userModel.phoneNumber = phoneNumber;
@@ -19,12 +27,12 @@ class UpdateHelper {
       // userModel.updatedAt = FieldValue.serverTimestamp();
       await docRef.set(userModel.toMap(), SetOptions(merge: true));
       user.updateDisplayName(fullName);
-      if (email != null){
+      if (email != null) {
         user.verifyBeforeUpdateEmail(email);
       }
       return true;
-    } on Exception catch (e){
-      if (kDebugMode){
+    } on Exception catch (e) {
+      if (kDebugMode) {
         print(e.toString());
       }
       return false;

@@ -11,9 +11,9 @@ class AppRoutes {
   static String landingPageRoute = '/landingPage';
 
   static dynamic getAppRoutes() => {
-    splashScreenRoute : (context) => const SplashPage(),
-    customerDashboardRoute : (context) => const CustomerDashboard(),
-    chefDashboardRoute : (context) => const ChefDashboard(),
-    landingPageRoute : (context) => const LandingPage()
+    splashScreenRoute: (context) => const SplashPage(),
+    customerDashboardRoute: (context) => const CustomerDashboard(),
+    chefDashboardRoute: (context) => const ChefDashboard(),
+    landingPageRoute: (context) => const LandingPage(),
   };
 }
