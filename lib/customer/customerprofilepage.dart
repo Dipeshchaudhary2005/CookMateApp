@@ -1,4 +1,5 @@
 import 'package:cookmate/backend/profile.dart';
+import 'package:cookmate/core/helper.dart';
 import 'package:cookmate/core/static.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         setState(() {
           _profileImage = File(pickedFile.path);
         });
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Profile picture updated!'),
@@ -77,6 +79,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error picking image: $e'),
@@ -442,7 +445,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             spreadRadius: 2,
                             blurRadius: 5,
                           ),
@@ -574,35 +577,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                     // Show logout confirmation dialog
                     showDialog(
                       context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Logout'),
-                        content: const Text('Are you sure you want to logout?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              FirebaseAuth.instance.signOut();
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Cancel'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Navigate back to landing page
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LandingPage(),
-                                ),
-                                    (route) => false,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                            ),
-                            child: const Text('Logout'),
-                          ),
-                        ],
-                      ),
+                      builder: (context) => Helper.confirmLogOut(context)
                     );
                   },
                   style: ElevatedButton.styleFrom(

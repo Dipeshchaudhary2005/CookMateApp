@@ -1,3 +1,5 @@
+import 'package:cookmate/backend/fetch_from_database.dart';
+import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'summarypage.dart';
 
@@ -9,13 +11,14 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
-  String selectedEvent = 'Engagement Function';
+  String? selectedEvent;
   DateTime selectedDate = DateTime.now();
   String selectedTime = '8:00 AM - 12:00 PM';
   String? selectedPackage;
   List<String> selectedFoodItems = [];
   List<String> customMenuItems = [];
-
+  late Future<List<String>> cuisinesList;
+  late Future<List<String>> eventList;
   // Food items for different packages
   final Map<String, List<String>> packageFoodItems = {
     '2-Course Dinner': [
@@ -37,6 +40,16 @@ class _BookingPageState extends State<BookingPage> {
     ],
   };
 
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  _loadData() {
+    cuisinesList = FetchFromDatabase.getDataList(PredefinedCollection.cuisinesCollection);
+    eventList = FetchFromDatabase.getDataList(PredefinedCollection.eventTypeCollection);
+  }
   // Method to show calendar
   Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
@@ -353,19 +366,19 @@ class _BookingPageState extends State<BookingPage> {
     );
 
     Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pop(context);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Payment via $paymentMethod successful!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const SummaryPage()),
-      );
+      if (context.mounted && mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Payment via $paymentMethod successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SummaryPage()),
+        );
+      }
     });
   }
 
@@ -381,7 +394,7 @@ class _BookingPageState extends State<BookingPage> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: color, width: 2),
         ),
@@ -465,14 +478,25 @@ class _BookingPageState extends State<BookingPage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: DropdownButton<String>(
-                  value: selectedEvent,
-                  isExpanded: true,
-                  underline: const SizedBox(),
-                  items: ['Engagement Function', 'Birthday Party', 'Wedding']
-                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                      .toList(),
-                  onChanged: (val) => setState(() => selectedEvent = val!),
+                child: FutureBuilder<List<String>>(
+                  future: eventList,
+                  builder: (context, asyncSnapshot) {
+                    if (asyncSnapshot.hasData){
+                      return DropdownButton<String>(
+                        value: selectedEvent,
+                        isExpanded: true,
+                        underline: const SizedBox(),
+                        items: asyncSnapshot.data!.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                        // items: ['Engagement Function', 'Birthday Party', 'Wedding']
+                        //     .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        //     .toList(),
+                        onChanged: (val) => setState(() => selectedEvent = val!),
+                      );
+                    }
+                    else {
+                      return const CircularProgressIndicator();
+                    }
+                  }
                 ),
               ),
               const SizedBox(height: 20),

@@ -301,6 +301,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                 _nameController.text,
                                 widget.userType,
                                 phoneNumber: _phoneController.text,
+                                context: context
                               );
 
                               if (!mounted) return;
@@ -308,7 +309,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               setState(() {
                                 _loading = false;
                               });
-
+                              if (!context.mounted) return;
                               if (!accountCreated) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

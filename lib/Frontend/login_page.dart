@@ -1,5 +1,5 @@
 import 'package:cookmate/backend/auth.dart';
-import 'package:cookmate/core/autoLoginHelper.dart';
+import 'package:cookmate/core/helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'registration_page.dart';
@@ -41,12 +41,11 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       // Call your Auth class method for Google Sign-In
-      await Auth.signInWithGoogle(widget.userType);
+      await Auth.signInWithGoogle(widget.userType, context);
      if (!mounted) {
-       print("Not mounted");
        return;
      }
-      await AutoLoginHelper.loadDashBoard(context);
+      await Helper.loadDashBoard(context, userType: widget.userType);
     } catch (e) {
       if (!mounted) return;
 
@@ -223,7 +222,9 @@ class _LoginPageState extends State<LoginPage> {
 
                               await Auth.loginUserWithEmail(
                                   _emailController.text,
-                                  _passwordController.text
+                                  _passwordController.text,
+                                  context,
+                                  widget.userType
                               );
 
                               if (!mounted) return;
@@ -231,7 +232,9 @@ class _LoginPageState extends State<LoginPage> {
                               setState(() {
                                 _isLoading = false;
                               });
-                              await AutoLoginHelper.loadDashBoard(context);
+                              if (context.mounted){
+                                await Helper.loadDashBoard(context, userType: widget.userType);
+                              }
                             }
                           },
                           style: ElevatedButton.styleFrom(

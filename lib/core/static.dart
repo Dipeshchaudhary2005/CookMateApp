@@ -11,4 +11,9 @@ class StaticClass {
 class PredefinedCollection{
   static const String fieldType = 'fieldType';
   static const String listOfFields = 'list';
+
+  static const String cuisinesCollection = 'cuisines';
+  static const String eventTypeCollection = 'eventType';
+
+  static const String nameField = 'name';
 }

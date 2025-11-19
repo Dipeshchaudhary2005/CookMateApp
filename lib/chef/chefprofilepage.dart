@@ -219,7 +219,7 @@ class ChefProfilePage extends StatelessWidget {
           Switch(
             value: value,
             onChanged: (val) {},
-            activeColor: const Color(0xFF8BC34A),
+            activeThumbColor: const Color(0xFF8BC34A),
           ),
         ],
       ),

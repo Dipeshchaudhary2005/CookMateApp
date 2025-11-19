@@ -1,17 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-enum UserType{
-  customer('Customer'),
-  chef('Chef');
-
-  final String name;
-  const UserType(this.name);
-
-  static UserType fromString(String type){
-    return UserType.values.firstWhere((e) => e.name == type);
-  }
-}
 
 class UserModel {
   static const uidField = 'uid';
@@ -24,11 +13,14 @@ class UserModel {
   static const signInMethodField = 'signInMethod';
   static const userAddressField = 'userAddress';
 
+  static const customerField = 'customer';
+  static const chefField = 'chef';
+
   String? uid;
   String? email;
   String? fullName;
   String? phoneNumber;
-  UserType? userType;
+  Map<String, dynamic>? userType;
   Timestamp? createdAt;
   Timestamp? updatedAt;
   String? signInMethod;
@@ -55,16 +47,18 @@ class UserModel {
     final data = snap.data()!;
     if (kDebugMode){
       data.forEach((key, value){
-          print("$key : $value");
+        if (kDebugMode){
+            print("$key : $value");
+        }
       });
     }
 
     return UserModel(
-      uid: data[UserModel.userTypeField],
+      uid: data[UserModel.uidField],
       email: data[UserModel.emailField],
       fullName: data[UserModel.fullNameField],
       phoneNumber: data[UserModel.phoneNumberField],
-      userType: UserType.fromString(data[UserModel.userTypeField]),
+      userType: data[UserModel.userTypeField],
       createdAt: data[UserModel.createdAtField],
       updatedAt: data[UserModel.updatedAtField],
       signInMethod: data[UserModel.signInMethodField],
