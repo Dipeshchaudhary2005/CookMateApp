@@ -1,6 +1,6 @@
+import 'package:cookmate/backend/model/user.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
-import 'registration_page.dart';
 
 class ChooseUserPage extends StatelessWidget {
   const ChooseUserPage({super.key});
@@ -53,7 +53,7 @@ class ChooseUserPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LoginPage(userType: 'Customer'),
+                    builder: (context) => const LoginPage(userType: UserModel.customerField),
                   ),
                 );
               },
@@ -69,7 +69,7 @@ class ChooseUserPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LoginPage(userType: 'Chef'),
+                    builder: (context) => const LoginPage(userType: UserModel.chefField),
                   ),
                 );
               },
@@ -149,7 +149,8 @@ class ChooseUserPage extends StatelessWidget {
                   subtitle,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.black.withOpacity(0.6),
+                    // color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     height: 1.3,
                   ),
                 ),

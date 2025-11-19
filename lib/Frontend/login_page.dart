@@ -1,8 +1,7 @@
 import 'package:cookmate/backend/auth.dart';
+import 'package:cookmate/core/helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../chef/chefdashboard.dart';
-import '../customer/customerdashboard.dart';
 import 'registration_page.dart';
 import 'forgot_password_page.dart';
 
@@ -28,6 +27,12 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseAuth.instance.signOut();
+  }
 
   Future<void> _handleGoogleSignIn() async {
     setState(() {
@@ -36,35 +41,11 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       // Call your Auth class method for Google Sign-In
-      await Auth.signInWithGoogle(widget.userType);
-
-      if (FirebaseAuth.instance.currentUser != null) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Google Sign-In Successful!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Navigate based on user type
-        if (widget.userType == "Customer") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CustomerDashboard(),
-            ),
-          );
-        } else if (widget.userType == "Chef") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ChefDashboard(),
-            ),
-          );
-        }
-      }
+      await Auth.signInWithGoogle(widget.userType, context);
+     if (!mounted) {
+       return;
+     }
+      await Helper.loadDashBoard(context, userType: widget.userType);
     } catch (e) {
       if (!mounted) return;
 
@@ -241,7 +222,9 @@ class _LoginPageState extends State<LoginPage> {
 
                               await Auth.loginUserWithEmail(
                                   _emailController.text,
-                                  _passwordController.text
+                                  _passwordController.text,
+                                  context,
+                                  widget.userType
                               );
 
                               if (!mounted) return;
@@ -249,30 +232,8 @@ class _LoginPageState extends State<LoginPage> {
                               setState(() {
                                 _isLoading = false;
                               });
-
-                              if (FirebaseAuth.instance.currentUser == null) return;
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Login Successful!'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-
-                              if (widget.userType == "Customer") {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const CustomerDashboard()
-                                  ),
-                                );
-                              } else if (widget.userType == "Chef") {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const ChefDashboard()
-                                  ),
-                                );
+                              if (context.mounted){
+                                await Helper.loadDashBoard(context, userType: widget.userType);
                               }
                             }
                           },

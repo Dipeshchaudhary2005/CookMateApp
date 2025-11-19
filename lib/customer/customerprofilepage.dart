@@ -1,3 +1,7 @@
+import 'package:cookmate/backend/profile.dart';
+import 'package:cookmate/core/helper.dart';
+import 'package:cookmate/core/static.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -16,10 +20,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   final ImagePicker _picker = ImagePicker();
 
   // User data
-  String userName = 'John Doe';
-  String userEmail = 'john.doe@email.com';
-  String userPhone = '+977 9876543210';
-  String userAddress = 'Novaliches, QC';
+  // String userName = 'John Doe';
+  // String userEmail = 'john.doe@email.com';
+  // String userPhone = '+977 9876543210';
+  // String userAddress = 'Novaliches, QC';
 
   // Booking history data
   final List<Map<String, dynamic>> bookingHistory = [
@@ -66,6 +70,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         setState(() {
           _profileImage = File(pickedFile.path);
         });
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Profile picture updated!'),
@@ -74,6 +79,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error picking image: $e'),
@@ -116,10 +122,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
 
   // Edit Profile Dialog
   void _showEditProfileDialog() {
-    final nameController = TextEditingController(text: userName);
-    final emailController = TextEditingController(text: userEmail);
-    final phoneController = TextEditingController(text: userPhone);
-    final addressController = TextEditingController(text: userAddress);
+    final nameController = TextEditingController(text: StaticClass.currentUser!.fullName ?? "No name");
+    final emailController = TextEditingController(text: StaticClass.currentUser!.email ?? "No email");
+    final phoneController = TextEditingController(text: StaticClass.currentUser!.phoneNumber ?? "No phone");
+    final addressController = TextEditingController(text: StaticClass.currentUser!.userAddress ?? "No address");
 
     showDialog(
       context: context,
@@ -175,10 +181,12 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                userName = nameController.text;
-                userEmail = emailController.text;
-                userPhone = phoneController.text;
-                userAddress = addressController.text;
+                UpdateHelper.updateProfile(
+                  fullName: nameController.text,
+                  email: emailController.text,
+                  phoneNumber: phoneController.text,
+                  userAddress: addressController.text
+                );
               });
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -425,7 +433,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              // Profile Avatar with upload functionality
+              // Profile Avatar
               Center(
                 child: Stack(
                   children: [
@@ -437,7 +445,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             spreadRadius: 2,
                             blurRadius: 5,
                           ),
@@ -465,6 +473,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                           ),
                           child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
                         ),
+                        // child: const Icon(Icons.edit, size: 20, color: Colors.white),
                       ),
                     ),
                   ],
@@ -472,12 +481,12 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               ),
               const SizedBox(height: 20),
               Text(
-                userName,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                StaticClass.currentUser!.fullName ?? "No Name",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               Text(
-                userEmail,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                StaticClass.currentUser!.email ?? "no@email.com",
+                style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 8),
               Row(
@@ -485,7 +494,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 children: [
                   const Icon(Icons.phone, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text(userPhone, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(StaticClass.currentUser!.phoneNumber ?? "No Phone", style: const TextStyle(fontSize: 14, color: Colors.grey)),
                 ],
               ),
               Row(
@@ -493,7 +502,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 children: [
                   const Icon(Icons.location_on, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text(userAddress, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(StaticClass.currentUser!.userAddress ?? "No address", style: const TextStyle(fontSize: 14, color: Colors.grey)),
                 ],
               ),
               const SizedBox(height: 30),
@@ -565,33 +574,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
+                    // Show logout confirmation dialog
                     showDialog(
                       context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Logout'),
-                        content: const Text('Are you sure you want to logout?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LandingPage(),
-                                ),
-                                    (route) => false,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                            ),
-                            child: const Text('Logout'),
-                          ),
-                        ],
-                      ),
+                      builder: (context) => Helper.confirmLogOut(context)
                     );
                   },
                   style: ElevatedButton.styleFrom(
