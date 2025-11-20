@@ -17,6 +17,7 @@ class CustomerDashboard extends StatefulWidget {
 class _CustomerDashboardState extends State<CustomerDashboard> {
   int _currentIndex = 0;
   late Future<List<String>> listOfCuisines;
+  late Stream<List<String>> chefsNear;
 
   @override
   void initState() {
@@ -226,7 +227,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 SizedBox(
                   height: 140,
                   child: StreamBuilder(
-                    stream: stream,
+                    stream: chefsNear,
                     builder: (context, asyncSnapshot) {
                       return ListView(
                         scrollDirection: Axis.horizontal,
