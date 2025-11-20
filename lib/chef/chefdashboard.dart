@@ -1,3 +1,4 @@
+import 'package:cookmate/core/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'bookeddetailedpage.dart';
@@ -126,7 +127,15 @@ class _ChefDashboardState extends State<ChefDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (b,v){
+        showDialog(
+            context: context,
+            builder: (context) => Helper.confirmLogOut(context),
+        );
+      },
+      child: Scaffold(
       backgroundColor: const Color(0xFFB8E6B8),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -137,45 +146,77 @@ class _ChefDashboardState extends State<ChefDashboard> {
             backgroundColor: Colors.white,
             child: Icon(Icons.person, color: Color(0xFF8BC34A)),
           ),
-        ),
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Hello Chef',
-                style: TextStyle(fontSize: 12, color: Colors.grey)),
-            Text('Ram Bhatta',
-                style: TextStyle(fontSize: 16, color: Colors.black)),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.black),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
+          title: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Booking Status Card
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFB3D9),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Booking Status',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+              Text('Hello Chef',
+                  style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('Ram Bhatta',
+                  style: TextStyle(fontSize: 16, color: Colors.black)),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search, color: Colors.black),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Booking Status Card
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFB3D9),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Booking Status',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatusItem('15', 'Pending'),
+                          _buildStatusItem('8', 'Confirmed'),
+                          _buildStatusItem('3', 'Completed'),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Navigation Cards
+                const Text(
+                  'Manage',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.3,
+                  children: [
+                    _buildManageCard(
+                      'Menu Items',
+                      Icons.restaurant_menu,
+                      Colors.white,
+                          () {},
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -249,6 +290,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
             ],
           ),
         ),
+        bottomNavigationBar: _buildBottomNav(),
       ),
       bottomNavigationBar: _buildBottomNav(context),
     );
@@ -304,6 +346,38 @@ class _ChefDashboardState extends State<ChefDashboard> {
                 radius: 25,
                 backgroundColor: Color(0xFFB8E6B8),
                 child: Icon(Icons.person, color: Colors.black),
+  Widget _buildManageCard(
+      String title,
+      IconData icon,
+      Color color,
+      VoidCallback onTap,
+      ) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              // color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: Colors.black87),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -394,7 +468,10 @@ class _ChefDashboardState extends State<ChefDashboard> {
     );
   }
 
-  Widget _buildConfirmedBookingCard(
+  Widget _buildBookingCard(
+  Widget _buildPendingBookingCard(
+      BuildContext context,
+      int index,
       String name,
       String event,
       String date,

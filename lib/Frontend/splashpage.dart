@@ -1,3 +1,4 @@
+import 'package:cookmate/core/helper.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cookmate/Frontend/landingpage.dart';
@@ -13,13 +14,19 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    // Navigate to landing page after 3 seconds
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LandingPage()),
-      );
-    });
+    autoLogin();
+  }
+
+  autoLogin() async{
+    bool loggedIn = await Helper.loadDashBoard(context);
+    if (!loggedIn){
+      Timer(const Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LandingPage()),
+        );
+      });
+    }
   }
 
   @override

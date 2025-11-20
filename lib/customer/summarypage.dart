@@ -56,6 +56,7 @@ class _SummaryPageState extends State<SummaryPage> {
                         );
                         // Navigate to rating page after 1 second
                         Future.delayed(const Duration(seconds: 1), () {
+                          if (!context.mounted) return;
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const RatingPage()),
