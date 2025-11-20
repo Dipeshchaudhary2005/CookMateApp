@@ -1,4 +1,6 @@
+import 'package:cookmate/backend/fetch_from_database.dart';
 import 'package:cookmate/core/helper.dart';
+import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'bookingpage.dart';
 import 'favoritechefpage.dart';
@@ -14,6 +16,13 @@ class CustomerDashboard extends StatefulWidget {
 
 class _CustomerDashboardState extends State<CustomerDashboard> {
   int _currentIndex = 0;
+  late Future<List<String>> listOfCuisines;
+
+  @override
+  void initState() {
+    super.initState();
+    listOfCuisines = FetchFromDatabase.getListOfNames(StaticClass.cuisinesCollection);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,13 +180,28 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 // Popular Cuisine - HORIZONTAL SCROLL
                 SizedBox(
                   height: 140,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      _buildCuisineCard('Thakali set', 'Resource/chef.png'),
-                      _buildCuisineCard('Chouga', 'Resource/chef.png'),
-                      _buildCuisineCard('Momo', 'Resource/chef.png'),
-                    ],
+                  child: FutureBuilder<List<String>>(
+                    future: listOfCuisines,
+                    builder: (context, asyncSnapshot) {
+                      if (asyncSnapshot.hasData){
+                        return ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: asyncSnapshot.data!.length,
+                          itemBuilder: (BuildContext context, index){
+                            return _buildCuisineCard(asyncSnapshot.data![index], 'Resource/chef.png');
+                          },
+                          // children: [
+                          //   asyncSnapshot.data!.map()
+                          //   _buildCuisineCard('Thakali set', 'Resource/chef.png'),
+                          //   _buildCuisineCard('Chouga', 'Resource/chef.png'),
+                          //   _buildCuisineCard('Momo', 'Resource/chef.png'),
+                          // ],
+                        );
+                      }
+                      else {
+                        return const CircularProgressIndicator();
+                      }
+                    }
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -201,13 +225,18 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 // Chefs Near You - HORIZONTAL SCROLL
                 SizedBox(
                   height: 140,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      _buildChefCard('Sita Lama', 'Resource/chef.png'),
-                      _buildChefCard('Rajesh Tharu', 'Resource/chef.png'),
-                      _buildChefCard('Ram Bhatta', 'Resource/chef.png'),
-                    ],
+                  child: StreamBuilder(
+                    stream: stream,
+                    builder: (context, asyncSnapshot) {
+                      return ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: [
+                          _buildChefCard('Sita Lama', 'Resource/chef.png'),
+                          _buildChefCard('Rajesh Tharu', 'Resource/chef.png'),
+                          _buildChefCard('Ram Bhatta', 'Resource/chef.png'),
+                        ],
+                      );
+                    }
                   ),
                 ),
                 const SizedBox(height: 24),

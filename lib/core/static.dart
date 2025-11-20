@@ -6,6 +6,7 @@ class StaticClass {
   static const String chefsCollection = 'chefs';
   static const String customersCollection = 'customers';
   static const String bookingsCollection = 'bookings';
+  static const String cuisinesCollection = 'cuisines';
   static UserModel? currentUser;
 }
 

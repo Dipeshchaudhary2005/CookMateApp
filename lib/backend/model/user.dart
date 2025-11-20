@@ -11,6 +11,7 @@ class UserModel {
   static const updatedAtField = 'updatedAt';
   static const signInMethodField = 'signInMethod';
   static const userAddressField = 'userAddress';
+  static const geoPointField = 'geoPoint';
 
   static const customerField = 'customer';
   static const chefField = 'chef';
@@ -24,6 +25,7 @@ class UserModel {
   Timestamp? updatedAt;
   String? signInMethod;
   String? userAddress;
+  GeoPoint? geoPoint;
 
   UserModel({
     this.uid,
@@ -35,6 +37,7 @@ class UserModel {
     this.createdAt,
     this.signInMethod,
     this.userAddress,
+    this.geoPoint
   });
 
   Map<String, dynamic> toMap() {
@@ -48,6 +51,7 @@ class UserModel {
     if (updatedAt != null) map[UserModel.updatedAtField] = updatedAt;
     if (signInMethod != null) map[UserModel.signInMethodField] = signInMethod;
     if (userAddress != null) map[UserModel.userAddressField] = userAddress;
+    if (geoPoint != null) map[UserModel.geoPointField] = geoPoint;
     return map;
   }
 
@@ -71,6 +75,7 @@ class UserModel {
       updatedAt: data[UserModel.updatedAtField],
       signInMethod: data[UserModel.signInMethodField],
       userAddress: data[UserModel.userAddressField],
+      geoPoint: data[UserModel.geoPointField]
     );
   }
 }

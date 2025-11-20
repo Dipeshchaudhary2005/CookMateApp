@@ -264,6 +264,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  geoflutterfire_plus:
+    dependency: "direct main"
+    description:
+      name: geoflutterfire_plus
+      sha256: "7810af73360b4dddd2a16cef8ec2b440f3faa139d9637775157f6ea734d77e0c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.33"
   google_identity_services_web:
     dependency: transitive
     description:

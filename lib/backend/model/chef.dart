@@ -26,6 +26,7 @@ class Chef extends UserModel {
     super.signInMethod,
     super.userAddress,
     super.userType,
+    super.geoPoint,
     this.cuisines,
     this.dishes,
   });
@@ -42,6 +43,7 @@ class Chef extends UserModel {
       updatedAt: data[UserModel.updatedAtField],
       signInMethod: data[UserModel.signInMethodField],
       userAddress: data[UserModel.userAddressField],
+      geoPoint: data[UserModel.geoPointField],
       cuisines: List<String>.from(data[Chef.cuisinesField] as List),
       dishes: List<String>.from(data[Chef.dishesField] as List),
     );

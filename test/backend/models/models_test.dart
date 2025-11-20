@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookmate/backend/model/booking.dart';
 import 'package:cookmate/backend/model/chef.dart';
@@ -17,6 +19,7 @@ void main() {
     Timestamp updatedAt = Timestamp.now();
     String signInMethod = "email";
     String userAddress = "Hattiban";
+    GeoPoint geoPoint = GeoPoint(34.6, 45.6);
 
     final userModel = UserModel(
       uid: uid,
@@ -28,6 +31,7 @@ void main() {
       updatedAt: updatedAt,
       signInMethod: signInMethod,
       userAddress: userAddress,
+      geoPoint: geoPoint
     );
 
     final map = userModel.toMap();
@@ -40,6 +44,7 @@ void main() {
     expect(map[UserModel.updatedAtField], updatedAt);
     expect(map[UserModel.signInMethodField], signInMethod);
     expect(map[UserModel.userAddressField], userAddress);
+    expect(map[UserModel.geoPointField], geoPoint);
 
     final fakeFirestore = FakeFirebaseFirestore();
     final docRef = fakeFirestore
@@ -59,6 +64,7 @@ void main() {
     expect(user.updatedAt, updatedAt);
     expect(user.signInMethod, signInMethod);
     expect(user.userAddress, userAddress);
+    expect(user.geoPoint, geoPoint);
   });
 
   test("Booking model", () async {
@@ -127,6 +133,7 @@ void main() {
     Timestamp updatedAt = Timestamp.now();
     String signInMethod = "email";
     String userAddress = "Hattiban";
+    GeoPoint geoPoint = GeoPoint(34.6, 45.6);
     List<String> cuisines = ["Nepalese", "Newari"];
     List<String> dishes = ["Pulao", "Roti Tarkari"];
 
@@ -140,6 +147,7 @@ void main() {
       updatedAt: updatedAt,
       signInMethod: signInMethod,
       userAddress: userAddress,
+      geoPoint: geoPoint,
       dishes: dishes,
       cuisines: cuisines,
     );
@@ -154,6 +162,7 @@ void main() {
     expect(map[UserModel.updatedAtField], updatedAt);
     expect(map[UserModel.signInMethodField], signInMethod);
     expect(map[UserModel.userAddressField], userAddress);
+    expect(map[UserModel.geoPointField], geoPoint);
     expect(map[Chef.dishesField], dishes);
     expect(map[Chef.cuisinesField], cuisines);
 
@@ -173,6 +182,7 @@ void main() {
     expect(chef.updatedAt, updatedAt);
     expect(chef.signInMethod, signInMethod);
     expect(chef.userAddress, userAddress);
+    expect(chef.geoPoint, geoPoint);
     expect(chef.dishes, dishes);
     expect(chef.cuisines, cuisines);
   });
