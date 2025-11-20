@@ -1,260 +1,490 @@
 import 'package:flutter/material.dart';
 
-class BookedDetailsPage extends StatelessWidget {
+class BookedDetailsPage extends StatefulWidget {
   const BookedDetailsPage({super.key});
+
+  @override
+  State<BookedDetailsPage> createState() => _BookedDetailsPageState();
+}
+
+class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  // Sample booking data
+  final List<Map<String, dynamic>> pendingBookings = [
+    {
+      'name': 'John Doe',
+      'event': 'Wedding Event',
+      'date': '2025-03-15',
+      'time': '6:00 PM - 10:00 PM',
+      'guests': 150,
+      'package': '2-Course Dinner',
+      'amount': 'NPR 97,500',
+      'phone': '+977 9876543210',
+      'address': 'Kathmandu, Nepal',
+    },
+    {
+      'name': 'Sarah Smith',
+      'event': 'Birthday Party',
+      'date': '2025-03-18',
+      'time': '2:00 PM - 6:00 PM',
+      'guests': 50,
+      'package': 'Private Cooking',
+      'amount': 'NPR 32,500',
+      'phone': '+977 9812345678',
+      'address': 'Lalitpur, Nepal',
+    },
+  ];
+
+  final List<Map<String, dynamic>> confirmedBookings = [
+    {
+      'name': 'Emma Wilson',
+      'event': 'Anniversary Celebration',
+      'date': '2025-03-22',
+      'time': '7:00 PM - 11:00 PM',
+      'guests': 100,
+      'package': '2-Course Dinner',
+      'amount': 'NPR 65,000',
+      'phone': '+977 9801234567',
+      'address': 'Bhaktapur, Nepal',
+    },
+  ];
+
+  final List<Map<String, dynamic>> completedBookings = [
+    {
+      'name': 'Lisa Anderson',
+      'event': 'Retirement Party',
+      'date': '2025-03-10',
+      'time': '6:00 PM - 10:00 PM',
+      'guests': 60,
+      'package': 'Custom Menu',
+      'amount': 'NPR 45,000',
+      'phone': '+977 9823456789',
+      'address': 'Pokhara, Nepal',
+      'rating': 5.0,
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _showBookingDetails(Map<String, dynamic> booking, String status) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          constraints: const BoxConstraints(maxHeight: 600),
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Booking Details',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                const SizedBox(height: 16),
+                _buildDetailRow(Icons.person, 'Customer', booking['name']),
+                _buildDetailRow(Icons.event, 'Event Type', booking['event']),
+                _buildDetailRow(Icons.calendar_today, 'Date', booking['date']),
+                _buildDetailRow(Icons.access_time, 'Time', booking['time']),
+                _buildDetailRow(Icons.people, 'Guests', '${booking['guests']} People'),
+                _buildDetailRow(Icons.restaurant_menu, 'Package', booking['package']),
+                _buildDetailRow(Icons.phone, 'Phone', booking['phone']),
+                _buildDetailRow(Icons.location_on, 'Address', booking['address']),
+                const Divider(),
+                _buildDetailRow(Icons.money, 'Total Amount', booking['amount']),
+                if (booking['rating'] != null) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Rating: ${booking['rating']}',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 20),
+                if (status == 'pending')
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Booking Accepted'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.check),
+                          label: const Text('Accept'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF8BC34A),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Booking Cancelled'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.close),
+                          label: const Text('Cancel'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            side: const BorderSide(color: Colors.red),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                if (status == 'confirmed')
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Customer contacted'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF8BC34A),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text('Contact Customer'),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: const Color(0xFF8BC34A)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+                Text(
+                  value,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFB8E6B8),
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFFB8E6B8),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Booked Details',
+          'All Bookings',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Booking Status
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFB3D9),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Column(
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.green, size: 60),
-                    SizedBox(height: 8),
-                    Text(
-                      'Booking Confirmed',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Your booking has been confirmed',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Event Details
-              const Text(
-                'Event Details',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              _buildDetailCard([
-                _buildDetailRow(Icons.event, 'Event Type', 'Engagement Function'),
-                _buildDetailRow(Icons.calendar_today, 'Date', '2025-02-28'),
-                _buildDetailRow(Icons.access_time, 'Time', '8:00 AM - 8:00 AM'),
-                _buildDetailRow(Icons.location_on, 'Location', 'Novaliches, QC'),
-              ]),
-              const SizedBox(height: 20),
-              // Chef Details
-              const Text(
-                'Chef Details',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFB3D9),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 35,
-                      backgroundImage: AssetImage('assets/chef_ram.png'),
-                    ),
-                    const SizedBox(width: 16),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Ram Bhatta',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text('Italian Cuisine', style: TextStyle(fontSize: 14)),
-                          Row(
-                            children: [
-                              Icon(Icons.star, color: Colors.amber, size: 16),
-                              Text(' 4.8 (150+ reviews)',
-                                  style: TextStyle(fontSize: 12)),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.phone, color: Colors.green),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Menu Items
-              const Text(
-                'Menu Details',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              _buildDetailCard([
-                _buildMenuItem('Appetizers', 'Spring Rolls, Bruschetta'),
-                _buildMenuItem('Main Course', 'Grilled Salmon, Beef Wellington'),
-                _buildMenuItem('Desserts', 'Tiramisu, Chocolate Mousse'),
-                _buildMenuItem('Beverages', 'Wine, Fresh Juices'),
-              ]),
-              const SizedBox(height: 20),
-              // Payment Info
-              const Text(
-                'Payment Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              _buildDetailCard([
-                _buildPaymentRow('Service Fee', '\$650'),
-                _buildPaymentRow('Tax (10%)', '\$65'),
-                const Divider(),
-                _buildPaymentRow('Total', '\$715', isTotal: true),
-              ]),
-              const SizedBox(height: 30),
-              // Action Buttons
-              Row(
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.black,
+          labelColor: Colors.black,
+          unselectedLabelColor: Colors.grey,
+          tabs: [
+            Tab(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(color: Colors.red),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Cancel Booking',
-                        style: TextStyle(color: Colors.red),
-                      ),
+                  const Text('Pending'),
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8BC34A),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Contact Chef',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                    child: Text(
+                      '${pendingBookings.length}',
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            Tab(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Confirmed'),
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${confirmedBookings.length}',
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Tab(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Completed'),
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${completedBookings.length}',
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildBookingList(pendingBookings, 'pending'),
+          _buildBookingList(confirmedBookings, 'confirmed'),
+          _buildBookingList(completedBookings, 'completed'),
+        ],
+      ),
     );
   }
 
-  Widget _buildDetailCard(List<Widget> children) {
-    return Container(
-      width: double.infinity,
+  Widget _buildBookingList(List<Map<String, dynamic>> bookings, String status) {
+    if (bookings.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.event_busy,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No ${status} bookings',
+              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(children: children),
+      itemCount: bookings.length,
+      itemBuilder: (context, index) {
+        final booking = bookings[index];
+        return _buildBookingCard(booking, status);
+      },
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: Colors.grey[700]),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(label, style: const TextStyle(fontSize: 14)),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildBookingCard(Map<String, dynamic> booking, String status) {
+    Color statusColor = status == 'pending'
+        ? Colors.orange
+        : status == 'confirmed'
+        ? Colors.green
+        : Colors.blue;
 
-  Widget _buildMenuItem(String category, String items) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            category,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(items, style: const TextStyle(fontSize: 13, color: Colors.grey)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPaymentRow(String label, String value, {bool isTotal = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: isTotal ? 16 : 14,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+    return GestureDetector(
+      onTap: () => _showBookingDetails(booking, status),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: statusColor.withOpacity(0.3), width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
             ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isTotal ? 18 : 14,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
-              color: isTotal ? const Color(0xFF8BC34A) : Colors.black,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 30,
+                  backgroundColor: const Color(0xFFB8E6B8),
+                  child: Text(
+                    booking['name'].toString()[0],
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        booking['name'],
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        booking['event'],
+                        style: const TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    status.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: statusColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text(booking['date'], style: const TextStyle(fontSize: 14)),
+                const SizedBox(width: 16),
+                const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    booking['time'],
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.people, size: 16, color: Colors.grey),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${booking['guests']} Guests',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
+                Text(
+                  booking['amount'],
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF8BC34A),
+                  ),
+                ),
+              ],
+            ),
+            if (booking['rating'] != null) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(Icons.star, color: Colors.amber, size: 16),
+                  const SizedBox(width: 4),
+                  Text('Rating: ${booking['rating']}'),
+                ],
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
