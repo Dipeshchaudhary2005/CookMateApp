@@ -23,6 +23,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
   void initState() {
     super.initState();
     listOfCuisines = FetchFromDatabase.getListOfNames(StaticClass.cuisinesCollection);
+    chefsNear = FetchFromDatabase.getNameOfChef();
   }
 
   @override
@@ -226,17 +227,26 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 // Chefs Near You - HORIZONTAL SCROLL
                 SizedBox(
                   height: 140,
-                  child: StreamBuilder(
+                  child: StreamBuilder<List<String>>(
                     stream: chefsNear,
                     builder: (context, asyncSnapshot) {
-                      return ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          _buildChefCard('Sita Lama', 'Resource/chef.png'),
-                          _buildChefCard('Rajesh Tharu', 'Resource/chef.png'),
-                          _buildChefCard('Ram Bhatta', 'Resource/chef.png'),
-                        ],
-                      );
+                      if (asyncSnapshot.hasData){
+                        print(asyncSnapshot.data!.length);
+                        return ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: asyncSnapshot.data!.length,
+                          itemBuilder: (BuildContext context, index){
+                            return _buildChefCard(asyncSnapshot.data![index], 'Resource/chef.png');
+                          },
+                          // children: [
+                          //   _buildChefCard('Rajesh Tharu', 'Resource/chef.png'),
+                          //   _buildChefCard('Ram Bhatta', 'Resource/chef.png'),
+                          // ],
+                        );
+                      }
+                      else {
+                        return const CircularProgressIndicator();
+                      }
                     }
                   ),
                 ),

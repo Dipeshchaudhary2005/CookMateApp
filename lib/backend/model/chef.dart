@@ -43,9 +43,9 @@ class Chef extends UserModel {
       updatedAt: data[UserModel.updatedAtField],
       signInMethod: data[UserModel.signInMethodField],
       userAddress: data[UserModel.userAddressField],
-      geoPoint: data[UserModel.geoPointField],
-      cuisines: List<String>.from(data[Chef.cuisinesField] as List),
-      dishes: List<String>.from(data[Chef.dishesField] as List),
+      geoPoint: (data[UserModel.geoPointField] as Map<String, dynamic>)['geopoint'] as GeoPoint,
+      cuisines: data[Chef.cuisinesField] != null ? List<String>.from(data[Chef.cuisinesField] as List) : null,
+      dishes: data[Chef.dishesField] != null ? List<String>.from(data[Chef.dishesField] as List) : null,
     );
   }
 }

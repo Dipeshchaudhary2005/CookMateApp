@@ -34,6 +34,7 @@ class Auth {
         UserModel.phoneNumberField: phoneNumber ?? '',
         UserModel.signInMethodField: 'email',
         UserModel.createdAtField: FieldValue.serverTimestamp(),
+        UserModel.geoPointField: GeoPoint(0, 0.5)
       };
 
       DocumentReference docref = FirebaseFirestore.instance
@@ -212,6 +213,7 @@ class Auth {
           userType: {userType: true},
           phoneNumber: userCredential.user!.phoneNumber,
           signInMethod: 'google',
+          geoPoint: GeoPoint(0, 0.5)
         );
 
         var map = userModel.toMap();

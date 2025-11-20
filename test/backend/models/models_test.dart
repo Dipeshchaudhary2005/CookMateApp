@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookmate/backend/model/booking.dart';
@@ -7,6 +6,7 @@ import 'package:cookmate/backend/model/user.dart';
 import 'package:cookmate/core/static.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 
 void main() {
   test("UserModel ", () async {
@@ -44,7 +44,7 @@ void main() {
     expect(map[UserModel.updatedAtField], updatedAt);
     expect(map[UserModel.signInMethodField], signInMethod);
     expect(map[UserModel.userAddressField], userAddress);
-    expect(map[UserModel.geoPointField], geoPoint);
+    expect(map[UserModel.geoPointField], GeoFirePoint(geoPoint).data);
 
     final fakeFirestore = FakeFirebaseFirestore();
     final docRef = fakeFirestore
@@ -162,7 +162,7 @@ void main() {
     expect(map[UserModel.updatedAtField], updatedAt);
     expect(map[UserModel.signInMethodField], signInMethod);
     expect(map[UserModel.userAddressField], userAddress);
-    expect(map[UserModel.geoPointField], geoPoint);
+    expect(map[UserModel.geoPointField], GeoFirePoint(geoPoint).data);
     expect(map[Chef.dishesField], dishes);
     expect(map[Chef.cuisinesField], cuisines);
 

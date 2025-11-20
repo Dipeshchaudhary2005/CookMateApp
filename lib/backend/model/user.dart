@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/foundation.dart';
+import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 
 class UserModel {
   static const uidField = 'uid';
@@ -11,7 +11,7 @@ class UserModel {
   static const updatedAtField = 'updatedAt';
   static const signInMethodField = 'signInMethod';
   static const userAddressField = 'userAddress';
-  static const geoPointField = 'geoPoint';
+  static const geoPointField = 'geo';
 
   static const customerField = 'customer';
   static const chefField = 'chef';
@@ -51,7 +51,7 @@ class UserModel {
     if (updatedAt != null) map[UserModel.updatedAtField] = updatedAt;
     if (signInMethod != null) map[UserModel.signInMethodField] = signInMethod;
     if (userAddress != null) map[UserModel.userAddressField] = userAddress;
-    if (geoPoint != null) map[UserModel.geoPointField] = geoPoint;
+    if (geoPoint != null) map[UserModel.geoPointField] = GeoFirePoint(geoPoint!).data;
     return map;
   }
 
@@ -64,7 +64,6 @@ class UserModel {
     //     }
     //   });
     // }
-
     return UserModel(
       uid: data[UserModel.uidField],
       email: data[UserModel.emailField],
@@ -75,7 +74,7 @@ class UserModel {
       updatedAt: data[UserModel.updatedAtField],
       signInMethod: data[UserModel.signInMethodField],
       userAddress: data[UserModel.userAddressField],
-      geoPoint: data[UserModel.geoPointField]
+      geoPoint: (data[UserModel.geoPointField] as Map<String, dynamic>)['geopoint'] as GeoPoint,
     );
   }
 }
