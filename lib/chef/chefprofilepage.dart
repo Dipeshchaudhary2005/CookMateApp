@@ -605,98 +605,10 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              children: [
-                Icon(item['icon'] as IconData, size: 20, color: const Color(0xFF8BC34A)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item['label'],
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                      Text(
-                        item['value'],
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-<<<<<<< HEAD
-          ),
-          const SizedBox(height: 12),
-          content,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChipList(List<String> items) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: items.map((item) {
-        return Chip(
-          label: Text(item),
-          backgroundColor: const Color(0xFFB8E6B8),
-          labelStyle: const TextStyle(fontSize: 12),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildJobItem(String title, String date) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: const TextStyle(fontSize: 14)),
-          Text(date, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAvailabilityToggle(String title, bool value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: const TextStyle(fontSize: 14)),
-          Switch(
-            value: value,
-            onChanged: (val) {},
-            activeThumbColor: const Color(0xFF8BC34A),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPaymentMethod(String title, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
           Icon(icon, size: 20),
           const SizedBox(width: 12),
           Text(title, style: const TextStyle(fontSize: 14)),
-=======
           )),
->>>>>>> 92b4afe (Chef dashboard changes)
         ],
       ),
     );

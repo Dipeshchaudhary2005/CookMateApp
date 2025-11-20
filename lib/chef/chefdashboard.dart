@@ -127,7 +127,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (b,v){
@@ -137,17 +136,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
         );
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFB8E6B8),
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              // backgroundImage: AssetImage('assets/chef_avatar.png'),
-            ),
-=======
-    return Scaffold(
       backgroundColor: const Color(0xFFB8E6B8),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -157,7 +145,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
           child: CircleAvatar(
             backgroundColor: Colors.white,
             child: Icon(Icons.person, color: Color(0xFF8BC34A)),
->>>>>>> 92b4afe (Chef dashboard changes)
           ),
           title: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,57 +218,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
                       Colors.white,
                           () {},
                     ),
-<<<<<<< HEAD
-                    _buildManageCard(
-                      'Bookings',
-                      Icons.calendar_today,
-                      Colors.white,
-                          () {},
-                    ),
-                    _buildManageCard(
-                      'Revenue',
-                      Icons.attach_money,
-                      Colors.white,
-                          () {},
-                    ),
-                    _buildManageCard(
-                      'Profile',
-                      Icons.person,
-                      Colors.white,
-                          () {},
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                // Recent Bookings
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Recent Bookings',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('View All'),
-                    ),
-                  ],
-                ),
-                _buildBookingCard(
-                  'John Doe',
-                  'Wedding Event',
-                  '2025-03-15',
-                  '6:00 PM - 10:00 PM',
-                ),
-                _buildBookingCard(
-                  'Sarah Smith',
-                  'Birthday Party',
-                  '2025-03-18',
-                  '2:00 PM - 6:00 PM',
-                ),
-              ],
-            ),
-=======
                     const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -352,15 +288,11 @@ class _ChefDashboardState extends State<ChefDashboard> {
                 );
               }).toList(),
             ],
->>>>>>> 92b4afe (Chef dashboard changes)
           ),
         ),
         bottomNavigationBar: _buildBottomNav(),
       ),
-<<<<<<< HEAD
-=======
       bottomNavigationBar: _buildBottomNav(context),
->>>>>>> 92b4afe (Chef dashboard changes)
     );
   }
 
@@ -382,7 +314,38 @@ class _ChefDashboardState extends State<ChefDashboard> {
     );
   }
 
-<<<<<<< HEAD
+  Widget _buildPendingBookingCard(
+      BuildContext context,
+      int index,
+      String name,
+      String event,
+      String date,
+      String time,
+      String guests,
+      ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const CircleAvatar(
+                radius: 25,
+                backgroundColor: Color(0xFFB8E6B8),
+                child: Icon(Icons.person, color: Colors.black),
   Widget _buildManageCard(
       String title,
       IconData icon,
@@ -415,50 +378,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBookingCard(
-=======
-  Widget _buildPendingBookingCard(
-      BuildContext context,
-      int index,
->>>>>>> 92b4afe (Chef dashboard changes)
-      String name,
-      String event,
-      String date,
-      String time,
-      String guests,
-      ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 25,
-                backgroundColor: Color(0xFFB8E6B8),
-                child: Icon(Icons.person, color: Colors.black),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -549,7 +468,10 @@ class _ChefDashboardState extends State<ChefDashboard> {
     );
   }
 
-  Widget _buildConfirmedBookingCard(
+  Widget _buildBookingCard(
+  Widget _buildPendingBookingCard(
+      BuildContext context,
+      int index,
       String name,
       String event,
       String date,

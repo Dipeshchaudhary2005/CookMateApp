@@ -48,7 +48,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
     },
   ];
 
-<<<<<<< HEAD
+  void _addPackage() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -287,9 +287,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
   }
 
   void _showAddMenuDialog(BuildContext context) {
-=======
   void _addPackage() {
->>>>>>> 92b4afe (Chef dashboard changes)
     final nameController = TextEditingController();
     final priceController = TextEditingController();
     final descController = TextEditingController();
@@ -310,24 +308,11 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                 ),
               ),
               const SizedBox(height: 12),
-<<<<<<< HEAD
-              DropdownButtonFormField<String>(
-                initialValue: selectedCategory,
-                decoration: const InputDecoration(
-                  labelText: 'Category',
-                  border: OutlineInputBorder(),
-                ),
-                items: ['Appetizers', 'Main Course', 'Desserts', 'Beverages']
-                    .map((cat) => DropdownMenuItem(value: cat, child: Text(cat)))
-                    .toList(),
-                onChanged: (val) => selectedCategory = val!,
-              ),
-              const SizedBox(height: 12),
-=======
->>>>>>> 92b4afe (Chef dashboard changes)
               TextField(
                 controller: priceController,
                 keyboardType: TextInputType.number,
+              DropdownButtonFormField<String>(
+                initialValue: selectedCategory,
                 decoration: const InputDecoration(
                   labelText: 'Price (NPR)',
                   border: OutlineInputBorder(),
