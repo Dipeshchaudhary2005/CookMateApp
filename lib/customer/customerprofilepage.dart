@@ -409,16 +409,6 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
           'Profile',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Settings page coming soon!')),
-              );
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
