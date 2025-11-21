@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'favoritechefpage.dart';
 import '../Frontend/landingpage.dart';
 
 class CustomerProfilePage extends StatefulWidget {
@@ -500,17 +499,6 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 Icons.history,
                 'Booking History',
                 _showBookingHistoryDialog,
-              ),
-              _buildProfileOption(
-                context,
-                Icons.favorite,
-                'Favorite Chefs',
-                    () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const FavoriteChefPage()),
-                  );
-                },
               ),
               _buildProfileOption(
                 context,

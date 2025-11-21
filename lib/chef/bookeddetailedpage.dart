@@ -250,22 +250,29 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
           indicatorColor: Colors.black,
           labelColor: Colors.black,
           unselectedLabelColor: Colors.grey,
+          isScrollable: false,
           tabs: [
             Tab(
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Pending'),
+                  const Flexible(
+                    child: Text(
+                      'Pending',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   const SizedBox(width: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.orange,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       '${pendingBookings.length}',
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(color: Colors.white, fontSize: 11),
                     ),
                   ),
                 ],
@@ -273,19 +280,25 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
             ),
             Tab(
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Confirmed'),
+                  const Flexible(
+                    child: Text(
+                      'Confirmed',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   const SizedBox(width: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.green,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       '${confirmedBookings.length}',
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(color: Colors.white, fontSize: 11),
                     ),
                   ),
                 ],
@@ -293,19 +306,25 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
             ),
             Tab(
               child: Row(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Completed'),
+                  const Flexible(
+                    child: Text(
+                      'Completed',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   const SizedBox(width: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.blue,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       '${completedBookings.length}',
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: const TextStyle(color: Colors.white, fontSize: 11),
                     ),
                   ),
                 ],
@@ -338,7 +357,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
             ),
             const SizedBox(height: 16),
             Text(
-              'No ${status} bookings',
+              'No $status bookings',
               style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
           ],
@@ -416,7 +435,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
@@ -424,7 +443,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                   child: Text(
                     status.toUpperCase(),
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       color: statusColor,
                       fontWeight: FontWeight.bold,
                     ),
@@ -438,13 +457,14 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                 const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text(booking['date'], style: const TextStyle(fontSize: 14)),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 const Icon(Icons.access_time, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
                     booking['time'],
                     style: const TextStyle(fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -453,22 +473,31 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.people, size: 16, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${booking['guests']} Guests',
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
+                Flexible(
+                  child: Row(
+                    children: [
+                      const Icon(Icons.people, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          '${booking['guests']} Guests',
+                          style: const TextStyle(fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  booking['amount'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF8BC34A),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    booking['amount'],
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF8BC34A),
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
