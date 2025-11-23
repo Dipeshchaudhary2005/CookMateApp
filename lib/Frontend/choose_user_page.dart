@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
-import 'registration_page.dart';
 
 class ChooseUserPage extends StatelessWidget {
   const ChooseUserPage({super.key});
