@@ -41,6 +41,9 @@ dependencies:
   google_sign_in: ^7.2.0
   shared_preferences: ^2.5.3
   geoflutterfire_plus: ^0.0.33
+  http: ^1.6.0
+  flutter_secure_storage: ^9.2.4
+  jwt_decode: ^0.3.1
 
 
 dev_dependencies:

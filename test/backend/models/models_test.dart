@@ -15,8 +15,6 @@ void main() {
     String fullName = "name";
     String phoneNumber = "98768394";
     Map<String, dynamic> userType = {"customer": true, "chef": false};
-    Timestamp createdAt = Timestamp.now();
-    Timestamp updatedAt = Timestamp.now();
     String signInMethod = "email";
     String userAddress = "Hattiban";
     GeoPoint geoPoint = GeoPoint(34.6, 45.6);
@@ -27,8 +25,6 @@ void main() {
       fullName: fullName,
       phoneNumber: phoneNumber,
       userType: userType,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
       signInMethod: signInMethod,
       userAddress: userAddress,
       geoPoint: geoPoint
@@ -40,8 +36,6 @@ void main() {
     expect(map[UserModel.fullNameField], fullName);
     expect(map[UserModel.phoneNumberField], phoneNumber);
     expect(map[UserModel.userTypeField], userType);
-    expect(map[UserModel.createdAtField], createdAt);
-    expect(map[UserModel.updatedAtField], updatedAt);
     expect(map[UserModel.signInMethodField], signInMethod);
     expect(map[UserModel.userAddressField], userAddress);
     expect(map[UserModel.geoPointField], GeoFirePoint(geoPoint).data);
@@ -60,8 +54,6 @@ void main() {
     expect(user.fullName, fullName);
     expect(user.phoneNumber, phoneNumber);
     expect(user.userType, userType);
-    expect(user.createdAt, createdAt);
-    expect(user.updatedAt, updatedAt);
     expect(user.signInMethod, signInMethod);
     expect(user.userAddress, userAddress);
     expect(user.geoPoint, geoPoint);
@@ -129,8 +121,6 @@ void main() {
     String fullName = "name";
     String phoneNumber = "98768394";
     Map<String, dynamic> userType = {"customer": true, "chef": false};
-    Timestamp createdAt = Timestamp.now();
-    Timestamp updatedAt = Timestamp.now();
     String signInMethod = "email";
     String userAddress = "Hattiban";
     GeoPoint geoPoint = GeoPoint(34.6, 45.6);
@@ -143,8 +133,6 @@ void main() {
       fullName: fullName,
       phoneNumber: phoneNumber,
       userType: userType,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
       signInMethod: signInMethod,
       userAddress: userAddress,
       geoPoint: geoPoint,
@@ -158,8 +146,6 @@ void main() {
     expect(map[UserModel.fullNameField], fullName);
     expect(map[UserModel.phoneNumberField], phoneNumber);
     expect(map[UserModel.userTypeField], userType);
-    expect(map[UserModel.createdAtField], createdAt);
-    expect(map[UserModel.updatedAtField], updatedAt);
     expect(map[UserModel.signInMethodField], signInMethod);
     expect(map[UserModel.userAddressField], userAddress);
     expect(map[UserModel.geoPointField], GeoFirePoint(geoPoint).data);
@@ -178,8 +164,6 @@ void main() {
     expect(chef.fullName, fullName);
     expect(chef.phoneNumber, phoneNumber);
     expect(chef.userType, userType);
-    expect(chef.createdAt, createdAt);
-    expect(chef.updatedAt, updatedAt);
     expect(chef.signInMethod, signInMethod);
     expect(chef.userAddress, userAddress);
     expect(chef.geoPoint, geoPoint);

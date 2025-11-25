@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 
 class UserModel {
-  static const uidField = 'uid';
+  static const uidField = '_id';
   static const emailField = 'email';
   static const fullNameField = 'fullName';
   static const phoneNumberField = 'phoneNumber';
-  static const userTypeField = 'userType';
+  static const userTypeField = 'role';
   static const createdAtField = 'createdAt';
   static const updatedAtField = 'updatedAt';
   static const signInMethodField = 'signInMethod';
@@ -21,8 +21,8 @@ class UserModel {
   String? fullName;
   String? phoneNumber;
   Map<String, dynamic>? userType;
-  Timestamp? createdAt;
-  Timestamp? updatedAt;
+  String? createdAt;
+  String? updatedAt;
   String? signInMethod;
   String? userAddress;
   GeoPoint? geoPoint;
@@ -75,6 +75,21 @@ class UserModel {
       signInMethod: data[UserModel.signInMethodField],
       userAddress: data[UserModel.userAddressField],
       geoPoint: (data[UserModel.geoPointField] as Map<String, dynamic>)['geopoint'] as GeoPoint,
+    );
+  }
+
+  factory UserModel.fromJSON(dynamic data){
+    return UserModel(
+      uid: data[uidField],
+      email: data[emailField],
+      fullName: data[fullNameField],
+      userType: data[userTypeField],
+      phoneNumber: data[phoneNumberField],
+      signInMethod: data[signInMethodField],
+      createdAt:  data[createdAtField],
+      updatedAt: data[updatedAtField],
+      geoPoint: data[geoPointField] != null ? (data[geoPointField] as Map<String, dynamic>)['geopoint'] as GeoPoint : null,
+      userAddress: data[userAddressField]
     );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:cookmate/backend/fetch_from_database.dart';
+import 'package:cookmate/backend/services/fetch_services.dart';
 import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'summarypage.dart';
@@ -17,7 +17,7 @@ class _BookingPageState extends State<BookingPage> {
   String? selectedPackage;
   List<String> selectedFoodItems = [];
   List<String> customMenuItems = [];
-  late Future<List<String>> cuisinesList;
+  late Future<List<Map<String, List<String>>>?> cuisinesList;
   late Future<List<String>> eventList;
   // Food items for different packages
   final Map<String, List<String>> packageFoodItems = {
@@ -43,16 +43,16 @@ class _BookingPageState extends State<BookingPage> {
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _loadData(context);
   }
 
-  void _loadData() {
-    cuisinesList = FetchFromDatabase.getDataList(
-      PredefinedCollection.cuisinesCollection,
-    );
-    eventList = FetchFromDatabase.getDataList(
-      PredefinedCollection.eventTypeCollection,
-    );
+  void _loadData(BuildContext context) {
+    cuisinesList = FetchServices.getCuisines(context);
+    final test = () async {
+      List<String> list = List.empty();
+      return list;
+    };
+    eventList = test();
   }
 
   // Method to show calendar

@@ -8,6 +8,11 @@ class StaticClass {
   static const String bookingsCollection = 'bookings';
   static const String cuisinesCollection = 'cuisines';
   static UserModel? currentUser;
+  static String? jsonWebToken;
+
+  static const String jsonWebTokenField = 'jwt';
+  static const String serverBaseURL = 'cookmate-nodejs.onrender.com';
+  static const String serverApiURL = '/api/v1';
 }
 
 class PredefinedCollection {

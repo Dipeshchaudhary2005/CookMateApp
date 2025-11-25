@@ -1,6 +1,5 @@
-import 'package:cookmate/backend/fetch_from_database.dart';
+import 'package:cookmate/backend/services/fetch_services.dart';
 import 'package:cookmate/core/helper.dart';
-import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'bookingpage.dart';
 import 'favoritechefpage.dart';
@@ -16,14 +15,13 @@ class CustomerDashboard extends StatefulWidget {
 
 class _CustomerDashboardState extends State<CustomerDashboard> {
   int _currentIndex = 0;
-  late Future<List<String>> listOfCuisines;
-  late Stream<List<String>> chefsNear;
+  late Future<List<Map<String, List<String>>>?> listOfCuisines;
+  late Stream<List<String>> chefsNear = Stream.empty();
 
   @override
   void initState() {
     super.initState();
-    listOfCuisines = FetchFromDatabase.getListOfNames(StaticClass.cuisinesCollection);
-    chefsNear = FetchFromDatabase.getNameOfChef();
+    listOfCuisines = FetchServices.getCuisines(context);
   }
 
   @override
@@ -182,7 +180,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 // Popular Cuisine - HORIZONTAL SCROLL
                 SizedBox(
                   height: 140,
-                  child: FutureBuilder<List<String>>(
+                  child: FutureBuilder<List<Map<String, List<String>>>?>(
                     future: listOfCuisines,
                     builder: (context, asyncSnapshot) {
                       if (asyncSnapshot.hasData){
@@ -190,7 +188,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                           scrollDirection: Axis.horizontal,
                           itemCount: asyncSnapshot.data!.length,
                           itemBuilder: (BuildContext context, index){
-                            return _buildCuisineCard(asyncSnapshot.data![index], 'Resource/chef.png');
+                            return _buildCuisineCard(asyncSnapshot.data![index].keys.first, 'Resource/chef.png');
                           },
                           // children: [
                           //   asyncSnapshot.data!.map()
