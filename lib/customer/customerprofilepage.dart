@@ -1,10 +1,8 @@
-import 'package:cookmate/backend/profile.dart';
 import 'package:cookmate/core/helper.dart';
 import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'favoritechefpage.dart';
 
 class CustomerProfilePage extends StatefulWidget {
   const CustomerProfilePage({super.key});
@@ -18,10 +16,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   final ImagePicker _picker = ImagePicker();
 
   // User data
-  // String userName = 'John Doe';
-  // String userEmail = 'john.doe@email.com';
-  // String userPhone = '+977 9876543210';
-  // String userAddress = 'Novaliches, QC';
+  String userName = 'John Doe';
+  String userEmail = 'john.doe@email.com';
+  String userPhone = '+977 9876543210';
+  String userAddress = 'Novaliches, QC';
 
   // Booking history data
   final List<Map<String, dynamic>> bookingHistory = [
@@ -105,10 +103,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               },
             ),
             ListTile(
-              leading: const Icon(
-                Icons.photo_library,
-                color: Color(0xFF8BC34A),
-              ),
+              leading: const Icon(Icons.photo_library, color: Color(0xFF8BC34A)),
               title: const Text('Gallery'),
               onTap: () {
                 Navigator.pop(context);
@@ -190,12 +185,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                UpdateHelper.updateProfile(
-                  fullName: nameController.text,
-                  email: emailController.text,
-                  phoneNumber: phoneController.text,
-                  userAddress: addressController.text,
-                );
+                userName = nameController.text;
+                userEmail = emailController.text;
+                userPhone = phoneController.text;
+                userAddress = addressController.text;
               });
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -362,11 +355,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildPaymentMethodTile(
-              'eSewa',
-              Icons.account_balance_wallet,
-              true,
-            ),
+            _buildPaymentMethodTile('eSewa', Icons.account_balance_wallet, true),
             _buildPaymentMethodTile('Khalti', Icons.payment, false),
             _buildPaymentMethodTile('Fonepay', Icons.phone_android, false),
             const SizedBox(height: 16),
@@ -401,16 +390,16 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
       title: Text(name),
       trailing: isDefault
           ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'Default',
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            )
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Text(
+          'Default',
+          style: TextStyle(color: Colors.white, fontSize: 12),
+        ),
+      )
           : null,
     );
   }
@@ -436,7 +425,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              // Profile Avatar
+              // Profile Avatar with upload functionality
               Center(
                 child: Stack(
                   children: [
@@ -456,16 +445,12 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                       ),
                       child: _profileImage != null
                           ? ClipOval(
-                              child: Image.file(
-                                _profileImage!,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : const Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Colors.grey,
-                            ),
+                        child: Image.file(
+                          _profileImage!,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                          : const Icon(Icons.person, size: 60, color: Colors.grey),
                     ),
                     Positioned(
                       bottom: 0,
@@ -478,13 +463,8 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                             color: Color(0xFF8BC34A),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
-                            Icons.camera_alt,
-                            size: 20,
-                            color: Colors.white,
-                          ),
+                          child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
                         ),
-                        // child: const Icon(Icons.edit, size: 20, color: Colors.white),
                       ),
                     ),
                   ],
@@ -539,19 +519,6 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               ),
               _buildProfileOption(
                 context,
-                Icons.favorite,
-                'Favorite Chefs',
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const FavoriteChefPage(),
-                    ),
-                  );
-                },
-              ),
-              _buildProfileOption(
-                context,
                 Icons.payment,
                 'Payment Methods',
                 _showPaymentMethodsDialog,
@@ -560,7 +527,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 context,
                 Icons.notifications,
                 'Notifications',
-                () {
+                    () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Notifications page coming soon!'),
@@ -579,7 +546,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 context,
                 Icons.privacy_tip,
                 'Privacy Policy',
-                () {
+                    () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Privacy Policy page coming soon!'),
@@ -621,11 +588,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   }
 
   Widget _buildProfileOption(
-    BuildContext context,
-    IconData icon,
-    String title,
-    VoidCallback onTap,
-  ) {
+      BuildContext context,
+      IconData icon,
+      String title,
+      VoidCallback onTap,
+      ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(

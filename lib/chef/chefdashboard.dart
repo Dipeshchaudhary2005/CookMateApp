@@ -1,10 +1,9 @@
-import 'package:cookmate/core/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'bookeddetailedpage.dart';
 import 'chefprofilepage.dart';
 import 'managemenuprice.dart';
-
+import 'calendarupdate.dart';
 
 class ChefDashboard extends StatefulWidget {
   const ChefDashboard({super.key});
@@ -14,81 +13,85 @@ class ChefDashboard extends StatefulWidget {
 }
 
 class _ChefDashboardState extends State<ChefDashboard> {
-  // Sample booking data
-  List<Map<String, dynamic>> pendingBookings = [
+  // Sample booking data for status card
+  int pendingCount = 3;
+  int confirmedCount = 2;
+  int completedCount = 1;
+
+  // Search controller and filtered list
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> filteredCuisines = [];
+  bool isSearching = false;
+
+  // Sample posted cuisine images
+  List<Map<String, dynamic>> postedCuisines = [
     {
-      'name': 'John Doe',
-      'event': 'Wedding Event',
-      'date': '2025-03-15',
-      'time': '6:00 PM - 10:00 PM',
-      'guests': '150 Guests',
+      'image': 'Resource/chef.png',
+      'title': 'Italian Pasta Carbonara',
+      'likes': 45,
+      'comments': 12,
+      'date': '2 days ago',
     },
     {
-      'name': 'Sarah Smith',
-      'event': 'Birthday Party',
-      'date': '2025-03-18',
-      'time': '2:00 PM - 6:00 PM',
-      'guests': '50 Guests',
+      'image': 'Resource/chef.png',
+      'title': 'Nepalese Thakali Set',
+      'likes': 67,
+      'comments': 23,
+      'date': '5 days ago',
     },
     {
-      'name': 'Michael Johnson',
-      'event': 'Corporate Event',
-      'date': '2025-03-20',
-      'time': '12:00 PM - 4:00 PM',
-      'guests': '80 Guests',
+      'image': 'Resource/chef.png',
+      'title': 'Special Momo Platter',
+      'likes': 89,
+      'comments': 34,
+      'date': '1 week ago',
+    },
+    {
+      'image': 'Resource/chef.png',
+      'title': 'Wedding Feast Menu',
+      'likes': 102,
+      'comments': 45,
+      'date': '2 weeks ago',
     },
   ];
 
-  List<Map<String, dynamic>> confirmedBookings = [
-    {
-      'name': 'Emma Wilson',
-      'event': 'Anniversary Celebration',
-      'date': '2025-03-22',
-      'time': '7:00 PM - 11:00 PM',
-      'guests': '100 Guests',
-    },
-    {
-      'name': 'David Brown',
-      'event': 'Family Gathering',
-      'date': '2025-03-25',
-      'time': '5:00 PM - 9:00 PM',
-      'guests': '30 Guests',
-    },
-  ];
-
-  List<Map<String, dynamic>> completedBookings = [
-    {
-      'name': 'Lisa Anderson',
-      'event': 'Retirement Party',
-      'date': '2025-03-10',
-      'time': '6:00 PM - 10:00 PM',
-      'guests': '60 Guests',
-    },
-  ];
-
-  void _acceptBooking(int index) {
-    setState(() {
-      final booking = pendingBookings.removeAt(index);
-      confirmedBookings.add(booking);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Booking Accepted'),
-        backgroundColor: Colors.green,
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    filteredCuisines = postedCuisines;
+    _searchController.addListener(_filterCuisines);
   }
 
-  void _cancelBooking(int index, String customerName) {
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterCuisines() {
+    String query = _searchController.text.toLowerCase();
     setState(() {
-      pendingBookings.removeAt(index);
+      if (query.isEmpty) {
+        filteredCuisines = postedCuisines;
+        isSearching = false;
+      } else {
+        isSearching = true;
+        filteredCuisines = postedCuisines.where((cuisine) {
+          return cuisine['title'].toLowerCase().contains(query) ||
+              cuisine['date'].toLowerCase().contains(query);
+        }).toList();
+      }
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Booking Cancelled for $customerName'),
-        backgroundColor: Colors.red,
-      ),
-    );
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      isSearching = !isSearching;
+      if (!isSearching) {
+        _searchController.clear();
+        filteredCuisines = postedCuisines;
+      }
+    });
   }
 
   Future<void> _pickAndUploadImage(BuildContext context) async {
@@ -118,149 +121,284 @@ class _ChefDashboardState extends State<ChefDashboard> {
     if (source != null) {
       final XFile? image = await picker.pickImage(source: source);
       if (image != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Image selected: ${image.name}')),
-        );
+        // Show post creation dialog
+        _showPostCreationDialog(image.path);
       }
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (b, d) {
-          showDialog(
-            context: context,
-            builder: (context) => Helper.confirmLogOut(context),
-          );
-        },
-      child: Scaffold(
-        backgroundColor: const Color(0xFFB8E6B8),
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.person, color: Color(0xFF8BC34A)),
-            ),
-          ),
-          title: const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Hello Chef',
-                  style: TextStyle(fontSize: 12, color: Colors.grey)),
-              Text('Ram Bhatta',
-                  style: TextStyle(fontSize: 16, color: Colors.black)),
-            ],
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.search, color: Colors.black),
-              onPressed: () {},
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+  void _showPostCreationDialog(String imagePath) {
+    final titleController = TextEditingController();
+    final descriptionController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Booking Status Card
+                const Text(
+                  'Create Post',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  height: 200,
+                  width: double.infinity,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFB3D9),
-                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Booking Status',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildStatusItem('${pendingBookings.length}', 'Pending'),
-                          _buildStatusItem('${confirmedBookings.length}', 'Confirmed'),
-                          _buildStatusItem('${completedBookings.length}', 'Completed'),
-                        ],
-                      ),
-                    ],
+                  child: const Center(
+                    child: Icon(Icons.image, size: 60, color: Colors.grey),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Cuisine Title',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: descriptionController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Pending Bookings Section
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    const Text(
-                      'Pending Bookings',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
                     TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const BookedDetailsPage(),
-                          ),
-                        );
+                        if (titleController.text.isNotEmpty) {
+                          setState(() {
+                            postedCuisines.insert(0, {
+                              'image': imagePath,
+                              'title': titleController.text,
+                              'likes': 0,
+                              'comments': 0,
+                              'date': 'Just now',
+                            });
+                          });
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Post created successfully!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        }
                       },
-                      child: const Text('View All'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF8BC34A),
+                      ),
+                      child: const Text('Post'),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-
-                ...pendingBookings.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  var booking = entry.value;
-                  return _buildPendingBookingCard(
-                    context,
-                    index,
-                    booking['name'],
-                    booking['event'],
-                    booking['date'],
-                    booking['time'],
-                    booking['guests'],
-                  );
-                }).toList(),
-
-                const SizedBox(height: 20),
-
-                // Confirmed Bookings Section
-                const Text(
-                  'Confirmed Bookings',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-
-                ...confirmedBookings.map((booking) {
-                  return _buildConfirmedBookingCard(
-                    booking['name'],
-                    booking['event'],
-                    booking['date'],
-                    booking['time'],
-                    booking['guests'],
-                  );
-                }).toList(),
               ],
             ),
           ),
         ),
-        bottomNavigationBar: _buildBottomNav(context),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFB8E6B8),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(Icons.person, color: Color(0xFF8BC34A)),
+          ),
+        ),
+        title: isSearching
+            ? Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha:0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TextField(
+            controller: _searchController,
+            autofocus: true,
+            style: const TextStyle(color: Colors.black),
+            decoration: InputDecoration(
+              hintText: 'Search your posts...',
+              hintStyle: const TextStyle(color: Colors.grey),
+              border: InputBorder.none,
+              icon: const Icon(Icons.search, color: Colors.grey, size: 20),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                icon: const Icon(Icons.clear, color: Colors.grey),
+                onPressed: () {
+                  _searchController.clear();
+                },
+              )
+                  : null,
+            ),
+          ),
+        )
+            : const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Hello Chef',
+                style: TextStyle(fontSize: 12, color: Colors.grey)),
+            Text('Ram Bhatta',
+                style: TextStyle(fontSize: 16, color: Colors.black)),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(isSearching ? Icons.close : Icons.search, color: Colors.black),
+            onPressed: _toggleSearch,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Booking Status Card
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFB3D9),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Booking Status',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatusItem('$pendingCount', 'Pending'),
+                        _buildStatusItem('$confirmedCount', 'Confirmed'),
+                        _buildStatusItem('$completedCount', 'Completed'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // My Posted Cuisines Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    isSearching
+                        ? 'Search Results (${filteredCuisines.length})'
+                        : 'My Posted Cuisines',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  if (!isSearching)
+                    TextButton(
+                      onPressed: () {
+                        // View all posts
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('View all posts coming soon!')),
+                        );
+                      },
+                      child: const Text('View All'),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Posted Cuisines Grid
+              filteredCuisines.isEmpty
+                  ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(40),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.search_off,
+                        size: 80,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        isSearching ? 'No posts found' : 'No posts yet',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        isSearching
+                            ? 'Try searching with different keywords'
+                            : 'Start posting your cuisines',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+                  : GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.75,
+                ),
+                itemCount: filteredCuisines.length,
+                itemBuilder: (context, index) {
+                  return _buildCuisineCard(filteredCuisines[index]);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: _buildBottomNav(context),
     );
   }
 
@@ -282,24 +420,14 @@ class _ChefDashboardState extends State<ChefDashboard> {
     );
   }
 
-  Widget _buildPendingBookingCard(
-      BuildContext context,
-      int index,
-      String name,
-      String event,
-      String date,
-      String time,
-      String guests,
-      ) {
+  Widget _buildCuisineCard(Map<String, dynamic> cuisine) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha:0.1),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -308,173 +436,92 @@ class _ChefDashboardState extends State<ChefDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 25,
-                backgroundColor: Color(0xFFB8E6B8),
-                child: Icon(Icons.person, color: Colors.black),
+          // Image
+          Container(
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
+            ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+              child: Image.asset(
+                cuisine['image'],
+                fit: BoxFit.cover,
+                width: double.infinity,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Center(
+                    child: Icon(Icons.restaurant, size: 40, color: Colors.grey),
+                  );
+                },
+              ),
+            ),
+          ),
+          // Content
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Title
+                  Flexible(
+                    child: Text(
+                      cuisine['title'],
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    Text(event, style: const TextStyle(fontSize: 14)),
-                    Text(
-                      '$date • $time',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'Pending',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.orange,
-                    fontWeight: FontWeight.bold,
                   ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.people, size: 16, color: Colors.grey),
-              const SizedBox(width: 4),
-              Text(
-                guests,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () => _acceptBooking(index),
-                  icon: const Icon(Icons.check, size: 18),
-                  label: const Text('Accept'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8BC34A),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  const SizedBox(height: 8),
+                  // Stats and Date
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Likes and Comments Row
+                      Row(
+                        children: [
+                          const Icon(Icons.favorite, size: 14, color: Colors.red),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              '${cuisine['likes']}',
+                              style: const TextStyle(fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Icon(Icons.comment, size: 14, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              '${cuisine['comments']}',
+                              style: const TextStyle(fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      // Date
+                      Text(
+                        cuisine['date'],
+                        style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _cancelBooking(index, name),
-                  icon: const Icon(Icons.close, size: 18),
-                  label: const Text('Cancel'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    side: const BorderSide(color: Colors.red),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildConfirmedBookingCard(
-      String name,
-      String event,
-      String date,
-      String time,
-      String guests,
-      ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 25,
-            backgroundColor: Color(0xFFB8E6B8),
-            child: Icon(Icons.person, color: Colors.black),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(event, style: const TextStyle(fontSize: 14)),
-                Text(
-                  '$date • $time',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.people, size: 16, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(
-                      guests,
-                      style: const TextStyle(fontSize: 13, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.green.shade100,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Text(
-              'Confirmed',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
+                ],
               ),
             ),
           ),
@@ -503,8 +550,13 @@ class _ChefDashboardState extends State<ChefDashboard> {
           // Post button tapped
           _pickAndUploadImage(context);
         } else if (index == 3) {
-          // Calendar button tapped
-          _showCalendarDialog(context);
+          // Calendar button tapped - Navigate to Calendar
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CalendarPage(),
+            ),
+          );
         } else if (index == 4) {
           // Profile button tapped
           _showProfileMenu(context);
@@ -532,49 +584,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
           label: 'Profile',
         ),
       ],
-    );
-  }
-
-  void _showCalendarDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: 450,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Your Schedule',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Expanded(
-              child: CalendarView(),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -641,6 +650,20 @@ class _ChefDashboardState extends State<ChefDashboard> {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.event_available, color: Color(0xFF8BC34A)),
+              title: const Text('Manage Availability'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CalendarPage(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.settings, color: Color(0xFF8BC34A)),
               title: const Text('Settings'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
@@ -670,205 +693,68 @@ class _ChefDashboardState extends State<ChefDashboard> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.logout, color: Colors.red[700]),
+            const SizedBox(width: 12),
+            const Text('Logout'),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to logout from your account?',
+          style: TextStyle(fontSize: 16),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.grey[700],
+            ),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
+              // Close the dialog
               Navigator.pop(context);
+
+              // Show logout confirmation
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Logged out successfully')),
+                const SnackBar(
+                  content: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.white),
+                      SizedBox(width: 12),
+                      Text('Logged out successfully'),
+                    ],
+                  ),
+                  backgroundColor: Colors.green,
+                  duration: Duration(seconds: 2),
+                ),
               );
+
+              // Navigate back to login/home screen after a short delay
+              Future.delayed(const Duration(milliseconds: 500), () {
+                // Pop until reaching the root (login screen)
+                // Replace this with your actual login route
+                Navigator.of(context).popUntil((route) => route.isFirst);
+
+                // Alternative: Navigate to a specific login page
+                // Navigator.of(context).pushAndRemoveUntil(
+                //   MaterialPageRoute(builder: (context) => const LoginPage()),
+                //   (route) => false,
+                // );
+              });
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
             child: const Text('Logout'),
           ),
         ],
       ),
     );
-  }
-}
-
-// Calendar Widget
-class CalendarView extends StatefulWidget {
-  const CalendarView({super.key});
-
-  @override
-  State<CalendarView> createState() => _CalendarViewState();
-}
-
-class _CalendarViewState extends State<CalendarView> {
-  DateTime selectedDate = DateTime.now();
-
-  final List<Map<String, dynamic>> bookings = [
-    {
-      'date': DateTime(2025, 3, 15),
-      'event': 'Wedding Event',
-      'time': '6:00 PM - 10:00 PM',
-      'customer': 'John Doe',
-    },
-    {
-      'date': DateTime(2025, 3, 18),
-      'event': 'Birthday Party',
-      'time': '2:00 PM - 6:00 PM',
-      'customer': 'Sarah Smith',
-    },
-    {
-      'date': DateTime(2025, 3, 20),
-      'event': 'Corporate Event',
-      'time': '12:00 PM - 4:00 PM',
-      'customer': 'Michael Johnson',
-    },
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
-    final firstDayOfMonth = DateTime(now.year, now.month, 1);
-    final startingWeekday = firstDayOfMonth.weekday % 7;
-
-    return Column(
-      children: [
-        // Month Header
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${_getMonthName(now.month)} ${now.year}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        // Weekday Headers
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-                .map((day) => SizedBox(
-              width: 40,
-              child: Text(
-                day,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                  fontSize: 12,
-                ),
-              ),
-            ))
-                .toList(),
-          ),
-        ),
-        const SizedBox(height: 8),
-        // Calendar Grid
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-            ),
-            itemCount: startingWeekday + daysInMonth,
-            itemBuilder: (context, index) {
-              if (index < startingWeekday) {
-                return const SizedBox();
-              }
-              final day = index - startingWeekday + 1;
-              final date = DateTime(now.year, now.month, day);
-              final hasBooking = bookings.any((b) =>
-              b['date'].year == date.year &&
-                  b['date'].month == date.month &&
-                  b['date'].day == date.day);
-              final isToday = date.day == now.day &&
-                  date.month == now.month &&
-                  date.year == now.year;
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedDate = date;
-                  });
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isToday
-                        ? const Color(0xFF8BC34A)
-                        : (selectedDate.day == day
-                        ? const Color(0xFFFFB3D9)
-                        : Colors.transparent),
-                    borderRadius: BorderRadius.circular(8),
-                    border: hasBooking
-                        ? Border.all(color: const Color(0xFF8BC34A), width: 2)
-                        : null,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '$day',
-                      style: TextStyle(
-                        fontWeight: hasBooking ? FontWeight.bold : FontWeight.normal,
-                        color: isToday ? Colors.white : Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        // Booking indicator
-        Container(
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFB8E6B8),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.info_outline, size: 16),
-              SizedBox(width: 8),
-              Text(
-                'Days with bookings are highlighted with border',
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _getMonthName(int month) {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return months[month - 1];
   }
 }
