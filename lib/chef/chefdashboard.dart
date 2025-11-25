@@ -268,19 +268,29 @@ class _ChefDashboardState extends State<ChefDashboard> {
             ),
           ),
         )
-            : const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+            : Row(
           children: [
-            Text('Hello Chef',
-                style: TextStyle(fontSize: 12, color: Colors.grey)),
-            Text('Ram Bhatta',
-                style: TextStyle(fontSize: 16, color: Colors.black)),
+            Icon(Icons.location_on, color: Colors.grey[700], size: 20),
+            const SizedBox(width: 4),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Ram Bhatta',
+                    style: TextStyle(fontSize: 16, color: Colors.black)),
+              ],
+            ),
           ],
         ),
         actions: [
           IconButton(
             icon: Icon(isSearching ? Icons.close : Icons.search, color: Colors.black),
             onPressed: _toggleSearch,
+          ),
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined, color: Colors.black),
+            onPressed: () {
+              // Notification functionality placeholder
+            },
           ),
         ],
       ),
@@ -354,7 +364,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
                     children: [
                       Icon(
                         Icons.search_off,
-                        size: 80,
+                        size: 100,
                         color: Colors.grey[400],
                       ),
                       const SizedBox(height: 16),
