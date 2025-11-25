@@ -11,7 +11,7 @@ class UserModel {
   static const updatedAtField = 'updatedAt';
   static const signInMethodField = 'signInMethod';
   static const userAddressField = 'userAddress';
-  static const geoPointField = 'geo';
+  static const geoPointField = 'geoPoint';
 
   static const customerField = 'customer';
   static const chefField = 'chef';

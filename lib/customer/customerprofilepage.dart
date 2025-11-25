@@ -1,3 +1,4 @@
+import 'package:cookmate/backend/services/user_services.dart';
 import 'package:cookmate/core/helper.dart';
 import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +17,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   final ImagePicker _picker = ImagePicker();
 
   // User data
-  String userName = 'John Doe';
-  String userEmail = 'john.doe@email.com';
-  String userPhone = '+977 9876543210';
-  String userAddress = 'Novaliches, QC';
+  String userName = StaticClass.currentUser!.fullName ?? "Null";
+  String userEmail = StaticClass.currentUser!.email ?? "Null";
+  String userPhone = StaticClass.currentUser!.phoneNumber ?? "No Phone";
+  String userAddress = StaticClass.currentUser!.userAddress ?? "No address";
 
   // Booking history data
   final List<Map<String, dynamic>> bookingHistory = [
@@ -119,16 +120,16 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   // Edit Profile Dialog
   void _showEditProfileDialog() {
     final nameController = TextEditingController(
-      text: StaticClass.currentUser!.fullName ?? "No name",
+      text: userName,
     );
     final emailController = TextEditingController(
-      text: StaticClass.currentUser!.email ?? "No email",
+      text: userEmail,
     );
     final phoneController = TextEditingController(
-      text: StaticClass.currentUser!.phoneNumber ?? "No phone",
+      text: userPhone,
     );
     final addressController = TextEditingController(
-      text: StaticClass.currentUser!.userAddress ?? "No address",
+      text: userAddress,
     );
 
     showDialog(
@@ -183,20 +184,32 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              setState(() {
-                userName = nameController.text;
-                userEmail = emailController.text;
-                userPhone = phoneController.text;
-                userAddress = addressController.text;
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Profile updated successfully!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+            onPressed: () async {
+                final newName = userName != nameController.text ? nameController.text : null;
+                final newEmail = userEmail != emailController.text ? emailController.text : null;
+                final newPhone = userPhone != phoneController.text ? phoneController.text : null;
+                final newAddress = userAddress != addressController.text ? addressController.text : null;
+
+                final changed = await UserServices.updateProfile(context,
+                  fullName: newName,
+                  phoneNumber: newPhone,
+                  userAddress: newAddress,
+                );
+                if (changed){
+                  setState(() {
+                    userName = nameController.text;
+                    userEmail = emailController.text;
+                    userPhone = phoneController.text;
+                    userAddress = addressController.text;
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Profile updated successfully!'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  });
+                }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF8BC34A),
@@ -472,11 +485,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               ),
               const SizedBox(height: 20),
               Text(
-                StaticClass.currentUser!.fullName ?? "No Name",
+                userName,
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               Text(
-                StaticClass.currentUser!.email ?? "no@email.com",
+                userEmail,
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 8),
@@ -486,7 +499,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                   const Icon(Icons.phone, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
                   Text(
-                    StaticClass.currentUser!.phoneNumber ?? "No Phone",
+                    userPhone,
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],
@@ -497,7 +510,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                   const Icon(Icons.location_on, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
                   Text(
-                    StaticClass.currentUser!.userAddress ?? "No address",
+                    userAddress,
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],

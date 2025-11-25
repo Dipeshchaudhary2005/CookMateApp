@@ -13,8 +13,9 @@ import 'package:http/http.dart' as http;
 class UserServices {
   static const serverPath = '/users';
 
-  static Future<bool> updateProfile(String userId,  BuildContext context , {String? fullName, String? phoneNumber, Map<String, bool>? role, GeoPoint? geoPoint}) async{
+  static Future<bool> updateProfile(BuildContext context , {String? fullName, String? phoneNumber, Map<String, bool>? role, GeoPoint? geoPoint, String? userAddress}) async{
     try {
+      final userId = StaticClass.currentUser!.uid!;
       final url = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}$serverPath/$userId');
       var response = await http.post(
           url,
@@ -24,10 +25,11 @@ class UserServices {
             'Authorization': StaticClass.jsonWebToken!
           },
           body: jsonEncode({
-            'fullName' : fullName,
-            'phoneNumber' : phoneNumber,
-            'geoPoint' : geoPoint != null ? GeoFirePoint(geoPoint).data : null,
-            'role' : role
+            UserModel.fullNameField : fullName,
+            UserModel.phoneNumberField : phoneNumber,
+            UserModel.geoPointField : geoPoint != null ? GeoFirePoint(geoPoint).data : null,
+            UserModel.userTypeField : role,
+            UserModel.userAddressField : userAddress
           })
       );
       if (response.statusCode.toString().contains('20')){
