@@ -22,12 +22,10 @@ class FetchServices {
       if (response.statusCode.toString().contains('20')) {
         final json = jsonDecode(response.body);
         final output = (json['cuisines'] as List).map((e) => {e['name'] as String: e['dishes'] as List<String>}).toList();
-        print(output);
         return output;
       }
       else {
         final data = jsonDecode(response.body);
-        print (data['error']);
         if (context.mounted) {
           Helper.showError(context, data['error']);
         }

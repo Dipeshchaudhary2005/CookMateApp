@@ -495,7 +495,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -527,7 +527,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                               ),
                               Switch(
                                 value: isActive,
-                                activeColor: const Color(0xFF8BC34A),
+                                activeThumbColor: const Color(0xFF8BC34A),
                                 onChanged: (value) {
                                   setState(() {
                                     packages[index]['isActive'] = value;

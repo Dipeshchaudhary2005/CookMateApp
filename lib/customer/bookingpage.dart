@@ -1,5 +1,4 @@
 import 'package:cookmate/backend/services/fetch_services.dart';
-import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'summarypage.dart';
 

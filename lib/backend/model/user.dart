@@ -12,6 +12,7 @@ class UserModel {
   static const signInMethodField = 'signInMethod';
   static const userAddressField = 'userAddress';
   static const geoPointField = 'geoPoint';
+  static const urlToImageField = 'urlToImage';
 
   static const customerField = 'customer';
   static const chefField = 'chef';
@@ -26,6 +27,7 @@ class UserModel {
   String? signInMethod;
   String? userAddress;
   GeoPoint? geoPoint;
+  String? urlToImage;
 
   UserModel({
     this.uid,
@@ -37,7 +39,8 @@ class UserModel {
     this.createdAt,
     this.signInMethod,
     this.userAddress,
-    this.geoPoint
+    this.geoPoint,
+    this.urlToImage,
   });
 
   Map<String, dynamic> toMap() {
@@ -89,7 +92,8 @@ class UserModel {
       createdAt:  data[createdAtField],
       updatedAt: data[updatedAtField],
       geoPoint: data[geoPointField] != null ? (data[geoPointField] as Map<String, dynamic>)['geopoint'] as GeoPoint : null,
-      userAddress: data[userAddressField]
+      userAddress: data[userAddressField],
+      urlToImage: data[urlToImageField]
     );
   }
 }

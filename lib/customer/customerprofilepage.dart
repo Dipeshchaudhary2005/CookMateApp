@@ -13,7 +13,7 @@ class CustomerProfilePage extends StatefulWidget {
 }
 
 class _CustomerProfilePageState extends State<CustomerProfilePage> {
-  File? _profileImage;
+  Image _profileImage = StaticClass.currentUser!.urlToImage != null ? Image.network(StaticClass.currentUser!.urlToImage!, fit: BoxFit.cover) : StaticClass.noImage;
   final ImagePicker _picker = ImagePicker();
 
   // User data
@@ -63,17 +63,20 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         imageQuality: 75,
       );
 
-      if (pickedFile != null) {
-        setState(() {
-          _profileImage = File(pickedFile.path);
-        });
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile picture updated!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+      if (pickedFile != null && mounted) {
+        final changed = await UserServices.updateProfilePic(context, File(pickedFile.path));
+        if (changed){
+          setState(() {
+            _profileImage = StaticClass.currentUser!.urlToImage != null ? Image.network(StaticClass.currentUser!.urlToImage! , fit: BoxFit.cover,) :  StaticClass.noImage;
+          });
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profile picture updated!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       }
     } catch (e) {
       if (!mounted) return;
@@ -195,7 +198,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                   phoneNumber: newPhone,
                   userAddress: newAddress,
                 );
-                if (changed){
+                bool emailChanged = false;
+                if (context.mounted && newEmail != null){
+                  emailChanged = await UserServices.changeUserEmail(context, newEmail);
+                }
+                if (changed || emailChanged){
                   setState(() {
                     userName = nameController.text;
                     userEmail = emailController.text;
@@ -456,14 +463,9 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                           ),
                         ],
                       ),
-                      child: _profileImage != null
-                          ? ClipOval(
-                        child: Image.file(
-                          _profileImage!,
-                          fit: BoxFit.cover,
-                        ),
+                      child: ClipOval(
+                        child: _profileImage,
                       )
-                          : const Icon(Icons.person, size: 60, color: Colors.grey),
                     ),
                     Positioned(
                       bottom: 0,

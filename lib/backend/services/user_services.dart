@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookmate/backend/auth.dart';
@@ -11,7 +12,7 @@ import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 import 'package:http/http.dart' as http;
 
 class UserServices {
-  static const serverPath = '/users';
+  static const serverPath = '/auth/users';
 
   static Future<bool> updateProfile(BuildContext context , {String? fullName, String? phoneNumber, Map<String, bool>? role, GeoPoint? geoPoint, String? userAddress}) async{
     try {
@@ -36,7 +37,7 @@ class UserServices {
 
         if (context.mounted){
           final userData = await Auth.getUserData(context, StaticClass.jsonWebToken!, StaticClass.currentUser!.uid!);
-          StaticClass.currentUser = UserModel.fromJSON(userData);
+          StaticClass.currentUser = userData;
         }
         return true;
       }
@@ -49,6 +50,88 @@ class UserServices {
       }
 
     } on Exception catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      if (context.mounted) {
+        Helper.showError(context, "Internal Error");
+      }
+      return false;
+    }
+  }
+
+  static Future<bool> changeUserEmail(BuildContext context, String newEmail) async{
+    try{
+      final userId = StaticClass.currentUser!.uid!;
+      final url = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}$serverPath/$userId/email');
+      var response = await http.post(
+          url,
+          headers: {
+            "Content-Type": "application/json",
+            'Accept': 'application/json',
+            'Authorization': StaticClass.jsonWebToken!
+          },
+          body: jsonEncode({
+            UserModel.emailField : newEmail
+          })
+      );
+      if (response.statusCode.toString().contains('20')){
+
+        if (context.mounted){
+          final userData = await Auth.getUserData(context, StaticClass.jsonWebToken!, StaticClass.currentUser!.uid!);
+          StaticClass.currentUser = UserModel.fromJSON(userData);
+        }
+        return true;
+      }
+      else{
+        final data = jsonDecode(response.body);
+        if (context.mounted){
+          Helper.showError(context, data['error']);
+        }
+        return false;
+      }
+    } on Exception catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      if (context.mounted) {
+        Helper.showError(context, "Internal Error");
+      }
+      return false;
+    }
+  }
+
+  static Future<bool> updateProfilePic(BuildContext context, File image) async {
+    try {
+      final userId = StaticClass.currentUser!.uid!;
+      final url = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}$serverPath/$userId/pic');
+      final request = http.MultipartRequest("POST", url);
+      request.headers.addAll({
+        "Content-Type": "application/json",
+        'Accept': 'application/json',
+        'Authorization': StaticClass.jsonWebToken!
+      });
+      request.files.add(
+        await http.MultipartFile.fromPath('image', image.path),
+      );
+      final response = await request.send();
+      if (response.statusCode.toString().contains('20')){
+
+        if (context.mounted){
+          final userData = await Auth.getUserData(context, StaticClass.jsonWebToken!, StaticClass.currentUser!.uid!);
+          StaticClass.currentUser = userData;
+        }
+        return true;
+      }
+      else{
+        final responseData = await response.stream.bytesToString();
+        final data = jsonDecode(responseData);
+        if (context.mounted){
+          Helper.showError(context, data['error']);
+        }
+        return false;
+      }
+    } on Exception catch(e) {
       if (kDebugMode) {
         print(e.toString());
       }
