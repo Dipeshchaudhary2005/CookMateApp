@@ -12,7 +12,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
   late TabController _tabController;
 
   // Sample booking data
-  final List<Map<String, dynamic>> pendingBookings = [
+  List<Map<String, dynamic>> pendingBookings = [
     {
       'name': 'John Doe',
       'event': 'Wedding Event',
@@ -37,7 +37,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
     },
   ];
 
-  final List<Map<String, dynamic>> confirmedBookings = [
+  List<Map<String, dynamic>> confirmedBookings = [
     {
       'name': 'Emma Wilson',
       'event': 'Anniversary Celebration',
@@ -51,7 +51,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
     },
   ];
 
-  final List<Map<String, dynamic>> completedBookings = [
+  List<Map<String, dynamic>> completedBookings = [
     {
       'name': 'Lisa Anderson',
       'event': 'Retirement Party',
@@ -76,6 +76,72 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _acceptBooking(Map<String, dynamic> booking) {
+    setState(() {
+      // Remove from pending bookings
+      pendingBookings.removeWhere((b) =>
+      b['name'] == booking['name'] &&
+          b['date'] == booking['date']
+      );
+
+      // Add to confirmed bookings
+      confirmedBookings.add(booking);
+
+      // Switch to confirmed tab
+      _tabController.animateTo(1);
+    });
+
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Booking Accepted'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  void _cancelBooking(Map<String, dynamic> booking) {
+    setState(() {
+      // Remove from pending bookings
+      pendingBookings.removeWhere((b) =>
+      b['name'] == booking['name'] &&
+          b['date'] == booking['date']
+      );
+    });
+
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Booking Cancelled'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  void _completeBooking(Map<String, dynamic> booking) {
+    setState(() {
+      // Remove from confirmed bookings
+      confirmedBookings.removeWhere((b) =>
+      b['name'] == booking['name'] &&
+          b['date'] == booking['date']
+      );
+
+      // Add to completed bookings (without rating initially)
+      completedBookings.add(booking);
+
+      // Switch to completed tab
+      _tabController.animateTo(2);
+    });
+
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Booking marked as completed'),
+        backgroundColor: Colors.green,
+      ),
+    );
   }
 
   void _showBookingDetails(Map<String, dynamic> booking, String status) {
@@ -153,15 +219,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Booking Accepted'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          },
+                          onPressed: () => _acceptBooking(booking),
                           icon: const Icon(Icons.check),
                           label: const Text('Accept'),
                           style: ElevatedButton.styleFrom(
@@ -173,15 +231,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                       const SizedBox(width: 12),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Booking Cancelled'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          },
+                          onPressed: () => _cancelBooking(booking),
                           icon: const Icon(Icons.close),
                           label: const Text('Cancel'),
                           style: OutlinedButton.styleFrom(
@@ -193,10 +243,23 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                       ),
                     ],
                   ),
-                if (status == 'confirmed')
+                if (status == 'confirmed') ...[
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _completeBooking(booking),
+                      icon: const Icon(Icons.check_circle),
+                      label: const Text('Complete'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
                       onPressed: () {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -206,13 +269,16 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                           ),
                         );
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8BC34A),
+                      icon: const Icon(Icons.phone),
+                      label: const Text('Contact Customer'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF8BC34A),
+                        side: const BorderSide(color: Color(0xFF8BC34A)),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: const Text('Contact Customer'),
                     ),
                   ),
+                ],
               ],
             ),
           ),
