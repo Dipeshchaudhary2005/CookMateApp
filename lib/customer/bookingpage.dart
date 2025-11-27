@@ -1,3 +1,4 @@
+import 'package:cookmate/backend/services/fetch_services.dart';
 import 'package:flutter/material.dart';
 import 'summarypage.dart';
 
@@ -9,13 +10,14 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
-  String selectedEvent = 'Engagement Function';
+  String? selectedEvent;
   DateTime selectedDate = DateTime.now();
   String selectedTime = '8:00 AM - 12:00 PM';
   String? selectedPackage;
   List<String> selectedFoodItems = [];
   List<String> customMenuItems = [];
-
+  late Future<List<Map<String, List<String>>>?> cuisinesList;
+  late Future<List<String>> eventList;
   // Food items for different packages
   final Map<String, List<String>> packageFoodItems = {
     '2-Course Dinner': [
@@ -37,11 +39,22 @@ class _BookingPageState extends State<BookingPage> {
     ],
   };
 
+  @override
+  void initState() {
+    super.initState();
+    _loadData(context);
+  }
+
+  void _loadData(BuildContext context) {
+    cuisinesList = FetchServices.getCuisines(context);
+    eventList = List.empty() as Future<List<String>>;
+  }
+
   // Method to show calendar
   Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
+      initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) {
@@ -79,7 +92,10 @@ class _BookingPageState extends State<BookingPage> {
               ),
               title: Text(
                 'Select Food Items - $packageName',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
               content: SizedBox(
                 width: double.maxFinite,
@@ -215,7 +231,10 @@ class _BookingPageState extends State<BookingPage> {
                                 dense: true,
                                 title: Text(tempCustomItems[index]),
                                 trailing: IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
                                   onPressed: () {
                                     setDialogState(() {
                                       tempCustomItems.removeAt(index);
@@ -244,7 +263,9 @@ class _BookingPageState extends State<BookingPage> {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('${tempCustomItems.length} custom items added'),
+                        content: Text(
+                          '${tempCustomItems.length} custom items added',
+                        ),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -292,7 +313,7 @@ class _BookingPageState extends State<BookingPage> {
                 'eSewa',
                 'assets/esewa_logo.png',
                 Colors.green[700]!,
-                    () {
+                () {
                   Navigator.pop(context);
                   _processPayment('eSewa');
                 },
@@ -302,7 +323,7 @@ class _BookingPageState extends State<BookingPage> {
                 'Fonepay',
                 'assets/fonepay_logo.png',
                 Colors.blue[700]!,
-                    () {
+                () {
                   Navigator.pop(context);
                   _processPayment('Fonepay');
                 },
@@ -312,7 +333,7 @@ class _BookingPageState extends State<BookingPage> {
                 'Khalti',
                 'assets/khalti_logo.png',
                 Colors.purple[700]!,
-                    () {
+                () {
                   Navigator.pop(context);
                   _processPayment('Khalti');
                 },
@@ -322,7 +343,7 @@ class _BookingPageState extends State<BookingPage> {
                 'Cash on Service',
                 null,
                 Colors.orange[700]!,
-                    () {
+                () {
                   Navigator.pop(context);
                   _processPayment('Cash on Service');
                 },
@@ -346,42 +367,40 @@ class _BookingPageState extends State<BookingPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) => const Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFF8BC34A),
-        ),
+        child: CircularProgressIndicator(color: Color(0xFF8BC34A)),
       ),
     );
 
     Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pop(context);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Payment via $paymentMethod successful!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const SummaryPage()),
-      );
+      if (context.mounted && mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Payment via $paymentMethod successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const SummaryPage()),
+        );
+      }
     });
   }
 
   Widget _buildPaymentOption(
-      String title,
-      String? logoPath,
-      Color color,
-      VoidCallback onTap,
-      ) {
+    String title,
+    String? logoPath,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: color, width: 2),
         ),
@@ -396,15 +415,15 @@ class _BookingPageState extends State<BookingPage> {
               ),
               child: logoPath != null
                   ? Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Image.asset(
-                  logoPath,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(Icons.payment, color: color, size: 30);
-                  },
-                ),
-              )
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.asset(
+                        logoPath,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(Icons.payment, color: color, size: 30);
+                        },
+                      ),
+                    )
                   : Icon(Icons.money, color: color, size: 30),
             ),
             const SizedBox(width: 16),
@@ -465,14 +484,29 @@ class _BookingPageState extends State<BookingPage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: DropdownButton<String>(
-                  value: selectedEvent,
-                  isExpanded: true,
-                  underline: const SizedBox(),
-                  items: ['Engagement Function', 'Birthday Party', 'Wedding']
-                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                      .toList(),
-                  onChanged: (val) => setState(() => selectedEvent = val!),
+                child: FutureBuilder<List<String>>(
+                  future: eventList,
+                  builder: (context, asyncSnapshot) {
+                    if (asyncSnapshot.hasData) {
+                      return DropdownButton<String>(
+                        value: selectedEvent,
+                        isExpanded: true,
+                        underline: const SizedBox(),
+                        items: asyncSnapshot.data!
+                            .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)),
+                            )
+                            .toList(),
+                        // items: ['Engagement Function', 'Birthday Party', 'Wedding']
+                        //     .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        //     .toList(),
+                        onChanged: (val) =>
+                            setState(() => selectedEvent = val!),
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
                 ),
               ),
               const SizedBox(height: 20),
@@ -493,7 +527,10 @@ class _BookingPageState extends State<BookingPage> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.calendar_today, color: Color(0xFF8BC34A)),
+                      const Icon(
+                        Icons.calendar_today,
+                        color: Color(0xFF8BC34A),
+                      ),
                       const SizedBox(width: 12),
                       Text(
                         '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}',
@@ -523,12 +560,17 @@ class _BookingPageState extends State<BookingPage> {
                   value: selectedTime,
                   isExpanded: true,
                   underline: const SizedBox(),
-                  items: [
-                    '8:00 AM - 12:00 PM',
-                    '12:00 PM - 4:00 PM',
-                    '4:00 PM - 8:00 PM',
-                    '8:00 PM - 12:00 AM',
-                  ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                  items:
+                      [
+                            '8:00 AM - 12:00 PM',
+                            '12:00 PM - 4:00 PM',
+                            '4:00 PM - 8:00 PM',
+                            '8:00 PM - 12:00 AM',
+                          ]
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
                   onChanged: (val) => setState(() => selectedTime = val!),
                 ),
               ),
@@ -549,7 +591,9 @@ class _BookingPageState extends State<BookingPage> {
                 Colors.white,
                 onTap: () => _showFoodSelectionDialog('2-Course Dinner'),
                 isSelected: selectedPackage == '2-Course Dinner',
-                selectedCount: selectedPackage == '2-Course Dinner' ? selectedFoodItems.length : 0,
+                selectedCount: selectedPackage == '2-Course Dinner'
+                    ? selectedFoodItems.length
+                    : 0,
                 showAddButton: true,
               ),
               const SizedBox(height: 12),
@@ -562,7 +606,9 @@ class _BookingPageState extends State<BookingPage> {
                 Colors.white,
                 onTap: () => _showFoodSelectionDialog('Private Cooking'),
                 isSelected: selectedPackage == 'Private Cooking',
-                selectedCount: selectedPackage == 'Private Cooking' ? selectedFoodItems.length : 0,
+                selectedCount: selectedPackage == 'Private Cooking'
+                    ? selectedFoodItems.length
+                    : 0,
                 showAddButton: true,
               ),
               const SizedBox(height: 12),
@@ -575,7 +621,9 @@ class _BookingPageState extends State<BookingPage> {
                 Colors.white,
                 onTap: _showCustomMenuDialog,
                 isSelected: selectedPackage == 'Custom Menu',
-                selectedCount: selectedPackage == 'Custom Menu' ? customMenuItems.length : 0,
+                selectedCount: selectedPackage == 'Custom Menu'
+                    ? customMenuItems.length
+                    : 0,
                 showAddButton: true,
               ),
               const SizedBox(height: 30),
@@ -610,15 +658,15 @@ class _BookingPageState extends State<BookingPage> {
   }
 
   Widget _buildPackageCard(
-      String title,
-      String price,
-      String description,
-      Color color, {
-        VoidCallback? onTap,
-        bool isSelected = false,
-        int selectedCount = 0,
-        bool showAddButton = false,
-      }) {
+    String title,
+    String price,
+    String description,
+    Color color, {
+    VoidCallback? onTap,
+    bool isSelected = false,
+    int selectedCount = 0,
+    bool showAddButton = false,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

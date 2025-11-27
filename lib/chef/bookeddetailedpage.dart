@@ -7,7 +7,8 @@ class BookedDetailsPage extends StatefulWidget {
   State<BookedDetailsPage> createState() => _BookedDetailsPageState();
 }
 
-class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTickerProviderStateMixin {
+class _BookedDetailsPageState extends State<BookedDetailsPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   // Sample booking data
@@ -161,7 +162,10 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                   children: [
                     const Text(
                       'Booking Details',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close),
@@ -175,10 +179,22 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                 _buildDetailRow(Icons.event, 'Event Type', booking['event']),
                 _buildDetailRow(Icons.calendar_today, 'Date', booking['date']),
                 _buildDetailRow(Icons.access_time, 'Time', booking['time']),
-                _buildDetailRow(Icons.people, 'Guests', '${booking['guests']} People'),
-                _buildDetailRow(Icons.restaurant_menu, 'Package', booking['package']),
+                _buildDetailRow(
+                  Icons.people,
+                  'Guests',
+                  '${booking['guests']} People',
+                ),
+                _buildDetailRow(
+                  Icons.restaurant_menu,
+                  'Package',
+                  booking['package'],
+                ),
                 _buildDetailRow(Icons.phone, 'Phone', booking['phone']),
-                _buildDetailRow(Icons.location_on, 'Address', booking['address']),
+                _buildDetailRow(
+                  Icons.location_on,
+                  'Address',
+                  booking['address'],
+                ),
                 const Divider(),
                 _buildDetailRow(Icons.money, 'Total Amount', booking['amount']),
                 if (booking['rating'] != null) ...[
@@ -189,7 +205,10 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                       const SizedBox(width: 8),
                       Text(
                         'Rating: ${booking['rating']}',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -286,7 +305,10 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                 ),
                 Text(
                   value,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -324,14 +346,14 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Flexible(
-                    child: Text(
-                      'Pending',
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child: Text('Pending', overflow: TextOverflow.ellipsis),
                   ),
                   const SizedBox(width: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.orange,
                       borderRadius: BorderRadius.circular(12),
@@ -350,14 +372,14 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Flexible(
-                    child: Text(
-                      'Confirmed',
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child: Text('Confirmed', overflow: TextOverflow.ellipsis),
                   ),
                   const SizedBox(width: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.green,
                       borderRadius: BorderRadius.circular(12),
@@ -376,14 +398,14 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Flexible(
-                    child: Text(
-                      'Completed',
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child: Text('Completed', overflow: TextOverflow.ellipsis),
                   ),
                   const SizedBox(width: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.blue,
                       borderRadius: BorderRadius.circular(12),
@@ -416,11 +438,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.event_busy,
-              size: 80,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.event_busy, size: 80, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'No $status bookings',
@@ -456,10 +474,13 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: statusColor.withOpacity(0.3), width: 2),
+          border: Border.all(
+            color: statusColor.withValues(alpha: 0.3),
+            width: 2,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -495,15 +516,21 @@ class _BookedDetailsPageState extends State<BookedDetailsPage> with SingleTicker
                       ),
                       Text(
                         booking['event'],
-                        style: const TextStyle(fontSize: 14, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.2),
+                    color: statusColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

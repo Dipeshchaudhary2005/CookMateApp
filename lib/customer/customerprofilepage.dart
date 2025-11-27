@@ -1,7 +1,9 @@
+import 'package:cookmate/backend/services/user_services.dart';
+import 'package:cookmate/core/helper.dart';
+import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../Frontend/landingpage.dart';
 
 class CustomerProfilePage extends StatefulWidget {
   const CustomerProfilePage({super.key});
@@ -11,14 +13,16 @@ class CustomerProfilePage extends StatefulWidget {
 }
 
 class _CustomerProfilePageState extends State<CustomerProfilePage> {
-  File? _profileImage;
+  Image _profileImage = StaticClass.currentUser!.urlToImage != null
+      ? Image.network(StaticClass.currentUser!.urlToImage!, fit: BoxFit.cover)
+      : StaticClass.noImage;
   final ImagePicker _picker = ImagePicker();
 
   // User data
-  String userName = 'John Doe';
-  String userEmail = 'john.doe@email.com';
-  String userPhone = '+977 9876543210';
-  String userAddress = 'Novaliches, QC';
+  String userName = StaticClass.currentUser!.fullName ?? "Null";
+  String userEmail = StaticClass.currentUser!.email ?? "Null";
+  String userPhone = StaticClass.currentUser!.phoneNumber ?? "No Phone";
+  String userAddress = StaticClass.currentUser!.userAddress ?? "No address";
 
   // Booking history data
   final List<Map<String, dynamic>> bookingHistory = [
@@ -61,18 +65,31 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         imageQuality: 75,
       );
 
-      if (pickedFile != null) {
-        setState(() {
-          _profileImage = File(pickedFile.path);
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile picture updated!'),
-            backgroundColor: Colors.green,
-          ),
+      if (pickedFile != null && mounted) {
+        final changed = await UserServices.updateProfilePic(
+          context,
+          File(pickedFile.path),
         );
+        if (changed) {
+          setState(() {
+            _profileImage = StaticClass.currentUser!.urlToImage != null
+                ? Image.network(
+                    StaticClass.currentUser!.urlToImage!,
+                    fit: BoxFit.cover,
+                  )
+                : StaticClass.noImage;
+          });
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profile picture updated!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error picking image: $e'),
@@ -100,7 +117,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: Color(0xFF8BC34A)),
+              leading: const Icon(
+                Icons.photo_library,
+                color: Color(0xFF8BC34A),
+              ),
               title: const Text('Gallery'),
               onTap: () {
                 Navigator.pop(context);
@@ -172,20 +192,48 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              setState(() {
-                userName = nameController.text;
-                userEmail = emailController.text;
-                userPhone = phoneController.text;
-                userAddress = addressController.text;
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Profile updated successfully!'),
-                  backgroundColor: Colors.green,
-                ),
+            onPressed: () async {
+              final newName = userName != nameController.text
+                  ? nameController.text
+                  : null;
+              final newEmail = userEmail != emailController.text
+                  ? emailController.text
+                  : null;
+              final newPhone = userPhone != phoneController.text
+                  ? phoneController.text
+                  : null;
+              final newAddress = userAddress != addressController.text
+                  ? addressController.text
+                  : null;
+
+              final changed = await UserServices.updateProfile(
+                context,
+                fullName: newName,
+                phoneNumber: newPhone,
+                userAddress: newAddress,
               );
+              bool emailChanged = false;
+              if (context.mounted && newEmail != null) {
+                emailChanged = await UserServices.changeUserEmail(
+                  context,
+                  newEmail,
+                );
+              }
+              if (changed || emailChanged) {
+                setState(() {
+                  userName = nameController.text;
+                  userEmail = emailController.text;
+                  userPhone = phoneController.text;
+                  userAddress = addressController.text;
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Profile updated successfully!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                });
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF8BC34A),
@@ -344,7 +392,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildPaymentMethodTile('eSewa', Icons.account_balance_wallet, true),
+            _buildPaymentMethodTile(
+              'eSewa',
+              Icons.account_balance_wallet,
+              true,
+            ),
             _buildPaymentMethodTile('Khalti', Icons.payment, false),
             _buildPaymentMethodTile('Fonepay', Icons.phone_android, false),
             const SizedBox(height: 16),
@@ -379,16 +431,16 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
       title: Text(name),
       trailing: isDefault
           ? Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: Colors.green,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Text(
-          'Default',
-          style: TextStyle(color: Colors.white, fontSize: 12),
-        ),
-      )
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                'Default',
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            )
           : null,
     );
   }
@@ -426,20 +478,13 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             spreadRadius: 2,
                             blurRadius: 5,
                           ),
                         ],
                       ),
-                      child: _profileImage != null
-                          ? ClipOval(
-                        child: Image.file(
-                          _profileImage!,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                          : const Icon(Icons.person, size: 60, color: Colors.grey),
+                      child: ClipOval(child: _profileImage),
                     ),
                     Positioned(
                       bottom: 0,
@@ -452,7 +497,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                             color: Color(0xFF8BC34A),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            size: 20,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -462,11 +511,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               const SizedBox(height: 20),
               Text(
                 userName,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               Text(
                 userEmail,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 8),
               Row(
@@ -474,7 +523,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 children: [
                   const Icon(Icons.phone, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text(userPhone, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(
+                    userPhone,
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
                 ],
               ),
               Row(
@@ -482,7 +534,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 children: [
                   const Icon(Icons.location_on, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text(userAddress, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  Text(
+                    userAddress,
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
                 ],
               ),
               const SizedBox(height: 30),
@@ -510,29 +565,30 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 context,
                 Icons.notifications,
                 'Notifications',
-                    () {
+                () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Notifications page coming soon!')),
+                    const SnackBar(
+                      content: Text('Notifications page coming soon!'),
+                    ),
                   );
                 },
               ),
-              _buildProfileOption(
-                context,
-                Icons.help,
-                'Help & Support',
-                    () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Help & Support page coming soon!')),
-                  );
-                },
-              ),
+              _buildProfileOption(context, Icons.help, 'Help & Support', () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Help & Support page coming soon!'),
+                  ),
+                );
+              }),
               _buildProfileOption(
                 context,
                 Icons.privacy_tip,
                 'Privacy Policy',
-                    () {
+                () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Privacy Policy page coming soon!')),
+                    const SnackBar(
+                      content: Text('Privacy Policy page coming soon!'),
+                    ),
                   );
                 },
               ),
@@ -543,33 +599,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
+                    // Show logout confirmation dialog
                     showDialog(
                       context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Logout'),
-                        content: const Text('Are you sure you want to logout?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LandingPage(),
-                                ),
-                                    (route) => false,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                            ),
-                            child: const Text('Logout'),
-                          ),
-                        ],
-                      ),
+                      builder: (context) => Helper.confirmLogOut(context),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -593,11 +626,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   }
 
   Widget _buildProfileOption(
-      BuildContext context,
-      IconData icon,
-      String title,
-      VoidCallback onTap,
-      ) {
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onTap,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(

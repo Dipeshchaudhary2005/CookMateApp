@@ -1,13 +1,15 @@
+import 'dart:math';
+
 import 'package:cookmate/backend/auth.dart';
+import 'package:cookmate/backend/model/user.dart';
+import 'package:cookmate/core/helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../chef/chefdashboard.dart';
-import '../customer/customerdashboard.dart';
 import 'registration_page.dart';
 import 'forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
-  final String userType;
+  final UserType userType;
 
   const LoginPage({super.key, required this.userType});
 
@@ -29,6 +31,13 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseAuth.instance.signOut();
+  }
+
   Future<void> _handleGoogleSignIn() async {
     setState(() {
       _isLoading = true;
@@ -36,35 +45,11 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       // Call your Auth class method for Google Sign-In
-      await Auth.signInWithGoogle(widget.userType);
-
-      if (FirebaseAuth.instance.currentUser != null) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Google Sign-In Successful!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // Navigate based on user type
-        if (widget.userType == "Customer") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CustomerDashboard(),
-            ),
-          );
-        } else if (widget.userType == "Chef") {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ChefDashboard(),
-            ),
-          );
-        }
+      await Auth.signInWithGoogle(widget.userType, context);
+      if (!mounted) {
+        return;
       }
+      await Helper.loadDashBoard(context, userType: widget.userType);
     } catch (e) {
       if (!mounted) return;
 
@@ -127,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 40),
                 Text(
-                  'Login as ${widget.userType}',
+                  'Login as ${widget.userType.name}',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -137,10 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 8),
                 const Text(
                   'Welcome back! Please enter your details.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(height: 32),
                 Form(
@@ -216,7 +198,8 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ForgotPasswordPage(),
+                                builder: (context) =>
+                                    const ForgotPasswordPage(),
                               ),
                             );
                           },
@@ -233,49 +216,33 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _isLoading ? null : () async {
-                            if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                _isLoading = true;
-                              });
+                          onPressed: _isLoading
+                              ? null
+                              : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
 
-                              await Auth.loginUserWithEmail(
-                                  _emailController.text,
-                                  _passwordController.text
-                              );
+                                    final loggedIn = await Auth.loginUserWithEmail(
+                                      _emailController.text,
+                                      _passwordController.text,
+                                      context
+                                    );
 
-                              if (!mounted) return;
+                                    if (!mounted) return;
 
-                              setState(() {
-                                _isLoading = false;
-                              });
-
-                              if (FirebaseAuth.instance.currentUser == null) return;
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Login Successful!'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-
-                              if (widget.userType == "Customer") {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const CustomerDashboard()
-                                  ),
-                                );
-                              } else if (widget.userType == "Chef") {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const ChefDashboard()
-                                  ),
-                                );
-                              }
-                            }
-                          },
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                    if (context.mounted && loggedIn) {
+                                      await Helper.loadDashBoard(
+                                        context,
+                                        userType: widget.userType,
+                                      );
+                                    }
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black87,
                             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -285,21 +252,23 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child: _isLoading
                               ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
                               : const Text(
-                            'Login',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
+                                  'Login',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -307,10 +276,7 @@ class _LoginPageState extends State<LoginPage> {
                       Row(
                         children: [
                           Expanded(
-                            child: Container(
-                              height: 1,
-                              color: Colors.black26,
-                            ),
+                            child: Container(height: 1, color: Colors.black26),
                           ),
                           const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16),
@@ -323,10 +289,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           Expanded(
-                            child: Container(
-                              height: 1,
-                              color: Colors.black26,
-                            ),
+                            child: Container(height: 1, color: Colors.black26),
                           ),
                         ],
                       ),
@@ -418,10 +381,7 @@ class _LoginPageState extends State<LoginPage> {
       child: ClipOval(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Image.asset(
-            'Resource/chefHat.png',
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset('Resource/chefHat.png', fit: BoxFit.contain),
         ),
       ),
     );

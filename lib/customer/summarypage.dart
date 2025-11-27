@@ -38,7 +38,9 @@ class _SummaryPageState extends State<SummaryPage> {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: const Text('Confirm Booking'),
-                  content: const Text('Are you sure you want to confirm this booking?'),
+                  content: const Text(
+                    'Are you sure you want to confirm this booking?',
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
@@ -56,9 +58,12 @@ class _SummaryPageState extends State<SummaryPage> {
                         );
                         // Navigate to rating page after 1 second
                         Future.delayed(const Duration(seconds: 1), () {
+                          if (!context.mounted) return;
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const RatingPage()),
+                            MaterialPageRoute(
+                              builder: (context) => const RatingPage(),
+                            ),
                           );
                         });
                       },
@@ -108,7 +113,10 @@ class _SummaryPageState extends State<SummaryPage> {
                       children: [
                         Text(
                           '24-02-28',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           '8:00 AM - 8:00 AM',
@@ -150,10 +158,17 @@ class _SummaryPageState extends State<SummaryPage> {
                         value: selectedEvent,
                         isExpanded: true,
                         underline: const SizedBox(),
-                        items: ['Engagement Function', 'Birthday Party', 'Wedding']
-                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                            .toList(),
-                        onChanged: (val) => setState(() => selectedEvent = val!),
+                        items:
+                            ['Engagement Function', 'Birthday Party', 'Wedding']
+                                .map(
+                                  (e) => DropdownMenuItem(
+                                    value: e,
+                                    child: Text(e),
+                                  ),
+                                )
+                                .toList(),
+                        onChanged: (val) =>
+                            setState(() => selectedEvent = val!),
                       ),
                     ),
                   ],
@@ -172,7 +187,7 @@ class _SummaryPageState extends State<SummaryPage> {
               _buildMenuSection(
                 'Appetizers',
                 showAppetizers,
-                    () => setState(() => showAppetizers = !showAppetizers),
+                () => setState(() => showAppetizers = !showAppetizers),
               ),
               const SizedBox(height: 12),
 
@@ -180,7 +195,7 @@ class _SummaryPageState extends State<SummaryPage> {
               _buildMenuSection(
                 'Main Courses',
                 showMainCourse,
-                    () => setState(() => showMainCourse = !showMainCourse),
+                () => setState(() => showMainCourse = !showMainCourse),
               ),
               const SizedBox(height: 12),
 
@@ -188,7 +203,7 @@ class _SummaryPageState extends State<SummaryPage> {
               _buildMenuSection(
                 'Sides & Desserts',
                 showSidesDesserts,
-                    () => setState(() => showSidesDesserts = !showSidesDesserts),
+                () => setState(() => showSidesDesserts = !showSidesDesserts),
               ),
               const SizedBox(height: 12),
 
@@ -196,7 +211,7 @@ class _SummaryPageState extends State<SummaryPage> {
               _buildMenuSection(
                 'Beverages',
                 showBeverages,
-                    () => setState(() => showBeverages = !showBeverages),
+                () => setState(() => showBeverages = !showBeverages),
               ),
               const SizedBox(height: 20),
 
@@ -238,7 +253,10 @@ class _SummaryPageState extends State<SummaryPage> {
                         children: [
                           Text(
                             'Ram Bhatta',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           Text(
                             'Italian',
@@ -272,10 +290,7 @@ class _SummaryPageState extends State<SummaryPage> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w500),
-        ),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
         trailing: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
         onTap: onTap,
       ),

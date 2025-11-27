@@ -1,3 +1,4 @@
+import 'package:cookmate/backend/model/user.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 
@@ -52,14 +53,16 @@ class ChooseUserPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LoginPage(userType: 'Customer'),
+                    builder: (context) =>
+                        const LoginPage(userType: UserType.customer),
                   ),
                 );
               },
               child: _buildUserCard(
                 icon: Icons.shopping_cart,
                 title: "I'm a Customer",
-                subtitle: "Browse recipes, create meal plans,\nand order ingredients",
+                subtitle:
+                    "Browse recipes, create meal plans,\nand order ingredients",
               ),
             ),
             const SizedBox(height: 16),
@@ -68,7 +71,8 @@ class ChooseUserPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LoginPage(userType: 'Chef'),
+                    builder: (context) =>
+                        const LoginPage(userType: UserType.chef),
                   ),
                 );
               },
@@ -83,10 +87,7 @@ class ChooseUserPage extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 24.0),
               child: Text(
                 'Power by CookMate Inc',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.black54,
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.black54),
               ),
             ),
           ],
@@ -106,10 +107,7 @@ class ChooseUserPage extends StatelessWidget {
       child: ClipOval(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Image.asset(
-            'Resource/chefHat.png',
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset('Resource/chefHat.png', fit: BoxFit.contain),
         ),
       ),
     );
@@ -148,7 +146,8 @@ class ChooseUserPage extends StatelessWidget {
                   subtitle,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.black.withOpacity(0.6),
+                    // color: Colors.black.withOpacity(0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     height: 1.3,
                   ),
                 ),

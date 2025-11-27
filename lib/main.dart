@@ -1,15 +1,14 @@
 // main.dart
+import 'package:cookmate/backend/auth.dart';
+import 'package:cookmate/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:cookmate/Frontend/splashpage.dart';
 
-
-Future<void> main () async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Auth.googleSignIn.initialize();
   runApp(const MyApp());
 }
 
@@ -25,7 +24,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const SplashPage(), // Use SplashPage as home
+      routes: AppRoutes.getAppRoutes(),
+      initialRoute: AppRoutes.splashScreenRoute, // Use SplashPage as home
     );
   }
 }

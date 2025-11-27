@@ -11,7 +11,6 @@ class FavoriteChefPage extends StatefulWidget {
 }
 
 class _FavoriteChefPageState extends State<FavoriteChefPage> {
-
   void _removeFavorite(int index) {
     setState(() {
       widget.favoritePosts[index]['isFavorite'] = false;
@@ -70,7 +69,11 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Center(
-                        child: Icon(Icons.restaurant, size: 80, color: Colors.grey),
+                        child: Icon(
+                          Icons.restaurant,
+                          size: 80,
+                          color: Colors.grey,
+                        ),
                       );
                     },
                   ),
@@ -91,9 +94,12 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                       const SizedBox(height: 8),
                       // Price
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF8BC34A).withOpacity(0.2),
+                          color: const Color(0xFF8BC34A).withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -155,11 +161,19 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                                 ),
                                 Row(
                                   children: [
-                                    const Icon(Icons.star, color: Colors.amber, size: 16),
+                                    const Icon(
+                                      Icons.star,
+                                      color: Colors.amber,
+                                      size: 16,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text('${post['rating']}'),
                                     const SizedBox(width: 12),
-                                    const Icon(Icons.work, size: 16, color: Colors.grey),
+                                    const Icon(
+                                      Icons.work,
+                                      size: 16,
+                                      color: Colors.grey,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(post['experience']),
                                   ],
@@ -247,41 +261,38 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
       ),
       body: widget.favoritePosts.isEmpty
           ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.bookmark_border,
-              size: 100,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'No favorites yet',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.bookmark_border,
+                    size: 100,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'No favorites yet',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Start adding posts to your favorites!',
+                    style: TextStyle(fontSize: 16, color: Colors.grey[500]),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Start adding posts to your favorites!',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[500],
-              ),
-            ),
-          ],
-        ),
-      )
+            )
           : ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: widget.favoritePosts.length,
-        itemBuilder: (context, index) {
-          return _buildFavoriteCard(widget.favoritePosts[index], index);
-        },
-      ),
+              padding: const EdgeInsets.all(16),
+              itemCount: widget.favoritePosts.length,
+              itemBuilder: (context, index) {
+                return _buildFavoriteCard(widget.favoritePosts[index], index);
+              },
+            ),
     );
   }
 
@@ -295,7 +306,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -406,7 +417,11 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                         style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(width: 20),
-                      const Icon(Icons.comment_outlined, color: Colors.grey, size: 20),
+                      const Icon(
+                        Icons.comment_outlined,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         '${post['comments']}',
@@ -414,14 +429,20 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: const Icon(Icons.bookmark, color: Color(0xFF8BC34A)),
+                        icon: const Icon(
+                          Icons.bookmark,
+                          color: Color(0xFF8BC34A),
+                        ),
                         onPressed: () => _removeFavorite(index),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF8BC34A),
                           borderRadius: BorderRadius.circular(8),

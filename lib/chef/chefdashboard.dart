@@ -1,3 +1,4 @@
+import 'package:cookmate/core/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'bookeddetailedpage.dart';
@@ -222,7 +223,15 @@ class _ChefDashboardState extends State<ChefDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, d) {
+          showDialog(
+            context: context,
+            builder: (context) => Helper.confirmLogOut(context),
+          );
+        },
+        child: Scaffold(
       backgroundColor: const Color(0xFFB8E6B8),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -417,15 +426,9 @@ class _ChefDashboardState extends State<ChefDashboard> {
       children: [
         Text(
           count,
-          style: const TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14),
-        ),
+        Text(label, style: const TextStyle(fontSize: 14)),
       ],
     );
   }
@@ -437,7 +440,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -501,7 +504,11 @@ class _ChefDashboardState extends State<ChefDashboard> {
                       // Likes and Comments Row
                       Row(
                         children: [
-                          const Icon(Icons.favorite, size: 14, color: Colors.red),
+                          const Icon(
+                            Icons.favorite,
+                            size: 14,
+                            color: Colors.red,
+                          ),
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
@@ -511,7 +518,11 @@ class _ChefDashboardState extends State<ChefDashboard> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Icon(Icons.comment, size: 14, color: Colors.grey),
+                          const Icon(
+                            Icons.comment,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
@@ -526,7 +537,10 @@ class _ChefDashboardState extends State<ChefDashboard> {
                       // Date
                       Text(
                         cuisine['date'],
-                        style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -552,9 +566,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
           // Bookings button tapped
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const BookedDetailsPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const BookedDetailsPage()),
           );
         } else if (index == 2) {
           // Post button tapped
@@ -563,9 +575,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
           // Calendar button tapped - Navigate to Calendar
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const CalendarPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const CalendarPage()),
           );
         } else if (index == 4) {
           // Profile button tapped
@@ -573,10 +583,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
         }
       },
       items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(
           icon: Icon(Icons.calendar_today),
           label: 'Bookings',
@@ -589,10 +596,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
           icon: Icon(Icons.event_note),
           label: 'Calendar',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
     );
   }
@@ -646,7 +650,10 @@ class _ChefDashboardState extends State<ChefDashboard> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.restaurant_menu, color: Color(0xFF8BC34A)),
+              leading: const Icon(
+                Icons.restaurant_menu,
+                color: Color(0xFF8BC34A),
+              ),
               title: const Text('Manage Menu & Pricing'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
@@ -660,7 +667,10 @@ class _ChefDashboardState extends State<ChefDashboard> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.event_available, color: Color(0xFF8BC34A)),
+              leading: const Icon(
+                Icons.event_available,
+                color: Color(0xFF8BC34A),
+              ),
               title: const Text('Manage Availability'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
@@ -747,7 +757,9 @@ class _ChefDashboardState extends State<ChefDashboard> {
               Future.delayed(const Duration(milliseconds: 500), () {
                 // Pop until reaching the root (login screen)
                 // Replace this with your actual login route
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                if (context.mounted) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
 
                 // Alternative: Navigate to a specific login page
                 // Navigator.of(context).pushAndRemoveUntil(
