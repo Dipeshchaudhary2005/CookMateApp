@@ -96,7 +96,8 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
           ),
           ElevatedButton(
             onPressed: () {
-              if (nameController.text.isNotEmpty && priceController.text.isNotEmpty) {
+              if (nameController.text.isNotEmpty &&
+                  priceController.text.isNotEmpty) {
                 setState(() {
                   packages.add({
                     'name': nameController.text,
@@ -128,7 +129,9 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
   void _editPackage(int index) {
     final package = packages[index];
     final nameController = TextEditingController(text: package['name']);
-    final priceController = TextEditingController(text: package['price'].toString());
+    final priceController = TextEditingController(
+      text: package['price'].toString(),
+    );
     final descController = TextEditingController(text: package['description']);
 
     showDialog(
@@ -206,7 +209,9 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Container(
             constraints: const BoxConstraints(maxHeight: 600),
             padding: const EdgeInsets.all(20),
@@ -216,7 +221,10 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
               children: [
                 Text(
                   'Manage Menu Items - ${package['name']}',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -250,31 +258,34 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                 const SizedBox(height: 16),
                 Expanded(
                   child: tempItems.isEmpty
-                      ? const Center(
-                    child: Text('No menu items added yet'),
-                  )
+                      ? const Center(child: Text('No menu items added yet'))
                       : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: tempItems.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          leading: const Icon(Icons.restaurant_menu,
-                              color: Color(0xFF8BC34A)),
-                          title: Text(tempItems[index]),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              setDialogState(() {
-                                tempItems.removeAt(index);
-                              });
-                            },
-                          ),
+                          shrinkWrap: true,
+                          itemCount: tempItems.length,
+                          itemBuilder: (context, index) {
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              child: ListTile(
+                                leading: const Icon(
+                                  Icons.restaurant_menu,
+                                  color: Color(0xFF8BC34A),
+                                ),
+                                title: Text(tempItems[index]),
+                                trailing: IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    setDialogState(() {
+                                      tempItems.removeAt(index);
+                                    });
+                                  },
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -318,7 +329,9 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Package'),
-        content: Text('Are you sure you want to delete "${packages[index]['name']}"?'),
+        content: Text(
+          'Are you sure you want to delete "${packages[index]['name']}"?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -422,33 +435,40 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
           Expanded(
             child: packages.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.restaurant_menu, size: 80, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No packages yet',
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: _addPackage,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8BC34A),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.restaurant_menu,
+                          size: 80,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No packages yet',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: _addPackage,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF8BC34A),
+                          ),
+                          child: const Text('Add Your First Package'),
+                        ),
+                      ],
                     ),
-                    child: const Text('Add Your First Package'),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: packages.length,
-              itemBuilder: (context, index) {
-                return _buildPackageCard(index);
-              },
-            ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: packages.length,
+                    itemBuilder: (context, index) {
+                      return _buildPackageCard(index);
+                    },
+                  ),
           ),
         ],
       ),
@@ -539,7 +559,10 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                           const SizedBox(height: 4),
                           Text(
                             package['description'],
-                            style: const TextStyle(fontSize: 14, color: Colors.grey),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -560,7 +583,11 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const Icon(Icons.restaurant_menu, size: 16, color: Colors.grey),
+                    const Icon(
+                      Icons.restaurant_menu,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${package['items'].length} menu items',
@@ -597,9 +624,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                   onPressed: () => _deletePackage(index),
                   icon: const Icon(Icons.delete, size: 18),
                   label: const Text('Delete'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
                 ),
               ],
             ),

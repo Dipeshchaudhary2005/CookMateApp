@@ -13,7 +13,9 @@ class CustomerProfilePage extends StatefulWidget {
 }
 
 class _CustomerProfilePageState extends State<CustomerProfilePage> {
-  Image _profileImage = StaticClass.currentUser!.urlToImage != null ? Image.network(StaticClass.currentUser!.urlToImage!, fit: BoxFit.cover) : StaticClass.noImage;
+  Image _profileImage = StaticClass.currentUser!.urlToImage != null
+      ? Image.network(StaticClass.currentUser!.urlToImage!, fit: BoxFit.cover)
+      : StaticClass.noImage;
   final ImagePicker _picker = ImagePicker();
 
   // User data
@@ -64,10 +66,18 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
       );
 
       if (pickedFile != null && mounted) {
-        final changed = await UserServices.updateProfilePic(context, File(pickedFile.path));
-        if (changed){
+        final changed = await UserServices.updateProfilePic(
+          context,
+          File(pickedFile.path),
+        );
+        if (changed) {
           setState(() {
-            _profileImage = StaticClass.currentUser!.urlToImage != null ? Image.network(StaticClass.currentUser!.urlToImage! , fit: BoxFit.cover,) :  StaticClass.noImage;
+            _profileImage = StaticClass.currentUser!.urlToImage != null
+                ? Image.network(
+                    StaticClass.currentUser!.urlToImage!,
+                    fit: BoxFit.cover,
+                  )
+                : StaticClass.noImage;
           });
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
@@ -107,7 +117,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: Color(0xFF8BC34A)),
+              leading: const Icon(
+                Icons.photo_library,
+                color: Color(0xFF8BC34A),
+              ),
               title: const Text('Gallery'),
               onTap: () {
                 Navigator.pop(context);
@@ -122,18 +135,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
 
   // Edit Profile Dialog
   void _showEditProfileDialog() {
-    final nameController = TextEditingController(
-      text: userName,
-    );
-    final emailController = TextEditingController(
-      text: userEmail,
-    );
-    final phoneController = TextEditingController(
-      text: userPhone,
-    );
-    final addressController = TextEditingController(
-      text: userAddress,
-    );
+    final nameController = TextEditingController(text: userName);
+    final emailController = TextEditingController(text: userEmail);
+    final phoneController = TextEditingController(text: userPhone);
+    final addressController = TextEditingController(text: userAddress);
 
     showDialog(
       context: context,
@@ -188,35 +193,47 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
           ),
           ElevatedButton(
             onPressed: () async {
-                final newName = userName != nameController.text ? nameController.text : null;
-                final newEmail = userEmail != emailController.text ? emailController.text : null;
-                final newPhone = userPhone != phoneController.text ? phoneController.text : null;
-                final newAddress = userAddress != addressController.text ? addressController.text : null;
+              final newName = userName != nameController.text
+                  ? nameController.text
+                  : null;
+              final newEmail = userEmail != emailController.text
+                  ? emailController.text
+                  : null;
+              final newPhone = userPhone != phoneController.text
+                  ? phoneController.text
+                  : null;
+              final newAddress = userAddress != addressController.text
+                  ? addressController.text
+                  : null;
 
-                final changed = await UserServices.updateProfile(context,
-                  fullName: newName,
-                  phoneNumber: newPhone,
-                  userAddress: newAddress,
+              final changed = await UserServices.updateProfile(
+                context,
+                fullName: newName,
+                phoneNumber: newPhone,
+                userAddress: newAddress,
+              );
+              bool emailChanged = false;
+              if (context.mounted && newEmail != null) {
+                emailChanged = await UserServices.changeUserEmail(
+                  context,
+                  newEmail,
                 );
-                bool emailChanged = false;
-                if (context.mounted && newEmail != null){
-                  emailChanged = await UserServices.changeUserEmail(context, newEmail);
-                }
-                if (changed || emailChanged){
-                  setState(() {
-                    userName = nameController.text;
-                    userEmail = emailController.text;
-                    userPhone = phoneController.text;
-                    userAddress = addressController.text;
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Profile updated successfully!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  });
-                }
+              }
+              if (changed || emailChanged) {
+                setState(() {
+                  userName = nameController.text;
+                  userEmail = emailController.text;
+                  userPhone = phoneController.text;
+                  userAddress = addressController.text;
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Profile updated successfully!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                });
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF8BC34A),
@@ -375,7 +392,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildPaymentMethodTile('eSewa', Icons.account_balance_wallet, true),
+            _buildPaymentMethodTile(
+              'eSewa',
+              Icons.account_balance_wallet,
+              true,
+            ),
             _buildPaymentMethodTile('Khalti', Icons.payment, false),
             _buildPaymentMethodTile('Fonepay', Icons.phone_android, false),
             const SizedBox(height: 16),
@@ -410,16 +431,16 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
       title: Text(name),
       trailing: isDefault
           ? Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: Colors.green,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Text(
-          'Default',
-          style: TextStyle(color: Colors.white, fontSize: 12),
-        ),
-      )
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                'Default',
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            )
           : null,
     );
   }
@@ -463,9 +484,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                           ),
                         ],
                       ),
-                      child: ClipOval(
-                        child: _profileImage,
-                      )
+                      child: ClipOval(child: _profileImage),
                     ),
                     Positioned(
                       bottom: 0,
@@ -478,7 +497,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                             color: Color(0xFF8BC34A),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            size: 20,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -542,7 +565,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 context,
                 Icons.notifications,
                 'Notifications',
-                    () {
+                () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Notifications page coming soon!'),
@@ -561,7 +584,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 context,
                 Icons.privacy_tip,
                 'Privacy Policy',
-                    () {
+                () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Privacy Policy page coming soon!'),
@@ -603,11 +626,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   }
 
   Widget _buildProfileOption(
-      BuildContext context,
-      IconData icon,
-      String title,
-      VoidCallback onTap,
-      ) {
+    BuildContext context,
+    IconData icon,
+    String title,
+    VoidCallback onTap,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(

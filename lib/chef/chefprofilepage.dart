@@ -20,7 +20,8 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
   String email = 'ram.bhatta@email.com';
   String phone = '+977 9876543210';
   String address = 'Kathmandu, Nepal';
-  String bio = 'Passionate chef specializing in Italian cuisine with 4 years of experience in creating memorable dining experiences.';
+  String bio =
+      'Passionate chef specializing in Italian cuisine with 4 years of experience in creating memorable dining experiences.';
   double rating = 4.8;
   int totalBookings = 127;
   int completedBookings = 115;
@@ -54,20 +55,21 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
         setState(() {
           _profileImage = File(pickedFile.path);
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile picture updated!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Profile picture updated!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 
@@ -88,7 +90,10 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: Color(0xFF8BC34A)),
+              leading: const Icon(
+                Icons.photo_library,
+                color: Color(0xFF8BC34A),
+              ),
               title: const Text('Gallery'),
               onTap: () {
                 Navigator.pop(context);
@@ -365,7 +370,7 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                           color: Colors.white,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha:0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               spreadRadius: 2,
                               blurRadius: 8,
                             ),
@@ -373,12 +378,16 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                         ),
                         child: _profileImage != null
                             ? ClipOval(
-                          child: Image.file(
-                            _profileImage!,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                            : const Icon(Icons.person, size: 60, color: Colors.grey),
+                                child: Image.file(
+                                  _profileImage!,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.person,
+                                size: 60,
+                                color: Colors.grey,
+                              ),
                       ),
                       Positioned(
                         bottom: 0,
@@ -391,7 +400,11 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                               color: Color(0xFF8BC34A),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              size: 20,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -400,7 +413,10 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                   const SizedBox(height: 16),
                   Text(
                     chefName,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -415,15 +431,15 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                       const SizedBox(width: 4),
                       Text(
                         '$rating',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(width: 16),
                       const Icon(Icons.work, size: 20, color: Colors.black54),
                       const SizedBox(width: 4),
-                      Text(
-                        experience,
-                        style: const TextStyle(fontSize: 16),
-                      ),
+                      Text(experience, style: const TextStyle(fontSize: 16)),
                     ],
                   ),
                 ],
@@ -436,11 +452,19 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
               child: Row(
                 children: [
                   Expanded(
-                    child: _buildStatCard('Total\nBookings', '$totalBookings', Colors.blue),
+                    child: _buildStatCard(
+                      'Total\nBookings',
+                      '$totalBookings',
+                      Colors.blue,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildStatCard('Completed', '$completedBookings', Colors.green),
+                    child: _buildStatCard(
+                      'Completed',
+                      '$completedBookings',
+                      Colors.green,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -459,14 +483,11 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
             ),
 
             // Contact Information
-            _buildInfoCard(
-              'Contact Information',
-              [
-                {'icon': Icons.email, 'label': 'Email', 'value': email},
-                {'icon': Icons.phone, 'label': 'Phone', 'value': phone},
-                {'icon': Icons.location_on, 'label': 'Address', 'value': address},
-              ],
-            ),
+            _buildInfoCard('Contact Information', [
+              {'icon': Icons.email, 'label': 'Email', 'value': email},
+              {'icon': Icons.phone, 'label': 'Phone', 'value': phone},
+              {'icon': Icons.location_on, 'label': 'Address', 'value': address},
+            ]),
 
             // Specializations
             Container(
@@ -484,7 +505,10 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                     children: [
                       const Text(
                         'Specializations',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.edit, size: 20),
@@ -498,7 +522,10 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                     runSpacing: 8,
                     children: specializations.map((spec) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFB8E6B8),
                           borderRadius: BorderRadius.circular(20),
@@ -553,7 +580,12 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
     );
   }
 
-  Widget _buildSection(String title, String content, IconData icon, {VoidCallback? onTap}) {
+  Widget _buildSection(
+    String title,
+    String content,
+    IconData icon, {
+    VoidCallback? onTap,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -573,7 +605,10 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                   const SizedBox(width: 8),
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -610,30 +645,42 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              children: [
-                Icon(item['icon'] as IconData, size: 20, color: const Color(0xFF8BC34A)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item['label'],
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                      Text(
-                        item['value'],
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                      ),
-                    ],
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    item['icon'] as IconData,
+                    size: 20,
+                    color: const Color(0xFF8BC34A),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item['label'],
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          item['value'],
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );

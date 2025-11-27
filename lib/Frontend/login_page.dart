@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:cookmate/backend/auth.dart';
+import 'package:cookmate/backend/model/user.dart';
 import 'package:cookmate/core/helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +9,7 @@ import 'registration_page.dart';
 import 'forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
-  final String userType;
+  final UserType userType;
 
   const LoginPage({super.key, required this.userType});
 
@@ -109,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 40),
                 Text(
-                  'Login as ${widget.userType}',
+                  'Login as ${widget.userType.name}',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -221,11 +224,10 @@ class _LoginPageState extends State<LoginPage> {
                                       _isLoading = true;
                                     });
 
-                                    await Auth.loginUserWithEmail(
+                                    final loggedIn = await Auth.loginUserWithEmail(
                                       _emailController.text,
                                       _passwordController.text,
-                                      context,
-                                      widget.userType,
+                                      context
                                     );
 
                                     if (!mounted) return;
@@ -233,7 +235,7 @@ class _LoginPageState extends State<LoginPage> {
                                     setState(() {
                                       _isLoading = false;
                                     });
-                                    if (context.mounted) {
+                                    if (context.mounted && loggedIn) {
                                       await Helper.loadDashBoard(
                                         context,
                                         userType: widget.userType,

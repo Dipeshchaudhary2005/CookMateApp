@@ -22,38 +22,39 @@ class Auth {
     String email,
     String password,
     String fullName,
-    String userType, {
+    UserType userType, {
     required String phoneNumber,
     required BuildContext context,
   }) async {
     try {
-      final url = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}$serverPath/register');
-      var response = await http.post(
-          url,
-          headers: {
-            "Content-Type": "application/json",
-            'Accept': 'application/json',
-          },
-          body: jsonEncode({
-            'email' : email,
-            'fullName' : fullName,
-            'password' : password,
-            'phoneNumber' : phoneNumber,
-            'signInMethod' : 'email',
-            'role' : { userType : true }
-          })
+      final url = Uri.https(
+        StaticClass.serverBaseURL,
+        '${StaticClass.serverApiURL}$serverPath/register',
       );
-      if (response.statusCode.toString().contains('20')){
+      var response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'fullName': fullName,
+          'password': password,
+          'phoneNumber': phoneNumber,
+          'signInMethod': 'email',
+          'role': [userType.name],
+        }),
+      );
+      if (response.statusCode.toString().contains('20')) {
         return true;
-      }
-      else{
+      } else {
         final data = jsonDecode(response.body);
-        if (context.mounted){
+        if (context.mounted) {
           Helper.showError(context, data['error']);
         }
         return false;
       }
-
     } on Exception catch (e) {
       if (kDebugMode) {
         print(e.toString());
@@ -100,33 +101,34 @@ class Auth {
     String email,
     String password,
     BuildContext context,
-    String userType,
   ) async {
     try {
-      final url = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}$serverPath/login');
-      var response = await http.post(
-          url,
-          headers: {
-            "Content-Type": "application/json",
-            'Accept': 'application/json',
-          },
-          body: jsonEncode({
-            'email' : email,
-            'password' : password,
-          })
+      final url = Uri.https(
+        StaticClass.serverBaseURL,
+        '${StaticClass.serverApiURL}$serverPath/login',
       );
-      if (response.statusCode.toString().contains('20')){
+      var response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'email': email, 'password': password}),
+      );
+      if (response.statusCode.toString().contains('20')) {
         final data = jsonDecode(response.body);
         StaticClass.jsonWebToken = data['token'];
         StaticClass.currentUser = UserModel.fromJSON(data['user']);
-        if (StaticClass.jsonWebToken != null){
-          await secureStorage.write(key: StaticClass.jsonWebTokenField, value: StaticClass.jsonWebToken!);
+        if (StaticClass.jsonWebToken != null) {
+          await secureStorage.write(
+            key: StaticClass.jsonWebTokenField,
+            value: StaticClass.jsonWebToken!,
+          );
         }
         return true;
-      }
-      else{
+      } else {
         final data = jsonDecode(response.body);
-        if (context.mounted){
+        if (context.mounted) {
           Helper.showError(context, data['error']);
         }
         return false;
@@ -144,57 +146,63 @@ class Auth {
 
   static Future<String?> verifyToken(BuildContext context, String token) async {
     try {
-      final url = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}$serverPath/verifyToken'
+      final url = Uri.https(
+        StaticClass.serverBaseURL,
+        '${StaticClass.serverApiURL}$serverPath/verifyToken',
       );
       var response = await http.post(
         url,
         headers: {
           "Content-Type": "application/json",
           'Accept': 'application/json',
-          'Authorization' : token
+          'Authorization': token,
         },
       );
-      if (response.statusCode.toString().contains('20')){
+      if (response.statusCode.toString().contains('20')) {
         final data = jsonDecode(response.body);
         return data['userId'];
-      }
-      else{
+      } else {
         final data = jsonDecode(response.body);
-        if (context.mounted){
+        if (context.mounted) {
           Helper.showError(context, data['error']);
         }
         return null;
       }
     } on Exception catch (e) {
-      if (kDebugMode){
+      if (kDebugMode) {
         print('Error verifying jwt: $e');
       }
-      if (context.mounted){
+      if (context.mounted) {
         Helper.showError(context, 'Error verifying jwt');
       }
       return null;
     }
   }
 
-  static Future<UserModel?> getUserData(BuildContext context, String token, String userId) async{
-    final url = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}$serverPath/users/$userId',
+  static Future<UserModel?> getUserData(
+    BuildContext context,
+    String token,
+    String userId,
+  ) async {
+    final url = Uri.https(
+      StaticClass.serverBaseURL,
+      '${StaticClass.serverApiURL}$serverPath/users/$userId',
     );
     var response = await http.get(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          'Accept': 'application/json',
-          'Authorization' : token
-        },
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        'Accept': 'application/json',
+        'Authorization': token,
+      },
     );
-    if (response.statusCode.toString().contains('20')){
+    if (response.statusCode.toString().contains('20')) {
       final data = jsonDecode(response.body);
       final user = UserModel.fromJSON(data['user']);
       return user;
-    }
-    else{
+    } else {
       final data = jsonDecode(response.body);
-      if (context.mounted){
+      if (context.mounted) {
         Helper.showError(context, data['error']);
       }
       return null;
@@ -202,51 +210,53 @@ class Auth {
   }
 
   static Future<User?> signInWithGoogle(
-    String userType,
+    UserType userType,
     BuildContext context,
   ) async {
     try {
-      final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
-
-      // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-      );
-
-      // Once signed in, return the UserCredential
-      var userCredential = await FirebaseAuth.instance.signInWithCredential(
-        credential,
-      );
-      // if (kDebugMode){
-      //   print(userCredential.user.toString());
-      //   print(FirebaseAuth.instance.currentUser.toString());
+      // TODO
+      return null;
+      // final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
+      //
+      // // Obtain the auth details from the request
+      // final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      //
+      // // Create a new credential
+      // final credential = GoogleAuthProvider.credential(
+      //   idToken: googleAuth.idToken,
+      // );
+      //
+      // // Once signed in, return the UserCredential
+      // var userCredential = await FirebaseAuth.instance.signInWithCredential(
+      //   credential,
+      // );
+      // // if (kDebugMode){
+      // //   print(userCredential.user.toString());
+      // //   print(FirebaseAuth.instance.currentUser.toString());
+      // // }
+      // if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+      //   var userModel = UserModel(
+      //     uid: userCredential.user!.uid,
+      //     email: userCredential.user!.email,
+      //     fullName: userCredential.user!.displayName,
+      //     userType: [userType],
+      //     phoneNumber: userCredential.user!.phoneNumber,
+      //     signInMethod: 'google',
+      //     geoPoint: GeoPoint(0, 0.5),
+      //   );
+      //
+      //   var map = userModel.toMap();
+      //   map[UserModel.createdAtField] = FieldValue.serverTimestamp();
+      //
+      //   DocumentReference docref = FirebaseFirestore.instance
+      //       .collection(StaticClass.usersCollection)
+      //       .doc(userCredential.user!.uid);
+      //   await docref.set(map, SetOptions(merge: true));
+      // } else {
+      //   await checkUserType(userCredential, userType, true);
       // }
-      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
-        var userModel = UserModel(
-          uid: userCredential.user!.uid,
-          email: userCredential.user!.email,
-          fullName: userCredential.user!.displayName,
-          userType: {userType: true},
-          phoneNumber: userCredential.user!.phoneNumber,
-          signInMethod: 'google',
-          geoPoint: GeoPoint(0, 0.5)
-        );
-
-        var map = userModel.toMap();
-        map[UserModel.createdAtField] = FieldValue.serverTimestamp();
-
-        DocumentReference docref = FirebaseFirestore.instance
-            .collection(StaticClass.usersCollection)
-            .doc(userCredential.user!.uid);
-        await docref.set(map, SetOptions(merge: true));
-      } else {
-        await checkUserType(userCredential, userType, true);
-      }
-
-      return userCredential.user;
+      //
+      // return userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
         switch (e.code) {
@@ -293,17 +303,15 @@ class Auth {
     }
   }
 
-  static bool jwtIsExpired(String token){
+  static bool jwtIsExpired(String token) {
     bool isExpired = Jwt.isExpired(token);
-    if (isExpired){
+    if (isExpired) {
       signOut();
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
-
 
   // Password Reset
   static Future<bool> sendPasswordResetEmail(String email) async {
@@ -317,6 +325,4 @@ class Auth {
       return false;
     }
   }
-
-
 }

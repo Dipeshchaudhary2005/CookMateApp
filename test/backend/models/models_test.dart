@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookmate/backend/model/booking.dart';
 import 'package:cookmate/backend/model/chef.dart';
@@ -27,7 +26,7 @@ void main() {
       userType: userType,
       signInMethod: signInMethod,
       userAddress: userAddress,
-      geoPoint: geoPoint
+      geoPoint: geoPoint,
     );
 
     final map = userModel.toMap();

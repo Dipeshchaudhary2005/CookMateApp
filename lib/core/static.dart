@@ -16,5 +16,3 @@ class StaticClass {
   static const String serverApiURL = '/api/v1';
   static Image noImage = Image.asset('Resource/no_image.jpeg');
 }
-
-

@@ -54,7 +54,7 @@ class ChooseUserPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        const LoginPage(userType: UserModel.customerField),
+                        const LoginPage(userType: UserType.customer),
                   ),
                 );
               },
@@ -72,7 +72,7 @@ class ChooseUserPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        const LoginPage(userType: UserModel.chefField),
+                        const LoginPage(userType: UserType.chef),
                   ),
                 );
               },

@@ -1,9 +1,10 @@
 import 'package:cookmate/backend/auth.dart';
+import 'package:cookmate/backend/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class RegistrationPage extends StatefulWidget {
-  final String userType;
+  final UserType userType;
 
   const RegistrationPage({super.key, required this.userType});
 
@@ -77,7 +78,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  'Create ${widget.userType} Account',
+                  'Create ${widget.userType.name} Account',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

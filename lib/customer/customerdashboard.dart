@@ -28,15 +28,24 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       'rating': 4.8,
       'cuisineTitle': 'Italian Pasta Carbonara',
       'cuisineImage': 'Resource/chef.png',
-      'description': 'Authentic Italian pasta with creamy carbonara sauce, pancetta, and fresh parmesan cheese.',
+      'description':
+          'Authentic Italian pasta with creamy carbonara sauce, pancetta, and fresh parmesan cheese.',
       'likes': 156,
       'comments': 45,
       'isLiked': false,
       'price': 'NPR 650/person',
       'isFavorite': false,
       'commentList': [
-        {'user': 'John Doe', 'comment': 'Looks delicious! 😋', 'time': '2 hours ago'},
-        {'user': 'Sarah Smith', 'comment': 'I tried this last week, amazing!', 'time': '1 day ago'},
+        {
+          'user': 'John Doe',
+          'comment': 'Looks delicious! 😋',
+          'time': '2 hours ago',
+        },
+        {
+          'user': 'Sarah Smith',
+          'comment': 'I tried this last week, amazing!',
+          'time': '1 day ago',
+        },
       ],
     },
     {
@@ -47,14 +56,19 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       'rating': 4.9,
       'cuisineTitle': 'Traditional Thakali Set',
       'cuisineImage': 'Resource/chef.png',
-      'description': 'Complete Thakali set with dal, bhat, tarkari, achar, and papad. Authentic taste from the mountains.',
+      'description':
+          'Complete Thakali set with dal, bhat, tarkari, achar, and papad. Authentic taste from the mountains.',
       'likes': 234,
       'comments': 67,
       'isLiked': false,
       'price': 'NPR 550/person',
       'isFavorite': false,
       'commentList': [
-        {'user': 'Mike Johnson', 'comment': 'Best Thakali set in town!', 'time': '3 hours ago'},
+        {
+          'user': 'Mike Johnson',
+          'comment': 'Best Thakali set in town!',
+          'time': '3 hours ago',
+        },
       ],
     },
     {
@@ -65,15 +79,24 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       'rating': 4.7,
       'cuisineTitle': 'Special Momo Platter',
       'cuisineImage': 'Resource/chef.png',
-      'description': 'Assorted momo platter with chicken, buff, and veg momos served with special chutney.',
+      'description':
+          'Assorted momo platter with chicken, buff, and veg momos served with special chutney.',
       'likes': 189,
       'comments': 52,
       'isLiked': false,
       'price': 'NPR 450/dozen',
       'isFavorite': false,
       'commentList': [
-        {'user': 'Emma Wilson', 'comment': 'Perfect for parties!', 'time': '5 hours ago'},
-        {'user': 'David Brown', 'comment': 'The chutney is incredible 🔥', 'time': '1 day ago'},
+        {
+          'user': 'Emma Wilson',
+          'comment': 'Perfect for parties!',
+          'time': '5 hours ago',
+        },
+        {
+          'user': 'David Brown',
+          'comment': 'The chutney is incredible 🔥',
+          'time': '1 day ago',
+        },
       ],
     },
     {
@@ -84,16 +107,29 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       'rating': 4.9,
       'cuisineTitle': 'Wedding Feast Special',
       'cuisineImage': 'Resource/chef.png',
-      'description': '5-course wedding menu with appetizers, soup, main course, dessert, and beverages.',
+      'description':
+          '5-course wedding menu with appetizers, soup, main course, dessert, and beverages.',
       'likes': 312,
       'comments': 98,
       'isLiked': false,
       'price': 'NPR 1200/person',
       'isFavorite': false,
       'commentList': [
-        {'user': 'Lisa Anderson', 'comment': 'Booked for my wedding! Can\'t wait!', 'time': '30 mins ago'},
-        {'user': 'Robert Taylor', 'comment': 'Outstanding service and taste', 'time': '2 days ago'},
-        {'user': 'Maria Garcia', 'comment': 'Worth every penny! 💯', 'time': '3 days ago'},
+        {
+          'user': 'Lisa Anderson',
+          'comment': 'Booked for my wedding! Can\'t wait!',
+          'time': '30 mins ago',
+        },
+        {
+          'user': 'Robert Taylor',
+          'comment': 'Outstanding service and taste',
+          'time': '2 days ago',
+        },
+        {
+          'user': 'Maria Garcia',
+          'comment': 'Worth every penny! 💯',
+          'time': '3 days ago',
+        },
       ],
     },
   ];
@@ -132,16 +168,20 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       filteredPosts[index]['isFavorite'] = !filteredPosts[index]['isFavorite'];
 
       // Update original list
-      int originalIndex = chefPosts.indexWhere((post) =>
-      post['cuisineTitle'] == filteredPosts[index]['cuisineTitle']);
+      int originalIndex = chefPosts.indexWhere(
+        (post) => post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
+      );
       if (originalIndex != -1) {
-        chefPosts[originalIndex]['isFavorite'] = filteredPosts[index]['isFavorite'];
+        chefPosts[originalIndex]['isFavorite'] =
+            filteredPosts[index]['isFavorite'];
       }
 
       // Update favorites list
       if (filteredPosts[index]['isFavorite']) {
-        if (!favoritePosts.any((post) =>
-        post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'])) {
+        if (!favoritePosts.any(
+          (post) =>
+              post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
+        )) {
           favoritePosts.add(filteredPosts[index]);
         }
         ScaffoldMessenger.of(context).showSnackBar(
@@ -152,8 +192,10 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
           ),
         );
       } else {
-        favoritePosts.removeWhere((post) =>
-        post['cuisineTitle'] == filteredPosts[index]['cuisineTitle']);
+        favoritePosts.removeWhere(
+          (post) =>
+              post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Removed from favorites'),
@@ -174,8 +216,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
         filteredPosts[index]['likes']--;
       }
       // Update original list
-      int originalIndex = chefPosts.indexWhere((post) =>
-      post['cuisineTitle'] == filteredPosts[index]['cuisineTitle']);
+      int originalIndex = chefPosts.indexWhere(
+        (post) => post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
+      );
       if (originalIndex != -1) {
         chefPosts[originalIndex]['isLiked'] = filteredPosts[index]['isLiked'];
         chefPosts[originalIndex]['likes'] = filteredPosts[index]['likes'];
@@ -188,7 +231,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       post['commentList'].insert(0, {
         'user': 'You',
         'comment': comment,
-        'time': 'Just now'
+        'time': 'Just now',
       });
       post['comments']++;
     });
@@ -252,81 +295,92 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 Expanded(
                   child: post['commentList'].isEmpty
                       ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.comment_outlined, size: 60, color: Colors.grey),
-                        SizedBox(height: 16),
-                        Text(
-                          'No comments yet',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Be the first to comment!',
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  )
-                      : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: post['commentList'].length,
-                    itemBuilder: (context, index) {
-                      final comment = post['commentList'][index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              radius: 18,
-                              backgroundColor: const Color(0xFFB8E6B8),
-                              child: Text(
-                                comment['user'][0],
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.comment_outlined,
+                                size: 60,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'No comments yet',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
+                              SizedBox(height: 8),
+                              Text(
+                                'Be the first to comment!',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: post['commentList'].length,
+                          itemBuilder: (context, index) {
+                            final comment = post['commentList'][index];
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        comment['user'],
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
+                                  CircleAvatar(
+                                    radius: 18,
+                                    backgroundColor: const Color(0xFFB8E6B8),
+                                    child: Text(
+                                      comment['user'][0],
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
                                       ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        comment['time'],
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    comment['comment'],
-                                    style: const TextStyle(fontSize: 14),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              comment['user'],
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              comment['time'],
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          comment['comment'],
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
                 ),
                 // Comment Input
                 Container(
@@ -335,7 +389,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha:0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 5,
                         offset: const Offset(0, -2),
                       ),
@@ -357,7 +411,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                               hintText: 'Add a comment...',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(24),
-                                borderSide: BorderSide(color: Colors.grey[300]!),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
                               ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -376,7 +432,10 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                               commentController.clear();
                             }
                           },
-                          icon: const Icon(Icons.send, color: Color(0xFF8BC34A)),
+                          icon: const Icon(
+                            Icons.send,
+                            color: Color(0xFF8BC34A),
+                          ),
                           style: IconButton.styleFrom(
                             backgroundColor: const Color(0xFFB8E6B8),
                           ),
@@ -437,7 +496,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Center(
-                        child: Icon(Icons.restaurant, size: 80, color: Colors.grey),
+                        child: Icon(
+                          Icons.restaurant,
+                          size: 80,
+                          color: Colors.grey,
+                        ),
                       );
                     },
                   ),
@@ -458,9 +521,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       const SizedBox(height: 8),
                       // Price
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF8BC34A).withValues(alpha:0.2),
+                          color: const Color(0xFF8BC34A).withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -476,7 +542,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       // Likes and Comments
                       Row(
                         children: [
-                          const Icon(Icons.favorite, color: Colors.red, size: 20),
+                          const Icon(
+                            Icons.favorite,
+                            color: Colors.red,
+                            size: 20,
+                          ),
                           const SizedBox(width: 4),
                           Text('${post['likes']} likes'),
                           const SizedBox(width: 20),
@@ -485,7 +555,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                               Navigator.pop(context);
                               _showCommentsDialog(post);
                             },
-                            child: const Icon(Icons.comment, color: Colors.grey, size: 20),
+                            child: const Icon(
+                              Icons.comment,
+                              color: Colors.grey,
+                              size: 20,
+                            ),
                           ),
                           const SizedBox(width: 4),
                           GestureDetector(
@@ -547,11 +621,19 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                 ),
                                 Row(
                                   children: [
-                                    const Icon(Icons.star, color: Colors.amber, size: 16),
+                                    const Icon(
+                                      Icons.star,
+                                      color: Colors.amber,
+                                      size: 16,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text('${post['rating']}'),
                                     const SizedBox(width: 12),
-                                    const Icon(Icons.work, size: 16, color: Colors.grey),
+                                    const Icon(
+                                      Icons.work,
+                                      size: 16,
+                                      color: Colors.grey,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(post['experience']),
                                   ],
@@ -625,8 +707,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (b, d){
-        Helper.confirmLogOut(context);
+      onPopInvokedWithResult: (didPop, d) {
+        showDialog(
+          context: context,
+          builder: (context) => Helper.confirmLogOut(context),
+        );
       },
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F5F5),
@@ -646,10 +731,14 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
           title: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Your Location',
-                  style: TextStyle(fontSize: 12, color: Colors.grey)),
-              Text('Novaliches, QC',
-                  style: TextStyle(fontSize: 14, color: Colors.black)),
+              Text(
+                'Your Location',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              Text(
+                'Novaliches, QC',
+                style: TextStyle(fontSize: 14, color: Colors.black),
+              ),
             ],
           ),
           actions: [
@@ -702,7 +791,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const BookingPage()),
+                      MaterialPageRoute(
+                        builder: (context) => const BookingPage(),
+                      ),
                     );
                   },
                   child: Container(
@@ -767,44 +858,44 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 // Chef Posts List
                 filteredPosts.isEmpty
                     ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(40),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.search_off,
-                          size: 80,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No results found',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
+                        child: Padding(
+                          padding: const EdgeInsets.all(40),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.search_off,
+                                size: 80,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No results found',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Try searching with different keywords',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Try searching with different keywords',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
+                      )
                     : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: filteredPosts.length,
-                  itemBuilder: (context, index) {
-                    return _buildPostCard(filteredPosts[index], index);
-                  },
-                ),
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: filteredPosts.length,
+                        itemBuilder: (context, index) {
+                          return _buildPostCard(filteredPosts[index], index);
+                        },
+                      ),
               ],
             ),
           ),
@@ -822,43 +913,57 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             // Navigate based on selected tab
             switch (index) {
               case 0:
-              // Home - Already on this page
+                // Home - Already on this page
                 break;
               case 1:
-              // Summary - Navigate to Summary Page
+                // Summary - Navigate to Summary Page
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const SummaryPage()),
                 );
                 break;
               case 2:
-              // Calendar - Navigate to Booking Page
+                // Calendar - Navigate to Booking Page
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const BookingPage()),
                 );
                 break;
               case 3:
-              // Favorites - Navigate to Favorite Chef Page
+                // Favorites - Navigate to Favorite Chef Page
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => FavoriteChefPage(favoritePosts: favoritePosts)),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        FavoriteChefPage(favoritePosts: favoritePosts),
+                  ),
                 );
                 break;
               case 4:
-              // Profile
+                // Profile
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CustomerProfilePage()),
+                  MaterialPageRoute(
+                    builder: (context) => const CustomerProfilePage(),
+                  ),
                 );
                 break;
             }
           },
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.receipt_long), label: 'Summary'),
-            BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Booking'),
-            BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favorites'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long),
+              label: 'Summary',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: 'Booking',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite),
+              label: 'Favorites',
+            ),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
         ),
@@ -876,7 +981,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha:0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             ),
@@ -941,8 +1046,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   ),
                   IconButton(
                     icon: Icon(
-                      post['isFavorite'] ? Icons.bookmark : Icons.bookmark_border,
-                      color: post['isFavorite'] ? const Color(0xFF8BC34A) : Colors.grey,
+                      post['isFavorite']
+                          ? Icons.bookmark
+                          : Icons.bookmark_border,
+                      color: post['isFavorite']
+                          ? const Color(0xFF8BC34A)
+                          : Colors.grey,
                     ),
                     onPressed: () => _toggleFavorite(index),
                     padding: const EdgeInsets.all(8),
@@ -991,7 +1100,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       GestureDetector(
                         onTap: () => _toggleLike(index),
                         child: Icon(
-                          post['isLiked'] ? Icons.favorite : Icons.favorite_border,
+                          post['isLiked']
+                              ? Icons.favorite
+                              : Icons.favorite_border,
                           color: post['isLiked'] ? Colors.red : Colors.grey,
                           size: 24,
                         ),
@@ -1004,7 +1115,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       const SizedBox(width: 20),
                       GestureDetector(
                         onTap: () => _showCommentsDialog(post),
-                        child: const Icon(Icons.comment_outlined, color: Colors.grey, size: 24),
+                        child: const Icon(
+                          Icons.comment_outlined,
+                          color: Colors.grey,
+                          size: 24,
+                        ),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -1013,7 +1128,10 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF8BC34A),
                           borderRadius: BorderRadius.circular(8),

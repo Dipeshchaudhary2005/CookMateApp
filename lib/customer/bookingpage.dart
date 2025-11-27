@@ -47,11 +47,7 @@ class _BookingPageState extends State<BookingPage> {
 
   void _loadData(BuildContext context) {
     cuisinesList = FetchServices.getCuisines(context);
-    final test = () async {
-      List<String> list = List.empty();
-      return list;
-    };
-    eventList = test();
+    eventList = List.empty() as Future<List<String>>;
   }
 
   // Method to show calendar

@@ -9,55 +9,95 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Helper {
   static Future<bool> loadDashBoard(
     BuildContext context, {
-    String? userType,
+    UserType? userType,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final storage = FlutterSecureStorage();
 
-    userType ??= prefs.getString(UserModel.userTypeField);
-    StaticClass.jsonWebToken ??= await storage.read(key: StaticClass.jsonWebTokenField);
+    final storedLoginType = prefs.getString(UserModel.userTypeField);
+    userType ??= storedLoginType != null ? UserType.fromString(storedLoginType) : null;
+    StaticClass.jsonWebToken ??= await storage.read(
+      key: StaticClass.jsonWebTokenField,
+    );
 
-    if (StaticClass.jsonWebToken == null || Auth.jwtIsExpired(StaticClass.jsonWebToken!)) return false;
+    if (StaticClass.jsonWebToken == null ||
+        Auth.jwtIsExpired(StaticClass.jsonWebToken!)) {
+      return false;
+    }
     if (StaticClass.currentUser == null) {
-      if (context.mounted){
-        String? uid = await Auth.verifyToken(context, StaticClass.jsonWebToken!);
-        if (uid != null){
-          if (context.mounted){
-            StaticClass.currentUser = await Auth.getUserData(context, StaticClass.jsonWebToken!, uid);
+      if (context.mounted) {
+        String? uid = await Auth.verifyToken(
+          context,
+          StaticClass.jsonWebToken!,
+        );
+        if (uid != null) {
+          if (context.mounted) {
+            StaticClass.currentUser = await Auth.getUserData(
+              context,
+              StaticClass.jsonWebToken!,
+              uid,
+            );
+          } else {
+            return false;
           }
-          else {return false;}
-        }else {
+        } else {
           return false;
         }
-      } else{
+      } else {
         return false;
       }
     }
+    if (userType == null) return false;
+    // TODO
+    // Fix the login process to show error if the user is not registered for that user type
+    // Also create method to add or remove user user
+    if (StaticClass.currentUser!.userType!.contains(userType)){
+      print("Current user: ${StaticClass.currentUser}");
+      print("User Type: $userType");
+      if (userType == UserType.chef){
+        if (context.mounted){
+          Navigator.pushNamed(context, AppRoutes.chefDashboardRoute);
+          await storage.write(
+            key: StaticClass.jsonWebTokenField,
+            value: StaticClass.jsonWebToken
+          );
+          await prefs.setString(UserModel.userTypeField, userType.toString());
+      }
+      }
 
-    if (StaticClass.currentUser!.userType![UserModel.chefField] == true &&
-        (userType == null || userType == UserModel.chefField)) {
-      if (context.mounted) {
-        Navigator.pushNamed(context, AppRoutes.chefDashboardRoute);
-        await storage.write(key: StaticClass.jsonWebTokenField, value: StaticClass.jsonWebToken);
-        await prefs.setString(UserModel.userTypeField, UserModel.chefField);
+      else if (userType == UserType.customer){
+        if (context.mounted){
+          Navigator.pushNamed(context, AppRoutes.customerDashboardRoute);
+          await storage.write(
+            key: StaticClass.jsonWebTokenField,
+            value: StaticClass.jsonWebToken
+          );
+          await prefs.setString(UserModel.userTypeField, userType.toString());
+        }
       }
-    } else if (StaticClass.currentUser!.userType![UserModel.customerField] ==
-            true &&
-        (userType == null || userType == UserModel.customerField)) {
-      if (context.mounted) {
-        Navigator.pushNamed(context, AppRoutes.customerDashboardRoute);
-        await storage.write(key: StaticClass.jsonWebTokenField, value: StaticClass.jsonWebToken);
-        await prefs.setString(UserModel.userTypeField, UserModel.customerField);
+      else if (userType == UserType.admin){
+        // TODO
+        return false;
       }
+    }
+    else {
+      if (context.mounted){
+        Helper.showError(context, "The user is not registerd for the role of $userType. \nTry regestring for that role");
+      }
+      return false;
     }
     return true;
   }
 
-  static void showError(BuildContext context, String message, {int? statusCode}) {
+  static void showError(
+    BuildContext context,
+    String message, {
+    int? statusCode,
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
-    if (statusCode != null && statusCode == 401){
+    if (statusCode != null && statusCode == 401) {
       Auth.signOut();
     }
   }
