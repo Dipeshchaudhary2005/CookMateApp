@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cookmate/backend/auth.dart';
 import 'package:cookmate/backend/model/user.dart';
 import 'package:cookmate/core/helper.dart';
 import 'package:cookmate/core/static.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 import 'package:http/http.dart' as http;
 
 class UserServices {
@@ -19,7 +17,8 @@ class UserServices {
     String? fullName,
     String? phoneNumber,
     Map<String, bool>? role,
-    GeoPoint? geoPoint,
+    double? longitude,
+    double? latitude,
     String? userAddress,
   }) async {
     try {
@@ -38,9 +37,7 @@ class UserServices {
         body: jsonEncode({
           UserModel.fullNameField: fullName,
           UserModel.phoneNumberField: phoneNumber,
-          UserModel.geoPointField: geoPoint != null
-              ? GeoFirePoint(geoPoint).data
-              : null,
+          UserModel.locationField: [longitude, latitude],
           UserModel.userTypeField: role,
           UserModel.userAddressField: userAddress,
         }),

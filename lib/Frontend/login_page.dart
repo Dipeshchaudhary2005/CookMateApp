@@ -1,9 +1,6 @@
-import 'dart:math';
-
 import 'package:cookmate/backend/auth.dart';
 import 'package:cookmate/backend/model/user.dart';
 import 'package:cookmate/core/helper.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'registration_page.dart';
 import 'forgot_password_page.dart';
@@ -35,7 +32,6 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    FirebaseAuth.instance.signOut();
   }
 
   Future<void> _handleGoogleSignIn() async {
