@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:cookmate/core/helper.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:cookmate/core/static.dart';
@@ -66,35 +64,6 @@ class Auth {
     }
   }
 
-  static Future<bool> checkUserType(
-    UserCredential userCred,
-    String userType,
-    bool addUserTypeIfNotPresent,
-  ) async {
-    final docRef = FirebaseFirestore.instance
-        .collection(StaticClass.usersCollection)
-        .doc(userCred.user!.uid);
-    final doc = await docRef.get();
-    if (doc.data()![UserModel.userTypeField][userType] == true) {
-      return true;
-    } else {
-      if (addUserTypeIfNotPresent) {
-        await addUserType(userType, docRef);
-        return true;
-      }
-      return false;
-    }
-  }
-
-  static Future<void> addUserType(
-    String userType,
-    DocumentReference docRef,
-  ) async {
-    Map<String, dynamic> map = {
-      UserModel.userTypeField: {userType: true},
-    };
-    await docRef.set(map, SetOptions(merge: true));
-  }
 
   // Email/Password Login
   static Future<bool> loginUserWithEmail(
@@ -160,6 +129,7 @@ class Auth {
       );
       if (response.statusCode.toString().contains('20')) {
         final data = jsonDecode(response.body);
+        print(data);
         return data['userId'];
       } else {
         final data = jsonDecode(response.body);
@@ -209,84 +179,18 @@ class Auth {
     }
   }
 
-  static Future<User?> signInWithGoogle(
+  static Future<bool> signInWithGoogle(
     UserType userType,
     BuildContext context,
   ) async {
     try {
       // TODO
-      return null;
-      // final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
-      //
-      // // Obtain the auth details from the request
-      // final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-      //
-      // // Create a new credential
-      // final credential = GoogleAuthProvider.credential(
-      //   idToken: googleAuth.idToken,
-      // );
-      //
-      // // Once signed in, return the UserCredential
-      // var userCredential = await FirebaseAuth.instance.signInWithCredential(
-      //   credential,
-      // );
-      // // if (kDebugMode){
-      // //   print(userCredential.user.toString());
-      // //   print(FirebaseAuth.instance.currentUser.toString());
-      // // }
-      // if (userCredential.additionalUserInfo?.isNewUser ?? false) {
-      //   var userModel = UserModel(
-      //     uid: userCredential.user!.uid,
-      //     email: userCredential.user!.email,
-      //     fullName: userCredential.user!.displayName,
-      //     userType: [userType],
-      //     phoneNumber: userCredential.user!.phoneNumber,
-      //     signInMethod: 'google',
-      //     geoPoint: GeoPoint(0, 0.5),
-      //   );
-      //
-      //   var map = userModel.toMap();
-      //   map[UserModel.createdAtField] = FieldValue.serverTimestamp();
-      //
-      //   DocumentReference docref = FirebaseFirestore.instance
-      //       .collection(StaticClass.usersCollection)
-      //       .doc(userCredential.user!.uid);
-      //   await docref.set(map, SetOptions(merge: true));
-      // } else {
-      //   await checkUserType(userCredential, userType, true);
-      // }
-      //
-      // return userCredential.user;
-    } on FirebaseAuthException catch (e) {
-      if (context.mounted) {
-        switch (e.code) {
-          case 'account-exists-with-different-credential':
-            Helper.showError(
-              context,
-              "Account is already registered with email and password. Try linking",
-            );
-            break;
-          case 'invalid-credential':
-            Helper.showError(context, "Invalid credentials");
-            break;
-          case 'user-disabled':
-            Helper.showError(
-              context,
-              "The user for this account have been disabled. Contact admin",
-            );
-            break;
-          default:
-            Helper.showError(context, "Internal error");
-            break;
-        }
-      }
-      await googleSignIn.signOut();
-      return null;
+      return false;
     } catch (e) {
       if (kDebugMode) {
         print('Google Sign-In error: $e');
       }
-      return null;
+      return false;
     }
   }
 
@@ -313,16 +217,4 @@ class Auth {
     }
   }
 
-  // Password Reset
-  static Future<bool> sendPasswordResetEmail(String email) async {
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      return true;
-    } on FirebaseAuthException catch (e) {
-      if (kDebugMode) {
-        print('Password reset error: ${e.message}');
-      }
-      return false;
-    }
-  }
 }

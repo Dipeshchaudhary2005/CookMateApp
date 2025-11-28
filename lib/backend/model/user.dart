@@ -1,6 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
-
 enum UserType{
   customer,
   chef,
@@ -25,12 +22,13 @@ class UserModel {
   static const createdAtField = 'createdAt';
   static const updatedAtField = 'updatedAt';
   static const signInMethodField = 'signInMethod';
+
   static const userAddressField = 'userAddress';
-  static const geoPointField = 'geoPoint';
+  static const locationField = 'location';
+  static const coordinatesField = 'coordinates';
+
   static const urlToImageField = 'urlToImage';
 
-  static const customerField = 'customer';
-  static const chefField = 'chef';
 
   String? uid;
   String? email;
@@ -41,7 +39,7 @@ class UserModel {
   String? updatedAt;
   String? signInMethod;
   String? userAddress;
-  GeoPoint? geoPoint;
+  List<double>? location;
   String? urlToImage;
 
   UserModel({
@@ -54,24 +52,27 @@ class UserModel {
     this.createdAt,
     this.signInMethod,
     this.userAddress,
-    this.geoPoint,
     this.urlToImage,
+    this.location
   });
 
   factory UserModel.fromJSON(dynamic data) {
+    // Checking for cast null error
+    final location = data[locationField] != null ? data[locationField] as Map : null;
+    final coordinates = location?[coordinatesField] != null ? (location![coordinatesField] as List).map((e) => e as double).toList() : null;
+
     return UserModel(
       uid: data[uidField],
       email: data[emailField],
       fullName: data[fullNameField],
-      userType: (data[userTypeField] as List).map((type) => UserType.fromString(type)).toList(),
+      userType: data[userTypeField] != null
+          ? (data[userTypeField] as List).map((type) => UserType.fromString(type)).toList()
+          : null,
       phoneNumber: data[phoneNumberField],
       signInMethod: data[signInMethodField],
       createdAt: data[createdAtField],
       updatedAt: data[updatedAtField],
-      geoPoint: data[geoPointField] != null
-          ? (data[geoPointField] as Map<String, dynamic>)['geopoint']
-                as GeoPoint
-          : null,
+      location: coordinates,
       userAddress: data[userAddressField],
       urlToImage: data[urlToImageField],
     );
