@@ -27,7 +27,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       'experience': '4 Years',
       'rating': 4.8,
       'cuisineTitle': 'Italian Pasta Carbonara',
-      'cuisineImage': 'Resource/Dal-Bhat-Tarkari.jpg',
+      'cuisineImage': 'Resource/pasta-carbonara.png',
       'description':
           'Authentic Italian pasta with creamy carbonara sauce, pancetta, and fresh parmesan cheese.',
       'likes': 156,
