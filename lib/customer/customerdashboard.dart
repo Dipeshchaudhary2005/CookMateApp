@@ -27,7 +27,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       'experience': '4 Years',
       'rating': 4.8,
       'cuisineTitle': 'Italian Pasta Carbonara',
-      'cuisineImage': 'Resource/chef.png',
+      'cuisineImage': 'Resource/Dal-Bhat-Tarkari.jpg',
       'description':
           'Authentic Italian pasta with creamy carbonara sauce, pancetta, and fresh parmesan cheese.',
       'likes': 156,
@@ -55,7 +55,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       'experience': '6 Years',
       'rating': 4.9,
       'cuisineTitle': 'Traditional Thakali Set',
-      'cuisineImage': 'Resource/chef.png',
+      'cuisineImage': 'Resource/Dal-Bhat-Tarkari.png',
       'description':
           'Complete Thakali set with dal, bhat, tarkari, achar, and papad. Authentic taste from the mountains.',
       'likes': 234,
@@ -78,7 +78,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       'experience': '5 Years',
       'rating': 4.7,
       'cuisineTitle': 'Special Momo Platter',
-      'cuisineImage': 'Resource/chef.png',
+      'cuisineImage': 'Resource/momo.png',
       'description':
           'Assorted momo platter with chicken, buff, and veg momos served with special chutney.',
       'likes': 189,
@@ -96,39 +96,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
           'user': 'David Brown',
           'comment': 'The chutney is incredible 🔥',
           'time': '1 day ago',
-        },
-      ],
-    },
-    {
-      'chefName': 'Chef Marlon',
-      'chefImage': 'Resource/chef.png',
-      'specialty': 'Mediterranean',
-      'experience': '7 Years',
-      'rating': 4.9,
-      'cuisineTitle': 'Wedding Feast Special',
-      'cuisineImage': 'Resource/chef.png',
-      'description':
-          '5-course wedding menu with appetizers, soup, main course, dessert, and beverages.',
-      'likes': 312,
-      'comments': 98,
-      'isLiked': false,
-      'price': 'NPR 1200/person',
-      'isFavorite': false,
-      'commentList': [
-        {
-          'user': 'Lisa Anderson',
-          'comment': 'Booked for my wedding! Can\'t wait!',
-          'time': '30 mins ago',
-        },
-        {
-          'user': 'Robert Taylor',
-          'comment': 'Outstanding service and taste',
-          'time': '2 days ago',
-        },
-        {
-          'user': 'Maria Garcia',
-          'comment': 'Worth every penny! 💯',
-          'time': '3 days ago',
         },
       ],
     },
