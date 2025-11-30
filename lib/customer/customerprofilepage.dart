@@ -205,13 +205,15 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               final newAddress = userAddress != addressController.text
                   ? addressController.text
                   : null;
-
-              final changed = await UserServices.updateProfile(
-                context,
-                fullName: newName,
-                phoneNumber: newPhone,
-                userAddress: newAddress,
-              );
+              bool changed = false;
+              if (newName != null || newPhone != null || newPhone != null || newAddress != null){
+                changed = await UserServices.updateProfile(
+                  context,
+                  fullName: newName,
+                  phoneNumber: newPhone,
+                  userAddress: newAddress,
+                );
+              }
               bool emailChanged = false;
               if (context.mounted && newEmail != null) {
                 emailChanged = await UserServices.changeUserEmail(

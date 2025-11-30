@@ -16,7 +16,7 @@ class _BookingPageState extends State<BookingPage> {
   String? selectedPackage;
   List<String> selectedFoodItems = [];
   List<String> customMenuItems = [];
-  late Future<List<Map<String, List<String>>>?> cuisinesList;
+  late Future<List<String>?> cuisinesList;
   late Future<List<String>> eventList;
   // Food items for different packages
   final Map<String, List<String>> packageFoodItems = {
@@ -47,7 +47,11 @@ class _BookingPageState extends State<BookingPage> {
 
   void _loadData(BuildContext context) {
     cuisinesList = FetchServices.getCuisines(context);
-    eventList = List.empty() as Future<List<String>>;
+    eventList = emptyList();
+  }
+
+  Future<List<String>> emptyList() async {
+    return List<String>.empty();
   }
 
   // Method to show calendar

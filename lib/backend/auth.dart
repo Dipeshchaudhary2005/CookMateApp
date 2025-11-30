@@ -53,7 +53,7 @@ class Auth {
         }
         return false;
       }
-    } on Exception catch (e) {
+    } catch (e) {
       if (kDebugMode) {
         print(e.toString());
       }
@@ -102,7 +102,7 @@ class Auth {
         }
         return false;
       }
-    } on Exception catch (e) {
+    } catch (e) {
       if (kDebugMode) {
         print(e.toString());
       }
@@ -138,7 +138,7 @@ class Auth {
         }
         return null;
       }
-    } on Exception catch (e) {
+    } catch (e) {
       if (kDebugMode) {
         print('Error verifying jwt: $e');
       }
