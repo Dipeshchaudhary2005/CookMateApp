@@ -55,7 +55,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       'experience': '6 Years',
       'rating': 4.9,
       'cuisineTitle': 'Traditional Thakali Set',
-      'cuisineImage': 'Resource/Dal-Bhat-Tarkari.png',
+      'cuisineImage': 'Resource/Dal-Bhat-Tarkari.jpg',
       'description':
           'Complete Thakali set with dal, bhat, tarkari, achar, and papad. Authentic taste from the mountains.',
       'likes': 234,
@@ -78,7 +78,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       'experience': '5 Years',
       'rating': 4.7,
       'cuisineTitle': 'Special Momo Platter',
-      'cuisineImage': 'Resource/momo.png',
+      'cuisineImage': 'Resource/momo.jpg',
       'description':
           'Assorted momo platter with chicken, buff, and veg momos served with special chutney.',
       'likes': 189,
