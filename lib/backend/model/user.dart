@@ -1,11 +1,11 @@
-enum UserType{
+enum UserType {
   customer,
   chef,
   admin;
 
-  factory UserType.fromString(String userType){
-    for(UserType type in UserType.values){
-      if (type.name == userType){
+  factory UserType.fromString(String userType) {
+    for (UserType type in UserType.values) {
+      if (type.name == userType) {
         return type;
       }
     }
@@ -72,21 +72,37 @@ class UserModel {
     this.rating,
     this.ratingCount,
     this.cuisines,
-    this.bio
+    this.bio,
   });
 
   factory UserModel.fromJSON(dynamic data) {
     // Checking for cast null error
-    final chefFields = data['chef'] != null ? data['chef'] as Map : {specialityField : null, experienceField: null, ratingField: null, ratingCountField: null, cuisinesField: null};
-    final location = data[locationField] != null ? data[locationField] as Map : null;
-    final coordinates = location?[coordinatesField] != null ? (location![coordinatesField] as List).map((e) => e as double).toList() : null;
-    final cuisines = chefFields[cuisinesField] != null ? (chefFields[cuisinesField] as List).map((e) => e as String).toList() : null;
+    final chefFields = data['chef'] != null
+        ? data['chef'] as Map
+        : {
+            specialityField: null,
+            experienceField: null,
+            ratingField: null,
+            ratingCountField: null,
+            cuisinesField: null,
+          };
+    final location = data[locationField] != null
+        ? data[locationField] as Map
+        : null;
+    final coordinates = location?[coordinatesField] != null
+        ? (location![coordinatesField] as List).map((e) => e as double).toList()
+        : null;
+    final cuisines = chefFields[cuisinesField] != null
+        ? (chefFields[cuisinesField] as List).map((e) => e as String).toList()
+        : null;
     return UserModel(
       uid: data[uidField],
       email: data[emailField],
       fullName: data[fullNameField],
       userType: data[userTypeField] != null
-          ? (data[userTypeField] as List).map((type) => UserType.fromString(type)).toList()
+          ? (data[userTypeField] as List)
+                .map((type) => UserType.fromString(type))
+                .toList()
           : null,
       phoneNumber: data[phoneNumberField],
       signInMethod: data[signInMethodField],
@@ -100,7 +116,7 @@ class UserModel {
       experience: chefFields[experienceField],
       rating: chefFields[ratingField] as num,
       ratingCount: chefFields[ratingCountField] as int,
-      cuisines: cuisines
+      cuisines: cuisines,
     );
   }
 }

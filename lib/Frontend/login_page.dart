@@ -220,11 +220,12 @@ class _LoginPageState extends State<LoginPage> {
                                       _isLoading = true;
                                     });
 
-                                    final loggedIn = await Auth.loginUserWithEmail(
-                                      _emailController.text,
-                                      _passwordController.text,
-                                      context
-                                    );
+                                    final loggedIn =
+                                        await Auth.loginUserWithEmail(
+                                          _emailController.text,
+                                          _passwordController.text,
+                                          context,
+                                        );
 
                                     if (!mounted) return;
 

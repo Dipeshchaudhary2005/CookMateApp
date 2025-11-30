@@ -1,3 +1,6 @@
+import 'package:cookmate/backend/model/ChefPackage.dart';
+import 'package:cookmate/backend/services/chef_packages_services.dart';
+import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 
 class ManageMenuPricePage extends StatefulWidget {
@@ -9,44 +12,8 @@ class ManageMenuPricePage extends StatefulWidget {
 
 class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
   // Package data
-  List<Map<String, dynamic>> packages = [
-    {
-      'name': '2-Course Dinner',
-      'price': 650,
-      'description': 'Good - Dine in 2-course/guest',
-      'isActive': true,
-      'items': [
-        'Chicken Tikka',
-        'Paneer Curry',
-        'Dal Makhani',
-        'Naan Bread',
-        'Rice',
-        'Gulab Jamun',
-      ],
-    },
-    {
-      'name': 'Private Cooking',
-      'price': 850,
-      'description': 'Very Good 4-course/guest',
-      'isActive': true,
-      'items': [
-        'Appetizer Platter',
-        'Caesar Salad',
-        'Grilled Salmon',
-        'Pasta Alfredo',
-        'Garlic Bread',
-        'Chocolate Mousse',
-        'Fresh Fruits',
-      ],
-    },
-    {
-      'name': 'Custom Menu',
-      'price': 0,
-      'description': 'Dine out booking/guest',
-      'isActive': true,
-      'items': [],
-    },
-  ];
+  late List<ChefPackage> packages;
+  late Future<List<ChefPackage>?> packagesFuture;
 
   void _addPackage() {
     final nameController = TextEditingController();
@@ -95,18 +62,21 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (nameController.text.isNotEmpty &&
-                  priceController.text.isNotEmpty) {
+                  priceController.text.isNotEmpty &&
+                  descController.text.isNotEmpty) {
+                final newPackage = await ChefPackagesServices.createPackage(
+                  context,
+                  nameController.text,
+                  descController.text,
+                  num.parse(priceController.text),
+                );
+                if (newPackage == null) return;
                 setState(() {
-                  packages.add({
-                    'name': nameController.text,
-                    'price': int.parse(priceController.text),
-                    'description': descController.text,
-                    'isActive': true,
-                    'items': [],
-                  });
+                  packages.add(newPackage);
                 });
+                if (!context.mounted) return;
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -128,11 +98,11 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
 
   void _editPackage(int index) {
     final package = packages[index];
-    final nameController = TextEditingController(text: package['name']);
+    final nameController = TextEditingController(text: package.name);
     final priceController = TextEditingController(
-      text: package['price'].toString(),
+      text: package.price.toString(),
     );
-    final descController = TextEditingController(text: package['description']);
+    final descController = TextEditingController(text: package.description);
 
     showDialog(
       context: context,
@@ -176,12 +146,21 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              bool changed = await ChefPackagesServices.updatePackage(
+                context,
+                package.id!,
+                name: nameController.text,
+                price: num.parse(priceController.text),
+                description: descController.text,
+              );
+              if (!changed) return;
               setState(() {
-                packages[index]['name'] = nameController.text;
-                packages[index]['price'] = int.parse(priceController.text);
-                packages[index]['description'] = descController.text;
+                packages[index].name = nameController.text;
+                packages[index].price = num.parse(priceController.text);
+                packages[index].description = descController.text;
               });
+              if (!context.mounted) return;
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -202,7 +181,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
 
   void _manageMenuItems(int packageIndex) {
     final package = packages[packageIndex];
-    List<String> tempItems = List.from(package['items']);
+    List<String> tempItems = List.from(package.dishes ?? List.empty());
     final controller = TextEditingController();
 
     showDialog(
@@ -220,7 +199,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Manage Menu Items - ${package['name']}',
+                  'Manage Menu Items - ${package.name}',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -297,10 +276,17 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                     ),
                     const SizedBox(width: 12),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        bool updated = await ChefPackagesServices.updatePackage(
+                          context,
+                          package.id!,
+                          dishes: tempItems,
+                        );
+                        if (!updated) return;
                         setState(() {
-                          packages[packageIndex]['items'] = tempItems;
+                          packages[packageIndex].dishes = tempItems;
                         });
+                        if (!context.mounted) return;
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -330,7 +316,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
       builder: (context) => AlertDialog(
         title: const Text('Delete Package'),
         content: Text(
-          'Are you sure you want to delete "${packages[index]['name']}"?',
+          'Are you sure you want to delete "${packages[index].name}"?',
         ),
         actions: [
           TextButton(
@@ -338,10 +324,16 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              bool deleted = await ChefPackagesServices.deletePackage(
+                context,
+                packages[index].id!,
+              );
+              if (!deleted) return;
               setState(() {
                 packages.removeAt(index);
               });
+              if (!context.mounted) return;
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -357,7 +349,11 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
       ),
     );
   }
-
+  @override
+  void initState() {
+    super.initState();
+    packagesFuture = ChefPackagesServices.getChefsPackages(context, StaticClass.currentUser!.uid!);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -374,103 +370,116 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Column(
-        children: [
-          // Stats Card
-          Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFB3D9),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: FutureBuilder<List<ChefPackage>?>(
+        future: packagesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            packages = snapshot.data ?? List<ChefPackage>.empty();
+            return Column(
               children: [
-                _buildStatItem(
-                  '${packages.length}',
-                  'Total Packages',
-                  Icons.restaurant_menu,
-                ),
-                Container(width: 1, height: 40, color: Colors.black26),
-                _buildStatItem(
-                  '${packages.where((p) => p['isActive']).length}',
-                  'Active',
-                  Icons.check_circle,
-                ),
-                Container(width: 1, height: 40, color: Colors.black26),
-                _buildStatItem(
-                  'NPR ${_calculateAvgPrice()}',
-                  'Avg Price',
-                  Icons.money,
-                ),
-              ],
-            ),
-          ),
-
-          // Package List Header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Your Packages',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _addPackage,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Package'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8BC34A),
+                // Stats Card
+                Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFB3D9),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildStatItem(
+                        '${packages.length}',
+                        'Total Packages',
+                        Icons.restaurant_menu,
+                      ),
+                      Container(width: 1, height: 40, color: Colors.black26),
+                      _buildStatItem(
+                        '${packages.where((p) => p.isActive ?? false).length}',
+                        'Active',
+                        Icons.check_circle,
+                      ),
+                      Container(width: 1, height: 40, color: Colors.black26),
+                      _buildStatItem(
+                        'NPR ${_calculateAvgPrice()}',
+                        'Avg Price',
+                        Icons.money,
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
 
-          // Package List
-          Expanded(
-            child: packages.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.restaurant_menu,
-                          size: 80,
-                          color: Colors.grey[400],
+                // Package List Header
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Your Packages',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No packages yet',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey[600],
-                          ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: _addPackage,
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add Package'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF8BC34A),
                         ),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: _addPackage,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8BC34A),
-                          ),
-                          child: const Text('Add Your First Package'),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: packages.length,
-                    itemBuilder: (context, index) {
-                      return _buildPackageCard(index);
-                    },
+                      ),
+                    ],
                   ),
-          ),
-        ],
+                ),
+                const SizedBox(height: 12),
+
+                // Package List
+                Expanded(
+                  child: packages.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.restaurant_menu,
+                                size: 80,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No packages yet',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              ElevatedButton(
+                                onPressed: _addPackage,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF8BC34A),
+                                ),
+                                child: const Text('Add Your First Package'),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: packages.length,
+                          itemBuilder: (context, index) {
+                            return _buildPackageCard(index);
+                          },
+                        ),
+                ),
+              ],
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }
@@ -494,15 +503,15 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
 
   String _calculateAvgPrice() {
     if (packages.isEmpty) return '0';
-    final activePackages = packages.where((p) => p['price'] > 0);
+    final activePackages = packages.where((p) => p.price! > 0);
     if (activePackages.isEmpty) return '0';
-    final sum = activePackages.fold(0, (sum, p) => sum + (p['price'] as int));
+    final sum = activePackages.fold(0.0, (sum, p) => sum + (p.price!));
     return (sum / activePackages.length).toStringAsFixed(0);
   }
 
   Widget _buildPackageCard(int index) {
     final package = packages[index];
-    final isActive = package['isActive'] as bool;
+    final isActive = package.isActive ?? false;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -538,7 +547,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  package['name'],
+                                  package.name ?? "No name",
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -550,7 +559,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                                 activeThumbColor: const Color(0xFF8BC34A),
                                 onChanged: (value) {
                                   setState(() {
-                                    packages[index]['isActive'] = value;
+                                    packages[index].isActive = value;
                                   });
                                 },
                               ),
@@ -558,7 +567,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            package['description'],
+                            package.description ?? "No description",
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.grey,
@@ -566,9 +575,9 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            package['price'] == 0
+                            package.price == 0
                                 ? 'Custom Pricing'
-                                : 'NPR ${package['price']}/guest',
+                                : 'NPR ${package.price}/guest',
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -590,7 +599,7 @@ class _ManageMenuPricePageState extends State<ManageMenuPricePage> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '${package['items'].length} menu items',
+                      '${package.dishes?.length ?? 0} menu items',
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ],

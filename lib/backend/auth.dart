@@ -64,7 +64,6 @@ class Auth {
     }
   }
 
-
   // Email/Password Login
   static Future<bool> loginUserWithEmail(
     String email,
@@ -129,7 +128,6 @@ class Auth {
       );
       if (response.statusCode.toString().contains('20')) {
         final data = jsonDecode(response.body);
-        print(data);
         return data['userId'];
       } else {
         final data = jsonDecode(response.body);
@@ -216,5 +214,4 @@ class Auth {
       return false;
     }
   }
-
 }

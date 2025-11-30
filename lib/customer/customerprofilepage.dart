@@ -206,7 +206,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                   ? addressController.text
                   : null;
               bool changed = false;
-              if (newName != null || newPhone != null || newPhone != null || newAddress != null){
+              if (newName != null ||
+                  newPhone != null ||
+                  newPhone != null ||
+                  newAddress != null) {
                 changed = await UserServices.updateProfile(
                   context,
                   fullName: newName,

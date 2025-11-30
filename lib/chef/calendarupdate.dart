@@ -18,19 +18,19 @@ class _CalendarPageState extends State<CalendarPage> {
       'isAvailable': true,
       'timeSlots': ['10:00 AM - 2:00 PM', '6:00 PM - 10:00 PM'],
       'maxBookings': 2,
-      'notes': 'Available for events'
+      'notes': 'Available for events',
     },
     '2025-03-18': {
       'isAvailable': true,
       'timeSlots': ['2:00 PM - 6:00 PM'],
       'maxBookings': 1,
-      'notes': 'Afternoon only'
+      'notes': 'Afternoon only',
     },
     '2025-03-20': {
       'isAvailable': false,
       'timeSlots': [],
       'maxBookings': 0,
-      'notes': 'Personal day off'
+      'notes': 'Personal day off',
     },
   };
 
@@ -65,10 +65,12 @@ class _CalendarPageState extends State<CalendarPage> {
     Map<String, dynamic>? existingData = availabilityData[dateKey];
 
     bool isAvailable = existingData?['isAvailable'] ?? true;
-    List<String> selectedSlots = List<String>.from(existingData?['timeSlots'] ?? []);
+    List<String> selectedSlots = List<String>.from(
+      existingData?['timeSlots'] ?? [],
+    );
     int maxBookings = existingData?['maxBookings'] ?? 1;
     TextEditingController notesController = TextEditingController(
-        text: existingData?['notes'] ?? ''
+      text: existingData?['notes'] ?? '',
     );
     TextEditingController customSlotController = TextEditingController();
 
@@ -76,7 +78,9 @@ class _CalendarPageState extends State<CalendarPage> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Container(
             constraints: const BoxConstraints(maxHeight: 700, maxWidth: 400),
             padding: const EdgeInsets.all(20),
@@ -91,7 +95,10 @@ class _CalendarPageState extends State<CalendarPage> {
                       const Flexible(
                         child: Text(
                           'Set Availability',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -175,7 +182,10 @@ class _CalendarPageState extends State<CalendarPage> {
                     // Time Slots Section
                     const Text(
                       'Available Time Slots',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
 
@@ -222,7 +232,10 @@ class _CalendarPageState extends State<CalendarPage> {
                               hintText: '3:00 PM - 7:00 PM',
                               border: OutlineInputBorder(),
                               prefixIcon: Icon(Icons.access_time, size: 20),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
                             ),
                             style: const TextStyle(fontSize: 14),
                           ),
@@ -259,39 +272,41 @@ class _CalendarPageState extends State<CalendarPage> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      ...selectedSlots.map((slot) => Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFB8E6B8),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.access_time, size: 16),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                slot,
-                                overflow: TextOverflow.ellipsis,
+                      ...selectedSlots.map(
+                        (slot) => Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFB8E6B8),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.access_time, size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  slot,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close, size: 18),
-                              onPressed: () {
-                                setDialogState(() {
-                                  selectedSlots.remove(slot);
-                                });
-                              },
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                          ],
+                              IconButton(
+                                icon: const Icon(Icons.close, size: 18),
+                                onPressed: () {
+                                  setDialogState(() {
+                                    selectedSlots.remove(slot);
+                                  });
+                                },
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                            ],
+                          ),
                         ),
-                      )),
+                      ),
                     ],
 
                     const SizedBox(height: 16),
@@ -299,7 +314,10 @@ class _CalendarPageState extends State<CalendarPage> {
                     // Max bookings
                     const Text(
                       'Maximum Bookings',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -308,10 +326,10 @@ class _CalendarPageState extends State<CalendarPage> {
                           icon: const Icon(Icons.remove_circle_outline),
                           onPressed: maxBookings > 1
                               ? () {
-                            setDialogState(() {
-                              maxBookings--;
-                            });
-                          }
+                                  setDialogState(() {
+                                    maxBookings--;
+                                  });
+                                }
                               : null,
                           padding: const EdgeInsets.all(8),
                         ),
@@ -362,7 +380,10 @@ class _CalendarPageState extends State<CalendarPage> {
                         hintText: 'Add any special notes...',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.note, size: 20),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
                       ),
                       style: const TextStyle(fontSize: 14),
                     ),
@@ -423,7 +444,9 @@ class _CalendarPageState extends State<CalendarPage> {
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Please select at least one time slot'),
+                                  content: Text(
+                                    'Please select at least one time slot',
+                                  ),
                                   backgroundColor: Colors.red,
                                 ),
                               );
@@ -450,8 +473,18 @@ class _CalendarPageState extends State<CalendarPage> {
 
   String _formatDisplayDate(DateTime date) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
@@ -481,12 +514,12 @@ class _CalendarPageState extends State<CalendarPage> {
                   title: const Text('How to use'),
                   content: const Text(
                     'Tap on any date to set your availability:\n\n'
-                        '• Toggle Available/Unavailable\n'
-                        '• Select time slots\n'
-                        '• Set max bookings per day\n'
-                        '• Add notes if needed\n\n'
-                        'Green border = Available\n'
-                        'Red border = Unavailable',
+                    '• Toggle Available/Unavailable\n'
+                    '• Select time slots\n'
+                    '• Set max bookings per day\n'
+                    '• Add notes if needed\n\n'
+                    'Green border = Available\n'
+                    'Red border = Unavailable',
                   ),
                   actions: [
                     TextButton(
@@ -577,17 +610,19 @@ class _CalendarPageState extends State<CalendarPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-                          .map((day) => SizedBox(
-                        width: 40,
-                        child: Text(
-                          day,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ))
+                          .map(
+                            (day) => SizedBox(
+                              width: 40,
+                              child: Text(
+                                day,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          )
                           .toList(),
                     ),
                     const SizedBox(height: 8),
@@ -694,11 +729,7 @@ class _CalendarPageState extends State<CalendarPage> {
           'Available Days',
           const Color(0xFF8BC34A),
         ),
-        _buildStatItem(
-          '$unavailableDays',
-          'Blocked Days',
-          Colors.red,
-        ),
+        _buildStatItem('$unavailableDays', 'Blocked Days', Colors.red),
         _buildStatItem(
           '${availableDays + unavailableDays}',
           'Total Set',
@@ -751,7 +782,9 @@ class _CalendarPageState extends State<CalendarPage> {
                 title: Text(
                   '$year',
                   style: TextStyle(
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                     color: isSelected ? const Color(0xFF8BC34A) : Colors.black,
                   ),
                 ),
@@ -787,21 +820,26 @@ class _CalendarPageState extends State<CalendarPage> {
     // Add day numbers
     for (int day = 1; day <= daysInMonth; day++) {
       final date = DateTime(selectedYear, selectedMonth, day);
-      final isSelected = date.day == selectedDate.day &&
+      final isSelected =
+          date.day == selectedDate.day &&
           date.month == selectedDate.month &&
           date.year == selectedDate.year;
       final isAvailable = _isDateAvailable(date);
       final isUnavailable = _isDateUnavailable(date);
-      final isPast = date.isBefore(DateTime.now().subtract(const Duration(days: 1)));
+      final isPast = date.isBefore(
+        DateTime.now().subtract(const Duration(days: 1)),
+      );
 
       dayWidgets.add(
         InkWell(
-          onTap: isPast ? null : () {
-            setState(() {
-              selectedDate = date;
-            });
-            _showAvailabilityDialog(date);
-          },
+          onTap: isPast
+              ? null
+              : () {
+                  setState(() {
+                    selectedDate = date;
+                  });
+                  _showAvailabilityDialog(date);
+                },
           child: Container(
             width: 40,
             height: 40,
@@ -868,8 +906,18 @@ class _CalendarPageState extends State<CalendarPage> {
 
   String _getMonthName(int month) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return months[month - 1];
   }

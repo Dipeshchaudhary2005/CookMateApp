@@ -20,7 +20,7 @@ class UserServices {
     double? longitude,
     double? latitude,
     String? userAddress,
-    String? bio
+    String? bio,
   }) async {
     try {
       final userId = StaticClass.currentUser!.uid!;
@@ -41,7 +41,7 @@ class UserServices {
           UserModel.locationField: [longitude, latitude],
           UserModel.userTypeField: role,
           UserModel.userAddressField: userAddress,
-          UserModel.bioField : bio
+          UserModel.bioField: bio,
         }),
       );
       if (response.statusCode.toString().contains('20')) {
@@ -135,14 +135,13 @@ class UserServices {
       request.files.add(await http.MultipartFile.fromPath('image', image.path));
       final response = await request.send();
       if (response.statusCode.toString().contains('20')) {
-        if (context.mounted) {
+        if (!context.mounted) return false;
           final userData = await Auth.getUserData(
             context,
             StaticClass.jsonWebToken!,
             StaticClass.currentUser!.uid!,
           );
           StaticClass.currentUser = userData;
-        }
         return true;
       } else {
         final responseData = await response.stream.bytesToString();
@@ -163,9 +162,13 @@ class UserServices {
     }
   }
 
-  static Future<bool> updateChefFields (BuildContext context, {String? speciality, String? experience, List<String>? cuisines }) async{
-    try{
-
+  static Future<bool> updateChefFields(
+    BuildContext context, {
+    String? speciality,
+    String? experience,
+    List<String>? cuisines,
+  }) async {
+    try {
       final userId = StaticClass.currentUser!.uid!;
       final url = Uri.https(
         StaticClass.serverBaseURL,
@@ -178,13 +181,11 @@ class UserServices {
           'Accept': 'application/json',
           'Authorization': StaticClass.jsonWebToken!,
         },
-        body : jsonEncode(
-          {
-            UserModel.specialityField : speciality,
-            UserModel.experienceField : experience,
-            UserModel.cuisinesField : cuisines
-          }
-        )
+        body: jsonEncode({
+          UserModel.specialityField: speciality,
+          UserModel.experienceField: experience,
+          UserModel.cuisinesField: cuisines,
+        }),
       );
 
       if (response.statusCode.toString().contains('20')) {
@@ -199,7 +200,7 @@ class UserServices {
         return false;
       }
     } catch (e) {
-      if (kDebugMode){
+      if (kDebugMode) {
         print("Error updating Chef Field ${e.toString()}");
       }
       if (context.mounted) {
@@ -208,5 +209,4 @@ class UserServices {
       return false;
     }
   }
-
 }

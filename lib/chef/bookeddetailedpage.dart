@@ -81,9 +81,8 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
   void _acceptBooking(Map<String, dynamic> booking) {
     setState(() {
       // Remove from pending bookings
-      pendingBookings.removeWhere((b) =>
-      b['name'] == booking['name'] &&
-          b['date'] == booking['date']
+      pendingBookings.removeWhere(
+        (b) => b['name'] == booking['name'] && b['date'] == booking['date'],
       );
 
       // Add to confirmed bookings
@@ -105,9 +104,8 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
   void _cancelBooking(Map<String, dynamic> booking) {
     setState(() {
       // Remove from pending bookings
-      pendingBookings.removeWhere((b) =>
-      b['name'] == booking['name'] &&
-          b['date'] == booking['date']
+      pendingBookings.removeWhere(
+        (b) => b['name'] == booking['name'] && b['date'] == booking['date'],
       );
     });
 
@@ -123,9 +121,8 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
   void _completeBooking(Map<String, dynamic> booking) {
     setState(() {
       // Remove from confirmed bookings
-      confirmedBookings.removeWhere((b) =>
-      b['name'] == booking['name'] &&
-          b['date'] == booking['date']
+      confirmedBookings.removeWhere(
+        (b) => b['name'] == booking['name'] && b['date'] == booking['date'],
       );
 
       // Add to completed bookings (without rating initially)

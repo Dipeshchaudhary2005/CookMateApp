@@ -210,12 +210,14 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       }
     });
   }
+
   void refreshPage() async {
     final newFuture = FetchServices.getRecentPosts(context, 0);
     setState(() {
       chefPostsFuture = newFuture;
     });
   }
+
   void _toggleLike(ChefPost post) async {
     bool? liked = await FetchServices.likePost(context, post.id!);
     if (liked == null) return;
@@ -227,13 +229,13 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
   void _addComment(String postId, String comment) async {
     bool success = await FetchServices.addComment(context, postId, comment);
-    if (success){
+    if (success) {
       if (!mounted) return;
       final updatedPost = await FetchServices.getPostById(context, postId);
       setState(() async {
         selectedPost = updatedPost;
       });
-    };
+    }
   }
 
   void _showCommentsDialog(String postId) async {
@@ -339,15 +341,16 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                     child: Image.network(
                                       comment.userPic!,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return const Center(
-                                          child: Icon(
-                                            Icons.restaurant,
-                                            size: 80,
-                                            color: Colors.grey,
-                                          ),
-                                        );
-                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return const Center(
+                                              child: Icon(
+                                                Icons.restaurant,
+                                                size: 80,
+                                                color: Colors.grey,
+                                              ),
+                                            );
+                                          },
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -434,7 +437,10 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                           onPressed: () {
                             if (commentController.text.isNotEmpty) {
                               setModalState(() {
-                                _addComment(selectedPost!.id!, commentController.text);
+                                _addComment(
+                                  selectedPost!.id!,
+                                  commentController.text,
+                                );
                               });
                               commentController.clear();
                             }
@@ -537,7 +543,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          "PRICING", // TODO
+                          "PRICING", //TODO
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -874,8 +880,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                             return buildPostCard(snapshot.data![index], index);
                           },
                         );
-                      }
-                      else {
+                      } else {
                         return Center(
                           child: Padding(
                             padding: const EdgeInsets.all(40),
@@ -908,11 +913,10 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                           ),
                         );
                       }
-                    }
-                    else {
+                    } else {
                       return const Center(child: CircularProgressIndicator());
                     }
-                  }
+                  },
                 ),
               ],
             ),
@@ -989,7 +993,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     );
   }
 
-  Widget buildPostCard(ChefPost post, int index){
+  Widget buildPostCard(ChefPost post, int index) {
     return GestureDetector(
       onTap: () => _showPostDetail(post),
       child: Container(
@@ -1064,9 +1068,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   ),
                   IconButton(
                     icon: Icon(
-                      post.liked!
-                          ? Icons.bookmark
-                          : Icons.bookmark_border,
+                      post.liked! ? Icons.bookmark : Icons.bookmark_border,
                       color: post.liked!
                           ? const Color(0xFF8BC34A)
                           : Colors.grey,
@@ -1174,5 +1176,4 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
       ),
     );
   }
-
 }

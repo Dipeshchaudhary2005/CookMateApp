@@ -15,7 +15,9 @@ class ChefProfilePage extends StatefulWidget {
 
 class _ChefProfilePageState extends State<ChefProfilePage> {
   UserModel chef = StaticClass.currentUser!;
-  Image? _profileImage = StaticClass.currentUser!.urlToImage != null ? Image.network(StaticClass.currentUser!.urlToImage!, fit: BoxFit.cover,) : null;
+  Image? _profileImage = StaticClass.currentUser!.urlToImage != null
+      ? Image.network(StaticClass.currentUser!.urlToImage!, fit: BoxFit.cover)
+      : null;
   final ImagePicker _picker = ImagePicker();
 
   // Chef data
@@ -52,10 +54,18 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
 
       if (pickedFile != null) {
         if (!mounted) return;
-        bool changed = await UserServices.updateProfilePic(context, File(pickedFile.path));
+        bool changed = await UserServices.updateProfilePic(
+          context,
+          File(pickedFile.path),
+        );
         if (!changed) return;
         setState(() {
-          _profileImage = StaticClass.currentUser!.urlToImage != null ? Image.network(StaticClass.currentUser!.urlToImage!, fit: BoxFit.cover) : null;
+          _profileImage = StaticClass.currentUser!.urlToImage != null
+              ? Image.network(
+                  StaticClass.currentUser!.urlToImage!,
+                  fit: BoxFit.cover,
+                )
+              : null;
         });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -118,167 +128,199 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
 
     showDialog(
       context: context,
-      builder: (context) =>StatefulBuilder(
+      builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Container(
-          constraints: const BoxConstraints(maxHeight: 600),
-          padding: const EdgeInsets.all(20),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Edit Profile',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            constraints: const BoxConstraints(maxHeight: 600),
+            padding: const EdgeInsets.all(20),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Edit Profile',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                    borderRadius: BorderRadius.circular(8.0),
-
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Full Name',
+                      prefixIcon: Icon(Icons.person),
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                  child: DropdownButton<String>(
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: EdgeInsets.all(4.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: DropdownButton<String>(
                       hint: Text("Select speciality"),
                       icon: Icon(Icons.work),
                       borderRadius: BorderRadius.circular(8.0),
                       isExpanded: true,
                       value: selectedSpeciality,
-                      items: chef.cuisines!.map((e) => DropdownMenuItem(value: e, child: Text(e),)).toList(),
-                      onChanged: (val){
+                      items: chef.cuisines!
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                      onChanged: (val) {
                         setState(() {
                           selectedSpeciality = val;
                         });
-                        setDialogState((){});
+                        setDialogState(() {});
                       },
                     ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: experienceController,
-                  decoration: const InputDecoration(
-                    labelText: 'Experience',
-                    prefixIcon: Icon(Icons.work),
-                    border: OutlineInputBorder(),
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: phoneController,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone',
-                    prefixIcon: Icon(Icons.phone),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: addressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Address',
-                    prefixIcon: Icon(Icons.location_on),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: bioController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: 'Bio',
-                    prefixIcon: Icon(Icons.notes),
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: experienceController,
+                    decoration: const InputDecoration(
+                      labelText: 'Experience',
+                      prefixIcon: Icon(Icons.work),
+                      border: OutlineInputBorder(),
                     ),
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final newName = nameController.text != chef.fullName ? nameController.text : null;
-                        final speciality = selectedSpeciality != chef.speciality ? selectedSpeciality : null;
-                        final experience = experienceController.text != chef.experience ? experienceController.text : null;
-                        final email = emailController.text != chef.email ? emailController.text : null;
-                        final phone = phoneController.text != chef.phoneNumber ? phoneController.text : null;
-                        final address = addressController.text != chef.userAddress ? addressController.text : null;
-                        final bioField = bioController.text != chef.bio ? bioController.text : null;
-                        bool changedProfile = false;
-                        bool changedChefFields = false;
-                        bool changedEmail = false;
-                        if (newName != null || phone != null || address != null  || bioField != null){
-                          changedProfile = await UserServices.updateProfile(context,
-                            fullName: newName,
-                            phoneNumber: phone,
-                            userAddress: address,
-                            bio: bioField
-                          );
-                        }
-                        if (speciality != null || experience != null){
-                          if (!context.mounted) return;
-                          changedChefFields = await UserServices.updateChefFields(context,
-                            speciality: speciality,
-                            experience: experience
-                          );
-                        }
-                        if (email != null){
-                          if (!context.mounted) return;
-                          changedEmail = await UserServices.changeUserEmail(context, email);
-                        }
-                        if (changedEmail || changedChefFields || changedProfile ){
-                          setState(() {
-                            chef = StaticClass.currentUser!;
-                          });
-
-                        }
-                        if (!context.mounted) return;
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Profile updated!'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8BC34A),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: emailController,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: phoneController,
+                    decoration: const InputDecoration(
+                      labelText: 'Phone',
+                      prefixIcon: Icon(Icons.phone),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: addressController,
+                    decoration: const InputDecoration(
+                      labelText: 'Address',
+                      prefixIcon: Icon(Icons.location_on),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: bioController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Bio',
+                      prefixIcon: Icon(Icons.notes),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
                       ),
-                      child: const Text('Save'),
-                    ),
-                  ],
-                ),
-              ],
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final newName = nameController.text != chef.fullName
+                              ? nameController.text
+                              : null;
+                          final speciality =
+                              selectedSpeciality != chef.speciality
+                              ? selectedSpeciality
+                              : null;
+                          final experience =
+                              experienceController.text != chef.experience
+                              ? experienceController.text
+                              : null;
+                          final email = emailController.text != chef.email
+                              ? emailController.text
+                              : null;
+                          final phone = phoneController.text != chef.phoneNumber
+                              ? phoneController.text
+                              : null;
+                          final address =
+                              addressController.text != chef.userAddress
+                              ? addressController.text
+                              : null;
+                          final bioField = bioController.text != chef.bio
+                              ? bioController.text
+                              : null;
+                          bool changedProfile = false;
+                          bool changedChefFields = false;
+                          bool changedEmail = false;
+                          if (newName != null ||
+                              phone != null ||
+                              address != null ||
+                              bioField != null) {
+                            changedProfile = await UserServices.updateProfile(
+                              context,
+                              fullName: newName,
+                              phoneNumber: phone,
+                              userAddress: address,
+                              bio: bioField,
+                            );
+                          }
+                          if (speciality != null || experience != null) {
+                            if (!context.mounted) return;
+                            changedChefFields =
+                                await UserServices.updateChefFields(
+                                  context,
+                                  speciality: speciality,
+                                  experience: experience,
+                                );
+                          }
+                          if (email != null) {
+                            if (!context.mounted) return;
+                            changedEmail = await UserServices.changeUserEmail(
+                              context,
+                              email,
+                            );
+                          }
+                          if (changedEmail ||
+                              changedChefFields ||
+                              changedProfile) {
+                            setState(() {
+                              chef = StaticClass.currentUser!;
+                            });
+                          }
+                          if (!context.mounted) return;
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Profile updated!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF8BC34A),
+                        ),
+                        child: const Text('Save'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    )
     );
   }
 
@@ -300,28 +342,32 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                       child: FutureBuilder<List<String>?>(
                         future: cuisinesList,
                         builder: (BuildContext context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.done){
-                            if (snapshot.hasData){
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.hasData) {
                               return DropdownButton<String>(
                                 value: selectedCuisine,
                                 underline: const SizedBox(),
                                 items: snapshot.data!
                                     .map(
-                                      (e) => DropdownMenuItem(value: e, child: Text(e)),
-                                )
+                                      (e) => DropdownMenuItem(
+                                        value: e,
+                                        child: Text(e),
+                                      ),
+                                    )
                                     .toList(),
                                 onChanged: (val) {
-                                    setState(() => selectedCuisine = val!);
-                                    setDialogState((){});
-                                }
+                                  setState(() => selectedCuisine = val!);
+                                  setDialogState(() {});
+                                },
                               );
-                            }else {
+                            } else {
                               return Text("No data found");
                             }
-                          }else {
+                          } else {
                             return const CircularProgressIndicator();
                           }
-                        }
+                        },
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -373,11 +419,14 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
             ),
             ElevatedButton(
               onPressed: () async {
-                bool changed = await UserServices.updateChefFields(context, cuisines: tempSpecializations);
+                bool changed = await UserServices.updateChefFields(
+                  context,
+                  cuisines: tempSpecializations,
+                );
                 if (!changed) return;
                 setState(() {
                   chef = StaticClass.currentUser!;
-                  if (!chef.cuisines!.contains(selectedSpeciality)){
+                  if (!chef.cuisines!.contains(selectedSpeciality)) {
                     selectedSpeciality = chef.cuisines!.first;
                   }
                 });
@@ -443,9 +492,7 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                           ],
                         ),
                         child: _profileImage != null
-                            ? ClipOval(
-                                child: _profileImage,
-                              )
+                            ? ClipOval(child: _profileImage)
                             : const Icon(
                                 Icons.person,
                                 size: 60,
@@ -502,7 +549,10 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                       const SizedBox(width: 16),
                       const Icon(Icons.work, size: 20, color: Colors.black54),
                       const SizedBox(width: 4),
-                      Text(chef.experience ?? "No experience", style: const TextStyle(fontSize: 16)),
+                      Text(
+                        chef.experience ?? "No experience",
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ],
                   ),
                 ],
@@ -531,7 +581,11 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildStatCard('Rating', '${chef.rating ?? 0.0}', Colors.amber),
+                    child: _buildStatCard(
+                      'Rating',
+                      '${chef.rating ?? 0.0}',
+                      Colors.amber,
+                    ),
                   ),
                 ],
               ),
@@ -547,9 +601,21 @@ class _ChefProfilePageState extends State<ChefProfilePage> {
 
             // Contact Information
             _buildInfoCard('Contact Information', [
-              {'icon': Icons.email, 'label': 'Email', 'value': chef.email ?? "No email"},
-              {'icon': Icons.phone, 'label': 'Phone', 'value': chef.phoneNumber ?? "No phone"},
-              {'icon': Icons.location_on, 'label': 'Address', 'value': chef.userAddress ?? "No address"},
+              {
+                'icon': Icons.email,
+                'label': 'Email',
+                'value': chef.email ?? "No email",
+              },
+              {
+                'icon': Icons.phone,
+                'label': 'Phone',
+                'value': chef.phoneNumber ?? "No phone",
+              },
+              {
+                'icon': Icons.location_on,
+                'label': 'Address',
+                'value': chef.userAddress ?? "No address",
+              },
             ]),
 
             // Specializations
