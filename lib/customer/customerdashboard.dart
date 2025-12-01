@@ -4,6 +4,7 @@ import 'bookingpage.dart';
 import 'favoritechefpage.dart';
 import 'customerprofilepage.dart';
 import 'summarypage.dart';
+import 'notification.dart';
 
 class CustomerDashboard extends StatefulWidget {
   const CustomerDashboard({super.key});
@@ -711,7 +712,14 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
           actions: [
             IconButton(
               icon: const Icon(Icons.notifications, color: Colors.purple),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationPage(),
+                  ),
+                );
+              },
             ),
           ],
         ),
