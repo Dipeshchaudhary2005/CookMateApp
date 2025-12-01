@@ -1,9 +1,11 @@
+import 'package:cookmate/backend/model/ChefPackage.dart';
+import 'package:cookmate/backend/services/chef_packages_services.dart';
 import 'package:cookmate/backend/services/fetch_services.dart';
 import 'package:flutter/material.dart';
 import 'summarypage.dart';
-
 class BookingPage extends StatefulWidget {
-  const BookingPage({super.key});
+  final String? chefId;
+  const BookingPage({super.key, this.chefId});
 
   @override
   State<BookingPage> createState() => _BookingPageState();
@@ -16,39 +18,40 @@ class _BookingPageState extends State<BookingPage> {
   String? selectedPackage;
   List<String> selectedFoodItems = [];
   List<String> customMenuItems = [];
-  late Future<List<String>?> cuisinesList;
-  late Future<List<String>> eventList;
+  late Future<List<ChefPackage>?> packagesFuture;
+  late List<ChefPackage>? packages;
+  List<ChefPackage> selectedPackages = [];
+  final List<String> eventList = [
+    "Wedding", "Birthday", "Home Cooking", "Private"
+  ];
   // Food items for different packages
-  final Map<String, List<String>> packageFoodItems = {
-    '2-Course Dinner': [
-      'Chicken Tikka',
-      'Paneer Curry',
-      'Dal Makhani',
-      'Naan Bread',
-      'Rice',
-      'Gulab Jamun',
-    ],
-    'Private Cooking': [
-      'Appetizer Platter',
-      'Caesar Salad',
-      'Grilled Salmon',
-      'Pasta Alfredo',
-      'Garlic Bread',
-      'Chocolate Mousse',
-      'Fresh Fruits',
-    ],
-  };
+  // final Map<String, List<String>> packageFoodItems = {
+  //   '2-Course Dinner': [
+  //     'Chicken Tikka',
+  //     'Paneer Curry',
+  //     'Dal Makhani',
+  //     'Naan Bread',
+  //     'Rice',
+  //     'Gulab Jamun',
+  //   ],
+  //   'Private Cooking': [
+  //     'Appetizer Platter',
+  //     'Caesar Salad',
+  //     'Grilled Salmon',
+  //     'Pasta Alfredo',
+  //     'Garlic Bread',
+  //     'Chocolate Mousse',
+  //     'Fresh Fruits',
+  //   ],
+  // };
 
   @override
   void initState() {
     super.initState();
-    _loadData(context);
+    packagesFuture = ChefPackagesServices.getChefsPackages(context, widget.chefId!);
   }
 
-  void _loadData(BuildContext context) {
-    cuisinesList = FetchServices.getCuisines(context);
-    eventList = emptyList();
-  }
+
 
   Future<List<String>> emptyList() async {
     return List<String>.empty();
@@ -83,7 +86,7 @@ class _BookingPageState extends State<BookingPage> {
 
   // Method to show food selection dialog
   void _showFoodSelectionDialog(String packageName) {
-    List<String> tempSelected = List.from(selectedFoodItems);
+    List<ChefPackage> tempSelected = List.from(selectedPackages);
 
     showDialog(
       context: context,
@@ -103,28 +106,43 @@ class _BookingPageState extends State<BookingPage> {
               ),
               content: SizedBox(
                 width: double.maxFinite,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: packageFoodItems[packageName]?.length ?? 0,
-                  itemBuilder: (context, index) {
-                    final item = packageFoodItems[packageName]![index];
-                    final isSelected = tempSelected.contains(item);
+                child: FutureBuilder<List<ChefPackage>?>(
+                  future: packagesFuture,
+                  builder: (context, asyncSnapshot) {
+                    if (asyncSnapshot.connectionState != ConnectionState.done){
+                      return const CircularProgressIndicator();
+                    }else {
+                      if (!asyncSnapshot.hasData) {
+                        return const Text("No Packages");
+                      }
+                      packages = asyncSnapshot.data;
+                      if (packages == null) return const Text("No packages");
+                      final package = packages!.where((package) => package.name == packageName).indexed.single;
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: package.$2.dishes!.length,
+                      itemBuilder: (context, index) {
+                        final item = package.$2.dishes![index];
+                        final isSelected = tempSelected[package.$1].dishes!.contains(item);
 
-                    return CheckboxListTile(
-                      title: Text(item),
-                      value: isSelected,
-                      activeColor: const Color(0xFF8BC34A),
-                      onChanged: (bool? value) {
-                        setDialogState(() {
-                          if (value == true) {
-                            tempSelected.add(item);
-                          } else {
-                            tempSelected.remove(item);
-                          }
-                        });
+                        return CheckboxListTile(
+                          title: Text(item),
+                          value: isSelected,
+                          activeColor: const Color(0xFF8BC34A),
+                          onChanged: (bool? value) {
+                            setDialogState(() {
+                              if (value == true) {
+                                tempSelected[package.$1].dishes!.add(item);
+                              } else {
+                                tempSelected[package.$1].dishes!.add(item);
+                              }
+                            });
+                          },
+                        );
                       },
                     );
-                  },
+                  }
+                  }
                 ),
               ),
               actions: [
@@ -135,7 +153,7 @@ class _BookingPageState extends State<BookingPage> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      selectedFoodItems = tempSelected;
+                      selectedPackages = tempSelected;
                       selectedPackage = packageName;
                     });
                     Navigator.pop(context);
@@ -488,30 +506,17 @@ class _BookingPageState extends State<BookingPage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: FutureBuilder<List<String>>(
-                  future: eventList,
-                  builder: (context, asyncSnapshot) {
-                    if (asyncSnapshot.hasData) {
-                      return DropdownButton<String>(
+                child: DropdownButton<String>(
                         value: selectedEvent,
                         isExpanded: true,
-                        underline: const SizedBox(),
-                        items: asyncSnapshot.data!
+                        items: eventList
                             .map(
                               (e) => DropdownMenuItem(value: e, child: Text(e)),
                             )
                             .toList(),
-                        // items: ['Engagement Function', 'Birthday Party', 'Wedding']
-                        //     .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        //     .toList(),
                         onChanged: (val) =>
                             setState(() => selectedEvent = val!),
-                      );
-                    } else {
-                      return const CircularProgressIndicator();
-                    }
-                  },
-                ),
+                      ),
               ),
               const SizedBox(height: 20),
 

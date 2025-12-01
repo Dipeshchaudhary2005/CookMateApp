@@ -20,6 +20,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
   List<Map<String, dynamic>> filteredPosts = [];
   static List<Map<String, dynamic>> favoritePosts = [];
   late Future<List<ChefPost>?> chefPostsFuture;
+  late List<ChefPost> posts;
   ChefPost? selectedPost;
   // Sample chef posts data
   List<Map<String, dynamic>> chefPosts = [
@@ -505,7 +506,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   width: double.infinity,
                   color: Colors.grey[200],
                   child: Image.network(
-                    post.urlToImage!,
+                    post.urlToImage ?? "null",
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Center(
@@ -605,7 +606,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                             ),
                             child: ClipOval(
                               child: Image.network(
-                                post.chef!.urlToImage!,
+                                post.chef!.urlToImage ?? "null",
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return const Icon(Icons.person, size: 30);
@@ -619,14 +620,14 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  post.chef!.fullName!,
+                                  post.chef!.fullName ?? "No name",
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
-                                  post.chef!.speciality!,
+                                  post.chef!.speciality ?? "No speciality",
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
@@ -648,7 +649,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                       color: Colors.grey,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(post.chef!.experience!),
+                                    Text(post.chef!.experience ?? "No experience"),
                                   ],
                                 ),
                               ],
@@ -871,7 +872,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   future: chefPostsFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
-                      if (snapshot.hasData) {
+                      if (snapshot.hasData && snapshot.data != null) {
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -1026,7 +1027,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                     ),
                     child: ClipOval(
                       child: Image.network(
-                        post.chef!.urlToImage!,
+                        post.chef!.urlToImage ?? "null",
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(Icons.person, size: 20);
@@ -1085,7 +1086,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               width: double.infinity,
               color: Colors.grey[200],
               child: Image.network(
-                post.urlToImage!,
+                post.urlToImage ?? "null",
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return const Center(
