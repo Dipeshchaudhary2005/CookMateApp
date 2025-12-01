@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cookmate/core/helper.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -129,7 +128,9 @@ class Auth {
       );
       if (response.statusCode.toString().contains('20')) {
         final data = jsonDecode(response.body);
-        print(data);
+        if (kDebugMode) {
+          print(data);
+        }
         return data['userId'];
       } else {
         final data = jsonDecode(response.body);
