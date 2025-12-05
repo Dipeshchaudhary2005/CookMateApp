@@ -128,6 +128,9 @@ class Auth {
       );
       if (response.statusCode.toString().contains('20')) {
         final data = jsonDecode(response.body);
+        if (kDebugMode) {
+          print(data);
+        }
         return data['userId'];
       } else {
         final data = jsonDecode(response.body);

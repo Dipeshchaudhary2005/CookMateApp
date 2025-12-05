@@ -24,6 +24,12 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   String userPhone = StaticClass.currentUser!.phoneNumber ?? "No Phone";
   String userAddress = StaticClass.currentUser!.userAddress ?? "No address";
 
+  // Settings
+  bool notificationsEnabled = true;
+  bool emailNotifications = true;
+  bool smsNotifications = false;
+  bool pushNotifications = true;
+
   // Booking history data
   final List<Map<String, dynamic>> bookingHistory = [
     {
@@ -74,9 +80,9 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
           setState(() {
             _profileImage = StaticClass.currentUser!.urlToImage != null
                 ? Image.network(
-                    StaticClass.currentUser!.urlToImage!,
-                    fit: BoxFit.cover,
-                  )
+              StaticClass.currentUser!.urlToImage!,
+              fit: BoxFit.cover,
+            )
                 : StaticClass.noImage;
           });
           if (!mounted) return;
@@ -409,7 +415,10 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               onPressed: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Add new payment method')),
+                  const SnackBar(
+                    content: Text('Add new payment method'),
+                    backgroundColor: Colors.green,
+                  ),
                 );
               },
               icon: const Icon(Icons.add),
@@ -436,17 +445,295 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
       title: Text(name),
       trailing: isDefault
           ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
-                'Default',
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
-            )
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Text(
+          'Default',
+          style: TextStyle(color: Colors.white, fontSize: 12),
+        ),
+      )
           : null,
+    );
+  }
+
+  // Notifications Settings Dialog
+  void _showNotificationsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Notification Settings'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SwitchListTile(
+                title: const Text('Enable Notifications'),
+                subtitle: const Text('Receive all notifications'),
+                value: notificationsEnabled,
+                activeColor: const Color(0xFF8BC34A),
+                onChanged: (value) {
+                  setDialogState(() {
+                    setState(() {
+                      notificationsEnabled = value;
+                    });
+                  });
+                },
+              ),
+              SwitchListTile(
+                title: const Text('Email Notifications'),
+                subtitle: const Text('Booking updates via email'),
+                value: emailNotifications,
+                activeColor: const Color(0xFF8BC34A),
+                onChanged: notificationsEnabled
+                    ? (value) {
+                  setDialogState(() {
+                    setState(() {
+                      emailNotifications = value;
+                    });
+                  });
+                }
+                    : null,
+              ),
+              SwitchListTile(
+                title: const Text('SMS Notifications'),
+                subtitle: const Text('Booking updates via SMS'),
+                value: smsNotifications,
+                activeColor: const Color(0xFF8BC34A),
+                onChanged: notificationsEnabled
+                    ? (value) {
+                  setDialogState(() {
+                    setState(() {
+                      smsNotifications = value;
+                    });
+                  });
+                }
+                    : null,
+              ),
+              SwitchListTile(
+                title: const Text('Push Notifications'),
+                subtitle: const Text('In-app notifications'),
+                value: pushNotifications,
+                activeColor: const Color(0xFF8BC34A),
+                onChanged: notificationsEnabled
+                    ? (value) {
+                  setDialogState(() {
+                    setState(() {
+                      pushNotifications = value;
+                    });
+                  });
+                }
+                    : null,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Notification settings updated!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF8BC34A),
+              ),
+              child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Help & Support Dialog
+  void _showHelpSupportDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Help & Support'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Need assistance? We\'re here to help!',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(Icons.email, color: Color(0xFF8BC34A)),
+                title: const Text('Email Support'),
+                subtitle: const Text('support@cookmate.com'),
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Opening email app...')),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.phone, color: Color(0xFF8BC34A)),
+                title: const Text('Call Support'),
+                subtitle: const Text('+977 9876543210'),
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Opening phone app...')),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.chat, color: Color(0xFF8BC34A)),
+                title: const Text('Live Chat'),
+                subtitle: const Text('Available 9 AM - 6 PM'),
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Chat feature coming soon!'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                },
+              ),
+              const Divider(height: 30),
+              const Text(
+                'FAQs',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              ExpansionTile(
+                title: const Text('How do I book a chef?'),
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text(
+                      'Browse available chefs, select your preferred chef, choose a date and menu, then confirm your booking with payment.',
+                    ),
+                  ),
+                ],
+              ),
+              ExpansionTile(
+                title: const Text('Can I cancel my booking?'),
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text(
+                      'Yes, you can cancel bookings up to 24 hours before the event. Full refund will be processed within 5-7 business days.',
+                    ),
+                  ),
+                ],
+              ),
+              ExpansionTile(
+                title: const Text('What payment methods are accepted?'),
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text(
+                      'We accept eSewa, Khalti, Fonepay, and cash on service.',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Privacy Policy Dialog
+  void _showPrivacyPolicyDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Privacy Policy'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text(
+                'CookMate Privacy Policy',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Last updated: December 2025',
+                style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+              ),
+              SizedBox(height: 16),
+              Text(
+                '1. Information We Collect',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'We collect personal information such as your name, email, phone number, and address when you register for our service. We also collect booking history and payment information.',
+              ),
+              SizedBox(height: 16),
+              Text(
+                '2. How We Use Your Information',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Your information is used to process bookings, facilitate communication between customers and chefs, and improve our services.',
+              ),
+              SizedBox(height: 16),
+              Text(
+                '3. Data Security',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'We implement industry-standard security measures to protect your personal information from unauthorized access, disclosure, or misuse.',
+              ),
+              SizedBox(height: 16),
+              Text(
+                '4. Your Rights',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'You have the right to access, update, or delete your personal information at any time through your profile settings.',
+              ),
+              SizedBox(height: 16),
+              Text(
+                '5. Contact Us',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'If you have any questions about our privacy policy, please contact us at privacy@cookmate.com',
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF8BC34A),
+            ),
+            child: const Text('I Understand'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -516,11 +803,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               const SizedBox(height: 20),
               Text(
                 userName,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               Text(
                 userEmail,
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 8),
               Row(
@@ -570,32 +857,19 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 context,
                 Icons.notifications,
                 'Notifications',
-                () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Notifications page coming soon!'),
-                    ),
-                  );
-                },
+                _showNotificationsDialog,
               ),
-              _buildProfileOption(context, Icons.help, 'Help & Support', () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Help & Support page coming soon!'),
-                  ),
-                );
-              }),
+              _buildProfileOption(
+                context,
+                Icons.help,
+                'Help & Support',
+                _showHelpSupportDialog,
+              ),
               _buildProfileOption(
                 context,
                 Icons.privacy_tip,
                 'Privacy Policy',
-                () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Privacy Policy page coming soon!'),
-                    ),
-                  );
-                },
+                _showPrivacyPolicyDialog,
               ),
               const SizedBox(height: 20),
 
@@ -604,7 +878,6 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Show logout confirmation dialog
                     showDialog(
                       context: context,
                       builder: (context) => Helper.confirmLogOut(context),
@@ -631,11 +904,11 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   }
 
   Widget _buildProfileOption(
-    BuildContext context,
-    IconData icon,
-    String title,
-    VoidCallback onTap,
-  ) {
+      BuildContext context,
+      IconData icon,
+      String title,
+      VoidCallback onTap,
+      ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
