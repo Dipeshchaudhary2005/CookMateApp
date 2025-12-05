@@ -473,7 +473,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 title: const Text('Enable Notifications'),
                 subtitle: const Text('Receive all notifications'),
                 value: notificationsEnabled,
-                activeColor: const Color(0xFF8BC34A),
+                activeThumbColor: const Color(0xFF8BC34A),
                 onChanged: (value) {
                   setDialogState(() {
                     setState(() {
@@ -486,7 +486,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 title: const Text('Email Notifications'),
                 subtitle: const Text('Booking updates via email'),
                 value: emailNotifications,
-                activeColor: const Color(0xFF8BC34A),
+                activeThumbColor: const Color(0xFF8BC34A),
                 onChanged: notificationsEnabled
                     ? (value) {
                   setDialogState(() {
@@ -501,7 +501,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 title: const Text('SMS Notifications'),
                 subtitle: const Text('Booking updates via SMS'),
                 value: smsNotifications,
-                activeColor: const Color(0xFF8BC34A),
+                activeThumbColor: const Color(0xFF8BC34A),
                 onChanged: notificationsEnabled
                     ? (value) {
                   setDialogState(() {
@@ -516,7 +516,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                 title: const Text('Push Notifications'),
                 subtitle: const Text('In-app notifications'),
                 value: pushNotifications,
-                activeColor: const Color(0xFF8BC34A),
+                activeThumbColor: const Color(0xFF8BC34A),
                 onChanged: notificationsEnabled
                     ? (value) {
                   setDialogState(() {
