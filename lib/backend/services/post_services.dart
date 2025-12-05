@@ -94,4 +94,62 @@ class PostServices {
       return null;
     }
   }
+  
+  static Future<bool> favoritePost(BuildContext context, String postId) async {
+    try{
+      final uri = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}/posts/$postId/favorite');
+      final response = await http.post(uri, headers: {
+        "Content-Type": "application/json",
+        'Accept': 'application/json',
+        'Authorization': StaticClass.jsonWebToken!,
+      });
+
+      if (response.statusCode.toString().contains('20')){
+        return true;
+      }else {
+        final data = jsonDecode(response.body);
+        if (context.mounted) {
+          Helper.showError(context, data['error']);
+        }
+        return false;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      if (context.mounted) {
+        Helper.showError(context, "Internal Error");
+      }
+      return false;
+    }
+  }
+
+  static Future<bool> unfavoritePost(BuildContext context, String postId) async {
+    try{
+      final uri = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}/posts/$postId/unfavorite');
+      final response = await http.post(uri, headers: {
+        "Content-Type": "application/json",
+        'Accept': 'application/json',
+        'Authorization': StaticClass.jsonWebToken!,
+      });
+
+      if (response.statusCode.toString().contains('20')){
+        return true;
+      }else {
+        final data = jsonDecode(response.body);
+        if (context.mounted) {
+          Helper.showError(context, data['error']);
+        }
+        return false;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      if (context.mounted) {
+        Helper.showError(context, "Internal Error");
+      }
+      return false;
+    }
+  }
 }

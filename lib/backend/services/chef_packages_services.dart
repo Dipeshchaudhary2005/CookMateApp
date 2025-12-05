@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cookmate/backend/model/ChefPackage.dart';
+import 'package:cookmate/backend/model/chef_package.dart';
 import 'package:cookmate/core/helper.dart';
 import 'package:cookmate/core/static.dart';
 import 'package:flutter/cupertino.dart';

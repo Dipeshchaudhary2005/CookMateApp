@@ -168,7 +168,7 @@ class FetchServices {
     }
   }
 
-  static Future<bool?> likePost(BuildContext context, String postId) async {
+  static Future<bool> likePost(BuildContext context, String postId) async {
     try {
       final url = Uri.https(
         StaticClass.serverBaseURL,
@@ -183,17 +183,13 @@ class FetchServices {
         },
       );
       if (response.statusCode.toString().contains('20')) {
-        final json = jsonDecode(response.body);
-        if ((json['message'] as String).contains('Unliked')) {
-          return false;
-        }
         return true;
       } else {
         final data = jsonDecode(response.body);
         if (context.mounted) {
           Helper.showError(context, data['error']);
         }
-        return null;
+        return false;
       }
     } catch (e) {
       if (kDebugMode) {
@@ -202,7 +198,41 @@ class FetchServices {
       if (context.mounted) {
         Helper.showError(context, "Internal Error");
       }
-      return null;
+      return false;
+    }
+  }
+
+  static Future<bool> unlikePost(BuildContext context, String postId) async {
+    try {
+      final url = Uri.https(
+        StaticClass.serverBaseURL,
+        '${StaticClass.serverApiURL}/posts/$postId/unlike',
+      );
+      var response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          'Accept': 'application/json',
+          'Authorization': StaticClass.jsonWebToken!,
+        },
+      );
+      if (response.statusCode.toString().contains('20')) {
+        return true;
+      } else {
+        final data = jsonDecode(response.body);
+        if (context.mounted) {
+          Helper.showError(context, data['error']);
+        }
+        return false;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      if (context.mounted) {
+        Helper.showError(context, "Internal Error");
+      }
+      return false;
     }
   }
 }

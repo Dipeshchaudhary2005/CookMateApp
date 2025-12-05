@@ -1,8 +1,9 @@
+import 'package:cookmate/backend/model/chefpost.dart';
 import 'package:flutter/material.dart';
 import 'bookingpage.dart';
 
 class FavoriteChefPage extends StatefulWidget {
-  final List<Map<String, dynamic>> favoritePosts;
+  final List<ChefPost> favoritePosts;
 
   const FavoriteChefPage({super.key, required this.favoritePosts});
 
@@ -13,7 +14,7 @@ class FavoriteChefPage extends StatefulWidget {
 class _FavoriteChefPageState extends State<FavoriteChefPage> {
   void _removeFavorite(int index) {
     setState(() {
-      widget.favoritePosts[index]['isFavorite'] = false;
+      widget.favoritePosts[index].favorite = false;
       widget.favoritePosts.removeAt(index);
     });
     ScaffoldMessenger.of(context).showSnackBar(
@@ -25,7 +26,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
     );
   }
 
-  void _showChefDetail(Map<String, dynamic> post) {
+  void _showChefDetail(ChefPost post) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -64,8 +65,8 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                   height: 250,
                   width: double.infinity,
                   color: Colors.grey[200],
-                  child: Image.asset(
-                    post['cuisineImage'],
+                  child: Image.network(
+                    post.urlToImage ?? "null",
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Center(
@@ -85,7 +86,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                     children: [
                       // Cuisine Title
                       Text(
-                        post['cuisineTitle'],
+                        post.title ?? "No title",
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -103,7 +104,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          post['price'],
+                          "Price todo", //TODO
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -131,8 +132,8 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                               color: Colors.grey[200],
                             ),
                             child: ClipOval(
-                              child: Image.asset(
-                                post['chefImage'],
+                              child: Image.network(
+                                post.chef?.urlToImage ?? "null",
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return const Icon(Icons.person, size: 30);
@@ -146,14 +147,14 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  post['chefName'],
+                                  post.chef?.fullName ?? "No name",
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
-                                  post['specialty'],
+                                  post.chef?.speciality ?? "No Speciality",
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
@@ -167,7 +168,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                                       size: 16,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text('${post['rating']}'),
+                                    Text('${post.chef?.rating}'),
                                     const SizedBox(width: 12),
                                     const Icon(
                                       Icons.work,
@@ -175,7 +176,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                                       color: Colors.grey,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(post['experience']),
+                                    Text(post.chef?.experience ?? "No experience"),
                                   ],
                                 ),
                               ],
@@ -194,7 +195,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        post['description'],
+                        post.description ?? "No description",
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black87,
@@ -296,7 +297,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
     );
   }
 
-  Widget _buildFavoriteCard(Map<String, dynamic> post, int index) {
+  Widget _buildFavoriteCard(ChefPost post, int index) {
     return GestureDetector(
       onTap: () => _showChefDetail(post),
       child: Container(
@@ -328,8 +329,8 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                       color: Colors.grey[200],
                     ),
                     child: ClipOval(
-                      child: Image.asset(
-                        post['chefImage'],
+                      child: Image.network(
+                        post.chef?.urlToImage ?? '',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(Icons.person, size: 20);
@@ -343,14 +344,14 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          post['chefName'],
+                          post.chef?.fullName ?? "No name",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          post['specialty'],
+                          post.chef?.speciality ?? "No speciality",
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
@@ -364,7 +365,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                       const Icon(Icons.star, color: Colors.amber, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        '${post['rating']}',
+                        '${post.chef?.rating ?? "No rating"}',
                         style: const TextStyle(fontSize: 12),
                       ),
                     ],
@@ -377,8 +378,8 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
               height: 200,
               width: double.infinity,
               color: Colors.grey[200],
-              child: Image.asset(
-                post['cuisineImage'],
+              child: Image.network(
+                post.urlToImage ?? 'null',
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return const Center(
@@ -394,7 +395,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    post['cuisineTitle'],
+                    post.title ?? "No title",
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -402,7 +403,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    post['description'],
+                    post.description ?? "No description",
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -413,7 +414,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                       const Icon(Icons.favorite, color: Colors.red, size: 20),
                       const SizedBox(width: 4),
                       Text(
-                        '${post['likes']}',
+                        '${post.likeCount}',
                         style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(width: 20),
@@ -424,7 +425,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${post['comments']}',
+                        '${post.commentCount}',
                         style: const TextStyle(fontSize: 14),
                       ),
                       const Spacer(),
@@ -448,7 +449,7 @@ class _FavoriteChefPageState extends State<FavoriteChefPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          post['price'],
+                          "Price", //TODO
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,

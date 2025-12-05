@@ -123,8 +123,8 @@ class _CalendarPageState extends State<CalendarPage> {
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: isAvailable
-                          ? const Color(0xFF8BC34A).withOpacity(0.1)
-                          : Colors.red.withOpacity(0.1),
+                          ? const Color(0xFF8BC34A).withValues(alpha: 0.1)
+                          : Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isAvailable
@@ -162,7 +162,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         ),
                         Switch(
                           value: isAvailable,
-                          activeColor: const Color(0xFF8BC34A),
+                          activeThumbColor: const Color(0xFF8BC34A),
                           onChanged: (value) {
                             setDialogState(() {
                               isAvailable = value;
@@ -546,7 +546,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -789,7 +789,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   ),
                 ),
                 selected: isSelected,
-                selectedTileColor: const Color(0xFFB8E6B8).withOpacity(0.3),
+                selectedTileColor: const Color(0xFFB8E6B8).withValues(alpha: 0.3),
                 onTap: () {
                   setState(() {
                     selectedYear = year;

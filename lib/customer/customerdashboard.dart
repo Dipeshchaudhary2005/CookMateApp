@@ -1,5 +1,6 @@
 import 'package:cookmate/backend/model/chefpost.dart';
 import 'package:cookmate/backend/services/fetch_services.dart';
+import 'package:cookmate/backend/services/post_services.dart';
 import 'package:cookmate/core/helper.dart';
 import 'package:flutter/material.dart';
 import 'bookingpage.dart';
@@ -17,131 +18,16 @@ class CustomerDashboard extends StatefulWidget {
 class _CustomerDashboardState extends State<CustomerDashboard> {
   int _currentIndex = 0;
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> filteredPosts = [];
-  static List<Map<String, dynamic>> favoritePosts = [];
+  List<ChefPost> filteredPosts = [];
+  static List<ChefPost> favoritePosts = [];
   late Future<List<ChefPost>?> chefPostsFuture;
   late List<ChefPost> posts;
   ChefPost? selectedPost;
   // Sample chef posts data
-  List<Map<String, dynamic>> chefPosts = [
-    {
-      'chefName': 'Ram Bhatta',
-      'chefImage': 'Resource/chef.png',
-      'specialty': 'Italian Cuisine',
-      'experience': '4 Years',
-      'rating': 4.8,
-      'cuisineTitle': 'Italian Pasta Carbonara',
-      'cuisineImage': 'Resource/chef.png',
-      'description':
-          'Authentic Italian pasta with creamy carbonara sauce, pancetta, and fresh parmesan cheese.',
-      'likes': 156,
-      'comments': 45,
-      'isLiked': false,
-      'price': 'NPR 650/person',
-      'isFavorite': false,
-      'commentList': [
-        {
-          'user': 'John Doe',
-          'comment': 'Looks delicious! 😋',
-          'time': '2 hours ago',
-        },
-        {
-          'user': 'Sarah Smith',
-          'comment': 'I tried this last week, amazing!',
-          'time': '1 day ago',
-        },
-      ],
-    },
-    {
-      'chefName': 'Sita Lama',
-      'chefImage': 'Resource/chef.png',
-      'specialty': 'Nepali Cuisine',
-      'experience': '6 Years',
-      'rating': 4.9,
-      'cuisineTitle': 'Traditional Thakali Set',
-      'cuisineImage': 'Resource/chef.png',
-      'description':
-          'Complete Thakali set with dal, bhat, tarkari, achar, and papad. Authentic taste from the mountains.',
-      'likes': 234,
-      'comments': 67,
-      'isLiked': false,
-      'price': 'NPR 550/person',
-      'isFavorite': false,
-      'commentList': [
-        {
-          'user': 'Mike Johnson',
-          'comment': 'Best Thakali set in town!',
-          'time': '3 hours ago',
-        },
-      ],
-    },
-    {
-      'chefName': 'Rajesh Tharu',
-      'chefImage': 'Resource/chef.png',
-      'specialty': 'Asian Fusion',
-      'experience': '5 Years',
-      'rating': 4.7,
-      'cuisineTitle': 'Special Momo Platter',
-      'cuisineImage': 'Resource/chef.png',
-      'description':
-          'Assorted momo platter with chicken, buff, and veg momos served with special chutney.',
-      'likes': 189,
-      'comments': 52,
-      'isLiked': false,
-      'price': 'NPR 450/dozen',
-      'isFavorite': false,
-      'commentList': [
-        {
-          'user': 'Emma Wilson',
-          'comment': 'Perfect for parties!',
-          'time': '5 hours ago',
-        },
-        {
-          'user': 'David Brown',
-          'comment': 'The chutney is incredible 🔥',
-          'time': '1 day ago',
-        },
-      ],
-    },
-    {
-      'chefName': 'Chef Marlon',
-      'chefImage': 'Resource/chef.png',
-      'specialty': 'Mediterranean',
-      'experience': '7 Years',
-      'rating': 4.9,
-      'cuisineTitle': 'Wedding Feast Special',
-      'cuisineImage': 'Resource/chef.png',
-      'description':
-          '5-course wedding menu with appetizers, soup, main course, dessert, and beverages.',
-      'likes': 312,
-      'comments': 98,
-      'isLiked': false,
-      'price': 'NPR 1200/person',
-      'isFavorite': false,
-      'commentList': [
-        {
-          'user': 'Lisa Anderson',
-          'comment': 'Booked for my wedding! Can\'t wait!',
-          'time': '30 mins ago',
-        },
-        {
-          'user': 'Robert Taylor',
-          'comment': 'Outstanding service and taste',
-          'time': '2 days ago',
-        },
-        {
-          'user': 'Maria Garcia',
-          'comment': 'Worth every penny! 💯',
-          'time': '3 days ago',
-        },
-      ],
-    },
-  ];
 
   @override
   void initState() {
     super.initState();
-    filteredPosts = chefPosts;
     chefPostsFuture = FetchServices.getRecentPosts(context, 0);
     _searchController.addListener(_filterPosts);
   }
@@ -156,51 +42,29 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     String query = _searchController.text.toLowerCase();
     setState(() {
       if (query.isEmpty) {
-        filteredPosts = chefPosts;
+        filteredPosts = posts;
       } else {
-        filteredPosts = chefPosts.where((post) {
-          return post['chefName'].toLowerCase().contains(query) ||
-              post['cuisineTitle'].toLowerCase().contains(query) ||
-              post['specialty'].toLowerCase().contains(query) ||
-              post['description'].toLowerCase().contains(query);
+        filteredPosts = posts.where((post) {
+          return (post.chef?.fullName?.toLowerCase().contains(query) ?? false) ||
+              (post.title?.toLowerCase().contains(query) ?? false) ||
+              (post.chef?.speciality?.toLowerCase().contains(query) ?? false) ||
+              (post.description?.toLowerCase().contains(query) ?? false);
         }).toList();
       }
     });
   }
 
-  void _toggleFavorite(int index) {
-    setState(() {
-      filteredPosts[index]['isFavorite'] = !filteredPosts[index]['isFavorite'];
-
-      // Update original list
-      int originalIndex = chefPosts.indexWhere(
-        (post) => post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
-      );
-      if (originalIndex != -1) {
-        chefPosts[originalIndex]['isFavorite'] =
-            filteredPosts[index]['isFavorite'];
-      }
-
+  void _toggleFavorite(String postId) async {
+      final selectedPost = posts.firstWhere((p) => p.id == postId);
       // Update favorites list
-      if (filteredPosts[index]['isFavorite']) {
-        if (!favoritePosts.any(
-          (post) =>
-              post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
-        )) {
-          favoritePosts.add(filteredPosts[index]);
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Added to favorites'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 1),
-          ),
-        );
-      } else {
-        favoritePosts.removeWhere(
-          (post) =>
-              post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
-        );
+      if (selectedPost.favorite ?? false) {
+        bool success = await PostServices.unfavoritePost(context, selectedPost.id!);
+        if (!success) return;
+        setState(() {
+          favoritePosts.removeWhere((post) => post.id == selectedPost.id);
+          selectedPost.favorite = false;
+        });
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Removed from favorites'),
@@ -208,8 +72,22 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             duration: Duration(seconds: 1),
           ),
         );
+      } else {
+        bool success = await PostServices.favoritePost(context, selectedPost.id!);
+        if (!success) return;
+        setState(() {
+          favoritePosts.add(selectedPost);
+          selectedPost.favorite = true;
+        });
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Added to favorites'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 1),
+          ),
+        );
       }
-    });
   }
 
   void refreshPage() async {
@@ -220,12 +98,22 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
   }
 
   void _toggleLike(ChefPost post) async {
-    bool? liked = await FetchServices.likePost(context, post.id!);
-    if (liked == null) return;
-    setState(() {
-      post.liked = liked;
-    });
-    refreshPage();
+    bool success = false;
+    if (post.liked ?? false){
+      success = await FetchServices.unlikePost(context, post.id!);
+    } else {
+      success = await FetchServices.likePost(context, post.id!);
+    }
+    if (success){
+      setState(() {
+        post.liked = !(post.liked ?? false);
+        if (post.liked!){
+          post.likeCount = (post.likeCount ?? 0) + 1;
+        } else {
+          post.likeCount = (post.likeCount ?? 0) - 1;
+        }
+      });
+    }
   }
 
   void _addComment(String postId, String comment) async {
@@ -682,10 +570,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.pop(context);
+                            final page = BookingPage(chefId: post.chef!.uid!,);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const BookingPage(),
+                                builder: (context) => page,
                               ),
                             );
                           },
@@ -873,12 +762,13 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
                       if (snapshot.hasData && snapshot.data != null) {
+                        posts = snapshot.data!;
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: snapshot.data!.length,
+                          itemCount: posts.length,
                           itemBuilder: (context, index) {
-                            return buildPostCard(snapshot.data![index], index);
+                            return buildPostCard(posts[index], index);
                           },
                         );
                       } else {
@@ -1069,12 +959,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   ),
                   IconButton(
                     icon: Icon(
-                      post.liked! ? Icons.bookmark : Icons.bookmark_border,
-                      color: post.liked!
+                      post.favorite! ? Icons.bookmark : Icons.bookmark_border,
+                      color: post.favorite!
                           ? const Color(0xFF8BC34A)
                           : Colors.grey,
                     ),
-                    onPressed: () => _toggleFavorite(index),
+                    onPressed: () => _toggleFavorite(post.id ?? "No id"),
                     padding: const EdgeInsets.all(8),
                   ),
                 ],
@@ -1121,10 +1011,10 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       GestureDetector(
                         onTap: () => _toggleLike(post),
                         child: Icon(
-                          post.favorite!
+                          post.liked!
                               ? Icons.favorite
                               : Icons.favorite_border,
-                          color: post.favorite! ? Colors.red : Colors.grey,
+                          color: post.liked! ? Colors.red : Colors.grey,
                           size: 24,
                         ),
                       ),

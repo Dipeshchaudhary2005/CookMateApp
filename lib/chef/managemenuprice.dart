@@ -1,4 +1,4 @@
-import 'package:cookmate/backend/model/ChefPackage.dart';
+import 'package:cookmate/backend/model/chef_package.dart';
 import 'package:cookmate/backend/services/chef_packages_services.dart';
 import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
