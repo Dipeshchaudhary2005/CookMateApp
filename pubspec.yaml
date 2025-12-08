@@ -40,6 +40,8 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   jwt_decode: ^0.3.1
   geoflutterfire_plus: ^0.0.33
+  fl_chart: ^0.66.0
+  qr_flutter: ^4.1.0
 
 
 dev_dependencies:

@@ -5,6 +5,8 @@ import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class ChefProfilePage extends StatefulWidget {
   const ChefProfilePage({super.key});
