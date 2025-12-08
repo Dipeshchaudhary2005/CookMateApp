@@ -31,7 +31,7 @@ class BookingServices {
       );
       if (response.statusCode.toString().contains('20')){
         final data = jsonDecode(response.body);
-        final booking = Booking.fromJSON(data['booking']);
+        final booking = Booking.fromJSON(data['bookingData']);
         return booking;
       }else {
         final data = jsonDecode(response.body);
@@ -53,7 +53,8 @@ class BookingServices {
 
   static Future<List<Booking>?> getBookings(BuildContext context, String userType) async {
     try{
-      final uri = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}/booking');
+      final uri = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}/booking', {'userType': userType});
+      print(uri);
       final response = await http.get(uri,
         headers: {
         "Content-Type": "application/json",
@@ -73,6 +74,40 @@ class BookingServices {
         return null;
       }
     } catch (e) {
+      if (kDebugMode){
+        print("Error creating booking: ${e.toString()}");
+      }
+      if (context.mounted){
+        Helper.showError(context, "Internal error");
+      }
+      return null;
+    }
+  }
+
+  static Future<bool?> updateStatus(BuildContext context, String bookingId, String status) async {
+    try{
+      final uri = Uri.https(StaticClass.serverBaseURL, '${StaticClass.serverApiURL}/booking/$bookingId');
+      final response = await http.put(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          'Accept': 'application/json',
+          'Authorization': StaticClass.jsonWebToken!,
+        },
+        body: jsonEncode({
+          'status' : status
+        })
+      );
+      if (response.statusCode.toString().contains('20')){
+        return true;
+      } else {
+        final data = jsonDecode(response.body);
+        if (context.mounted){
+          Helper.showError(context, data['error']);
+        }
+        return false;
+      }
+    }  catch (e) {
       if (kDebugMode){
         print("Error creating booking: ${e.toString()}");
       }

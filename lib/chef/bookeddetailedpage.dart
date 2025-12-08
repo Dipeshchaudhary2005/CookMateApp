@@ -1,3 +1,5 @@
+import 'package:cookmate/backend/model/booking.dart';
+import 'package:cookmate/backend/services/booking_services.dart';
 import 'package:flutter/material.dart';
 
 class BookedDetailsPage extends StatefulWidget {
@@ -10,66 +12,18 @@ class BookedDetailsPage extends StatefulWidget {
 class _BookedDetailsPageState extends State<BookedDetailsPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
-  // Sample booking data
-  List<Map<String, dynamic>> pendingBookings = [
-    {
-      'name': 'John Doe',
-      'event': 'Wedding Event',
-      'date': '2025-03-15',
-      'time': '6:00 PM - 10:00 PM',
-      'guests': 150,
-      'package': '2-Course Dinner',
-      'amount': 'NPR 97,500',
-      'phone': '+977 9876543210',
-      'address': 'Kathmandu, Nepal',
-    },
-    {
-      'name': 'Sarah Smith',
-      'event': 'Birthday Party',
-      'date': '2025-03-18',
-      'time': '2:00 PM - 6:00 PM',
-      'guests': 50,
-      'package': 'Private Cooking',
-      'amount': 'NPR 32,500',
-      'phone': '+977 9812345678',
-      'address': 'Lalitpur, Nepal',
-    },
-  ];
-
-  List<Map<String, dynamic>> confirmedBookings = [
-    {
-      'name': 'Emma Wilson',
-      'event': 'Anniversary Celebration',
-      'date': '2025-03-22',
-      'time': '7:00 PM - 11:00 PM',
-      'guests': 100,
-      'package': '2-Course Dinner',
-      'amount': 'NPR 65,000',
-      'phone': '+977 9801234567',
-      'address': 'Bhaktapur, Nepal',
-    },
-  ];
-
-  List<Map<String, dynamic>> completedBookings = [
-    {
-      'name': 'Lisa Anderson',
-      'event': 'Retirement Party',
-      'date': '2025-03-10',
-      'time': '6:00 PM - 10:00 PM',
-      'guests': 60,
-      'package': 'Custom Menu',
-      'amount': 'NPR 45,000',
-      'phone': '+977 9823456789',
-      'address': 'Pokhara, Nepal',
-      'rating': 5.0,
-    },
-  ];
+  late List<Booking> bookings;
+  late Future<List<Booking>?> bookingsFuture;
+  late List<Booking> pendingBookings;
+  late List<Booking> cancelledBookings;
+  late List<Booking> confirmedBookings;
+  late List<Booking> completedBookings;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
+    bookingsFuture = BookingServices.getBookings(context, 'chef');
   }
 
   @override
@@ -78,20 +32,16 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
     super.dispose();
   }
 
-  void _acceptBooking(Map<String, dynamic> booking) {
+  void _acceptBooking(Booking booking) async {
+    final success = await BookingServices.updateStatus(context, booking.id!, BookingStatus.upcoming.name);
+    if (success == null || !success){
+      return;
+    }
     setState(() {
-      // Remove from pending bookings
-      pendingBookings.removeWhere(
-        (b) => b['name'] == booking['name'] && b['date'] == booking['date'],
-      );
-
-      // Add to confirmed bookings
-      confirmedBookings.add(booking);
-
-      // Switch to confirmed tab
+      booking.status = BookingStatus.upcoming.name;
       _tabController.animateTo(1);
     });
-
+    if (!mounted) return;
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -101,14 +51,14 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
     );
   }
 
-  void _cancelBooking(Map<String, dynamic> booking) {
+  void _cancelBooking(Booking booking) async {
+    final success = await BookingServices.updateStatus(context, booking.id!, BookingStatus.cancelled.name);
+    if (success == null || !success) return;
     setState(() {
-      // Remove from pending bookings
-      pendingBookings.removeWhere(
-        (b) => b['name'] == booking['name'] && b['date'] == booking['date'],
-      );
+      booking.status = BookingStatus.cancelled.name;
+      _tabController.animateTo(3);
     });
-
+    if (!mounted) return;
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -118,20 +68,14 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
     );
   }
 
-  void _completeBooking(Map<String, dynamic> booking) {
+  void _completeBooking(Booking booking) async {
+    final success = await BookingServices.updateStatus(context, booking.id!, BookingStatus.completed.name);
+    if (success == null || !success) return;
     setState(() {
-      // Remove from confirmed bookings
-      confirmedBookings.removeWhere(
-        (b) => b['name'] == booking['name'] && b['date'] == booking['date'],
-      );
-
-      // Add to completed bookings (without rating initially)
-      completedBookings.add(booking);
-
-      // Switch to completed tab
+      booking.status = BookingStatus.completed.name;
       _tabController.animateTo(2);
     });
-
+    if (!mounted) return;
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -141,7 +85,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
     );
   }
 
-  void _showBookingDetails(Map<String, dynamic> booking, String status) {
+  void _showBookingDetails(Booking booking) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -172,36 +116,36 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                 ),
                 const Divider(),
                 const SizedBox(height: 16),
-                _buildDetailRow(Icons.person, 'Customer', booking['name']),
-                _buildDetailRow(Icons.event, 'Event Type', booking['event']),
-                _buildDetailRow(Icons.calendar_today, 'Date', booking['date']),
-                _buildDetailRow(Icons.access_time, 'Time', booking['time']),
+                _buildDetailRow(Icons.person, 'Customer', booking.customerName ?? "null"),
+                _buildDetailRow(Icons.event, 'Event Type', booking.eventType ?? "null"),
+                _buildDetailRow(Icons.calendar_today, 'Date', booking.date?.toString() ?? 'null'),
+                _buildDetailRow(Icons.access_time, 'Time', booking.timeInterval ?? 'null'),
                 _buildDetailRow(
                   Icons.people,
                   'Guests',
-                  '${booking['guests']} People',
+                  '${booking.noOfPeople} People',
                 ),
                 _buildDetailRow(
                   Icons.restaurant_menu,
                   'Package',
-                  booking['package'],
+                  booking.packages.toString(),
                 ),
-                _buildDetailRow(Icons.phone, 'Phone', booking['phone']),
+                _buildDetailRow(Icons.phone, 'Phone', booking.customerPhone ?? 'null'),
                 _buildDetailRow(
                   Icons.location_on,
                   'Address',
-                  booking['address'],
+                  booking.customerAddress ?? 'null',
                 ),
                 const Divider(),
-                _buildDetailRow(Icons.money, 'Total Amount', booking['amount']),
-                if (booking['rating'] != null) ...[
+                _buildDetailRow(Icons.money, 'Total Amount', booking.cost.toString()),
+                if (booking.rating != null) ...[
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       const Icon(Icons.star, color: Colors.amber, size: 20),
                       const SizedBox(width: 8),
                       Text(
-                        'Rating: ${booking['rating']}',
+                        'Rating: ${booking.rating}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -211,7 +155,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                   ),
                 ],
                 const SizedBox(height: 20),
-                if (status == 'pending')
+                if (booking.status == BookingStatus.pending.name)
                   Row(
                     children: [
                       Expanded(
@@ -240,7 +184,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                       ),
                     ],
                   ),
-                if (status == 'confirmed') ...[
+                if (booking.status == BookingStatus.upcoming.name) ...[
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -317,6 +261,10 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
 
   @override
   Widget build(BuildContext context) {
+    String pendingCount = '0';
+    String upcomingCount = '0';
+    String completedCount = '0';
+    String cancelledCount = '0';
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -356,7 +304,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${pendingBookings.length}',
+                      pendingCount,
                       style: const TextStyle(color: Colors.white, fontSize: 11),
                     ),
                   ),
@@ -382,7 +330,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${confirmedBookings.length}',
+                      upcomingCount,
                       style: const TextStyle(color: Colors.white, fontSize: 11),
                     ),
                   ),
@@ -408,7 +356,33 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${completedBookings.length}',
+                      completedCount,
+                      style: const TextStyle(color: Colors.white, fontSize: 11),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Tab(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Flexible(
+                    child: Text('Cancelled', overflow: TextOverflow.ellipsis),
+                  ),
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      cancelledCount,
                       style: const TextStyle(color: Colors.white, fontSize: 11),
                     ),
                   ),
@@ -418,18 +392,39 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildBookingList(pendingBookings, 'pending'),
-          _buildBookingList(confirmedBookings, 'confirmed'),
-          _buildBookingList(completedBookings, 'completed'),
-        ],
+      body: FutureBuilder<List<Booking>?>(
+        future: bookingsFuture,
+        builder: (context, asyncSnapshot) {
+          if (asyncSnapshot.connectionState != ConnectionState.done){
+            return const Center(child: CircularProgressIndicator(),);
+          }
+          if (!asyncSnapshot.hasData || asyncSnapshot.data == null){
+            return const Center(child: Text("No bookings"),);
+          }
+          bookings = asyncSnapshot.data!;
+          pendingBookings = bookings.where((e) => e.status == BookingStatus.pending.name).toList();
+          confirmedBookings = bookings.where((e) => e.status == BookingStatus.upcoming.name).toList();
+          cancelledBookings = bookings.where((e) => e.status == BookingStatus.cancelled.name).toList();
+          completedBookings = bookings.where((e) => e.status == BookingStatus.completed.name).toList();
+            pendingCount = '${pendingBookings.length}';
+            upcomingCount = '${confirmedBookings.length}';
+            completedCount = '${completedBookings.length}';
+            cancelledCount = '${cancelledBookings.length}';
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              _buildBookingList(pendingBookings, 'pending'),
+              _buildBookingList(confirmedBookings, 'confirmed'),
+              _buildBookingList(completedBookings, 'completed'),
+              _buildBookingList(cancelledBookings, 'cancelled')
+            ],
+          );
+        }
       ),
     );
   }
 
-  Widget _buildBookingList(List<Map<String, dynamic>> bookings, String status) {
+  Widget _buildBookingList(List<Booking> bookings, String status) {
     if (bookings.isEmpty) {
       return Center(
         child: Column(
@@ -451,20 +446,22 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
       itemCount: bookings.length,
       itemBuilder: (context, index) {
         final booking = bookings[index];
-        return _buildBookingCard(booking, status);
+        return _buildBookingCard(booking);
       },
     );
   }
 
-  Widget _buildBookingCard(Map<String, dynamic> booking, String status) {
-    Color statusColor = status == 'pending'
+  Widget _buildBookingCard(Booking booking) {
+    Color statusColor = booking.status! == BookingStatus.pending.name
         ? Colors.orange
-        : status == 'confirmed'
+        : booking.status! == BookingStatus.completed.name
         ? Colors.green
+        : booking.status! == BookingStatus.cancelled.name
+        ? Colors.red
         : Colors.blue;
 
     return GestureDetector(
-      onTap: () => _showBookingDetails(booking, status),
+      onTap: () => _showBookingDetails(booking),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
@@ -492,7 +489,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                   radius: 30,
                   backgroundColor: const Color(0xFFB8E6B8),
                   child: Text(
-                    booking['name'].toString()[0],
+                    booking.customerName?[0] ?? 'N',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -505,14 +502,14 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        booking['name'],
+                        booking.customerName ?? "No name",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        booking['event'],
+                        booking.eventType ?? "No event type",
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.grey,
@@ -531,7 +528,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    status.toUpperCase(),
+                    booking.status?.toUpperCase() ?? "No status",
                     style: TextStyle(
                       fontSize: 11,
                       color: statusColor,
@@ -546,13 +543,13 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
               children: [
                 const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
-                Text(booking['date'], style: const TextStyle(fontSize: 14)),
+                Text(booking.date.toString(), style: const TextStyle(fontSize: 14)),
                 const SizedBox(width: 12),
                 const Icon(Icons.access_time, size: 16, color: Colors.grey),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    booking['time'],
+                    booking.timeInterval ?? "No interval",
                     style: const TextStyle(fontSize: 14),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -570,7 +567,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
-                          '${booking['guests']} Guests',
+                          '${booking.noOfPeople ?? 'Null'} Guests',
                           style: const TextStyle(fontSize: 14),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -581,7 +578,7 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text(
-                    booking['amount'],
+                    booking.cost?.toString() ?? "No cost",
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -592,13 +589,13 @@ class _BookedDetailsPageState extends State<BookedDetailsPage>
                 ),
               ],
             ),
-            if (booking['rating'] != null) ...[
+            if (booking.rating != null) ...[
               const SizedBox(height: 8),
               Row(
                 children: [
                   const Icon(Icons.star, color: Colors.amber, size: 16),
                   const SizedBox(width: 4),
-                  Text('Rating: ${booking['rating']}'),
+                  Text('Rating: ${booking.rating}'),
                 ],
               ),
             ],

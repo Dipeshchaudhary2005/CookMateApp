@@ -230,11 +230,13 @@ class _ChefDashboardState extends State<ChefDashboard> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: const Padding(
+          leading: Padding(
             padding: EdgeInsets.all(8.0),
             child: CircleAvatar(
               backgroundColor: Colors.white,
-              child: Icon(Icons.person, color: Color(0xFF8BC34A)),
+              child: StaticClass.currentUser?.urlToImage != null ?
+                        Image.network(StaticClass.currentUser!.urlToImage!, fit: BoxFit.cover,) :
+                        Icon(Icons.person, color: Color(0xFF8BC34A)),
             ),
           ),
           title: isSearching
@@ -279,11 +281,11 @@ class _ChefDashboardState extends State<ChefDashboard> {
             children: [
               Icon(Icons.location_on, color: Colors.grey[700], size: 20),
               const SizedBox(width: 4),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Ram Bhatta',
+                    StaticClass.currentUser!.fullName ?? "No name",
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ],
@@ -499,6 +501,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Image
           Container(
             height: 120,
             decoration: BoxDecoration(
@@ -525,6 +528,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
               ),
             ),
           ),
+          // Content
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(12),
@@ -532,6 +536,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Title
                   Flexible(
                     child: Text(
                       post.title!,
@@ -544,9 +549,11 @@ class _ChefDashboardState extends State<ChefDashboard> {
                     ),
                   ),
                   const SizedBox(height: 8),
+                  // Stats and Date
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Likes and Comments Row
                       Row(
                         children: [
                           const Icon(
@@ -579,6 +586,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
                         ],
                       ),
                       const SizedBox(height: 4),
+                      // Date
                       Text(
                         post.createdAt!,
                         style: const TextStyle(
@@ -607,18 +615,22 @@ class _ChefDashboardState extends State<ChefDashboard> {
       currentIndex: 0,
       onTap: (index) {
         if (index == 1) {
+          // Bookings button tapped
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const BookedDetailsPage()),
           );
         } else if (index == 2) {
+          // Post button tapped
           _pickAndUploadImage(context);
         } else if (index == 3) {
+          // Calendar button tapped - Navigate to Calendar
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const CalendarPage()),
           );
         } else if (index == 4) {
+          // Profile button tapped
           _showProfileMenu(context);
         }
       },
@@ -724,12 +736,8 @@ class _ChefDashboardState extends State<ChefDashboard> {
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
                 Navigator.pop(context);
-                // Navigate to settings page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SettingsPage(),
-                  ),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Settings page coming soon!')),
                 );
               },
             ),
@@ -772,7 +780,10 @@ class _ChefDashboardState extends State<ChefDashboard> {
           ),
           ElevatedButton(
             onPressed: () {
+              // Close the dialog
               Navigator.pop(context);
+
+              // Show logout confirmation
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Row(
@@ -786,10 +797,20 @@ class _ChefDashboardState extends State<ChefDashboard> {
                   duration: Duration(seconds: 2),
                 ),
               );
+
+              // Navigate back to login/home screen after a short delay
               Future.delayed(const Duration(milliseconds: 500), () {
+                // Pop until reaching the root (login screen)
+                // Replace this with your actual login route
                 if (context.mounted) {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 }
+
+                // Alternative: Navigate to a specific login page
+                // Navigator.of(context).pushAndRemoveUntil(
+                //   MaterialPageRoute(builder: (context) => const LoginPage()),
+                //   (route) => false,
+                // );
               });
             },
             style: ElevatedButton.styleFrom(
