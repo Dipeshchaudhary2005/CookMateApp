@@ -10,6 +10,7 @@ import 'bookeddetailedpage.dart';
 import 'chefprofilepage.dart';
 import 'managemenuprice.dart';
 import 'calendarupdate.dart';
+import 'notification.dart'; // Import notification page
 
 class ChefDashboard extends StatefulWidget {
   const ChefDashboard({super.key});
@@ -19,49 +20,16 @@ class ChefDashboard extends StatefulWidget {
 }
 
 class _ChefDashboardState extends State<ChefDashboard> {
-  // Sample booking data for status card
   int pendingCount = 3;
   int confirmedCount = 2;
   int completedCount = 1;
+  int unreadNotifications = 5; // Track unread notifications
 
-  // Search controller and filtered list
   final TextEditingController _searchController = TextEditingController();
-  // List<Map<String, dynamic>> filteredCuisines = [];
   bool isSearching = false;
   late Future<List<ChefPost>?> postsFuture;
   late List<ChefPost> posts;
   late List<ChefPost> filteredPosts;
-  // Sample posted cuisine images
-  // List<Map<String, dynamic>> postedCuisines = [
-  //   {
-  //     'image': 'Resource/chef.png',
-  //     'title': 'Italian Pasta Carbonara',
-  //     'likes': 45,
-  //     'comments': 12,
-  //     'date': '2 days ago',
-  //   },
-  //   {
-  //     'image': 'Resource/chef.png',
-  //     'title': 'Nepalese Thakali Set',
-  //     'likes': 67,
-  //     'comments': 23,
-  //     'date': '5 days ago',
-  //   },
-  //   {
-  //     'image': 'Resource/chef.png',
-  //     'title': 'Special Momo Platter',
-  //     'likes': 89,
-  //     'comments': 34,
-  //     'date': '1 week ago',
-  //   },
-  //   {
-  //     'image': 'Resource/chef.png',
-  //     'title': 'Wedding Feast Menu',
-  //     'likes': 102,
-  //     'comments': 45,
-  //     'date': '2 weeks ago',
-  //   },
-  // ];
 
   @override
   void initState() {
@@ -106,10 +74,24 @@ class _ChefDashboardState extends State<ChefDashboard> {
     });
   }
 
+  // Navigate to notification page
+  void _openNotifications() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ChefNotificationPage(),
+      ),
+    ).then((_) {
+      // Reset unread count when returning from notifications
+      setState(() {
+        unreadNotifications = 0;
+      });
+    });
+  }
+
   Future<void> _pickAndUploadImage(BuildContext context) async {
     final ImagePicker picker = ImagePicker();
 
-    // Show dialog to choose camera or gallery
     final source = await showDialog<ImageSource>(
       context: context,
       builder: (context) => AlertDialog(
@@ -133,7 +115,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
     if (source != null) {
       final XFile? image = await picker.pickImage(source: source);
       if (image != null) {
-        // Show post creation dialog
         _showPostCreationDialog(File(image.path));
       }
     }
@@ -258,57 +239,57 @@ class _ChefDashboardState extends State<ChefDashboard> {
           ),
           title: isSearching
               ? Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    autofocus: true,
-                    style: const TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      hintText: 'Search your posts...',
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      border: InputBorder.none,
-                      icon: const Icon(
-                        Icons.search,
-                        color: Colors.grey,
-                        size: 20,
-                      ),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear, color: Colors.grey),
-                              onPressed: () {
-                                _searchController.clear();
-                              },
-                            )
-                          : null,
-                    ),
-                  ),
-                )
-              : Row(
-                  children: [
-                    Icon(Icons.location_on, color: Colors.grey[700], size: 20),
-                    const SizedBox(width: 4),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Ram Bhatta',
-                          style: TextStyle(fontSize: 16, color: Colors.black),
-                        ),
-                      ],
-                    ),
-                  ],
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
+              ],
+            ),
+            child: TextField(
+              controller: _searchController,
+              autofocus: true,
+              style: const TextStyle(color: Colors.black),
+              decoration: InputDecoration(
+                hintText: 'Search your posts...',
+                hintStyle: const TextStyle(color: Colors.grey),
+                border: InputBorder.none,
+                icon: const Icon(
+                  Icons.search,
+                  color: Colors.grey,
+                  size: 20,
+                ),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                  icon: const Icon(Icons.clear, color: Colors.grey),
+                  onPressed: () {
+                    _searchController.clear();
+                  },
+                )
+                    : null,
+              ),
+            ),
+          )
+              : Row(
+            children: [
+              Icon(Icons.location_on, color: Colors.grey[700], size: 20),
+              const SizedBox(width: 4),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Ram Bhatta',
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                ],
+              ),
+            ],
+          ),
           actions: [
             IconButton(
               icon: Icon(
@@ -317,14 +298,42 @@ class _ChefDashboardState extends State<ChefDashboard> {
               ),
               onPressed: _toggleSearch,
             ),
-            IconButton(
-              icon: const Icon(
-                Icons.notifications_outlined,
-                color: Colors.black,
-              ),
-              onPressed: () {
-                // Notification functionality placeholder
-              },
+            // Notification button with badge
+            Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.black,
+                  ),
+                  onPressed: _openNotifications,
+                ),
+                if (unreadNotifications > 0)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        unreadNotifications > 9 ? '9+' : '$unreadNotifications',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),
@@ -334,7 +343,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Booking Status Card
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -364,8 +372,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // My Posted Cuisines Section
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -381,7 +387,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
                     if (!isSearching)
                       TextButton(
                         onPressed: () {
-                          // View all posts
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('View all posts coming soon!'),
@@ -404,12 +409,12 @@ class _ChefDashboardState extends State<ChefDashboard> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: 0.75,
-                              ),
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.75,
+                          ),
                           itemCount: filteredPosts.length,
                           itemBuilder: (context, index) {
                             return _buildCuisineCard(filteredPosts[index]);
@@ -494,7 +499,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image
           Container(
             height: 120,
             decoration: BoxDecoration(
@@ -521,7 +525,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
               ),
             ),
           ),
-          // Content
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(12),
@@ -529,7 +532,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Title
                   Flexible(
                     child: Text(
                       post.title!,
@@ -542,11 +544,9 @@ class _ChefDashboardState extends State<ChefDashboard> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Stats and Date
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Likes and Comments Row
                       Row(
                         children: [
                           const Icon(
@@ -579,7 +579,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      // Date
                       Text(
                         post.createdAt!,
                         style: const TextStyle(
@@ -608,22 +607,18 @@ class _ChefDashboardState extends State<ChefDashboard> {
       currentIndex: 0,
       onTap: (index) {
         if (index == 1) {
-          // Bookings button tapped
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const BookedDetailsPage()),
           );
         } else if (index == 2) {
-          // Post button tapped
           _pickAndUploadImage(context);
         } else if (index == 3) {
-          // Calendar button tapped - Navigate to Calendar
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const CalendarPage()),
           );
         } else if (index == 4) {
-          // Profile button tapped
           _showProfileMenu(context);
         }
       },
@@ -729,8 +724,12 @@ class _ChefDashboardState extends State<ChefDashboard> {
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Settings page coming soon!')),
+                // Navigate to settings page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsPage(),
+                  ),
                 );
               },
             ),
@@ -773,10 +772,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
           ),
           ElevatedButton(
             onPressed: () {
-              // Close the dialog
               Navigator.pop(context);
-
-              // Show logout confirmation
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Row(
@@ -790,20 +786,10 @@ class _ChefDashboardState extends State<ChefDashboard> {
                   duration: Duration(seconds: 2),
                 ),
               );
-
-              // Navigate back to login/home screen after a short delay
               Future.delayed(const Duration(milliseconds: 500), () {
-                // Pop until reaching the root (login screen)
-                // Replace this with your actual login route
                 if (context.mounted) {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 }
-
-                // Alternative: Navigate to a specific login page
-                // Navigator.of(context).pushAndRemoveUntil(
-                //   MaterialPageRoute(builder: (context) => const LoginPage()),
-                //   (route) => false,
-                // );
               });
             },
             style: ElevatedButton.styleFrom(
