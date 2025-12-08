@@ -1,5 +1,7 @@
 import 'package:cookmate/backend/model/chef_package.dart';
+import 'package:cookmate/backend/services/booking_services.dart';
 import 'package:cookmate/backend/services/chef_packages_services.dart';
+import 'package:cookmate/core/helper.dart';
 import 'package:flutter/material.dart';
 class BookingPage extends StatefulWidget {
   final String? chefId;
@@ -14,11 +16,13 @@ class _BookingPageState extends State<BookingPage> {
   DateTime selectedDate = DateTime.now();
   String selectedTime = '8:00 AM - 12:00 PM';
   String? selectedPackage;
+  int? selectedNoOfPeople = 1;
   List<String> selectedFoodItems = [];
   List<String> customMenuItems = [];
   late Future<List<ChefPackage>?> packagesFuture;
   late List<ChefPackage>? packages;
   List<ChefPackage> selectedPackages = [];
+  TextEditingController? noOfPeopleController;
   final List<String> eventList = [
     "Wedding", "Birthday", "Home Cooking", "Private"
   ];
@@ -165,297 +169,9 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  // Method to show custom menu dialog
-  // void _showCustomMenuDialog() {
-  //   final TextEditingController customItemController = TextEditingController();
-  //   List<String> tempCustomItems = List.from(customMenuItems);
-  //
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return StatefulBuilder(
-  //         builder: (context, setDialogState) {
-  //           return AlertDialog(
-  //             shape: RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.circular(16),
-  //             ),
-  //             title: const Text(
-  //               'Add Custom Menu Items',
-  //               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-  //             ),
-  //             content: SizedBox(
-  //               width: double.maxFinite,
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 children: [
-  //                   // Input field for new item
-  //                   Row(
-  //                     children: [
-  //                       Expanded(
-  //                         child: TextField(
-  //                           controller: customItemController,
-  //                           decoration: InputDecoration(
-  //                             hintText: 'Enter dish name',
-  //                             border: OutlineInputBorder(
-  //                               borderRadius: BorderRadius.circular(12),
-  //                             ),
-  //                             contentPadding: const EdgeInsets.symmetric(
-  //                               horizontal: 12,
-  //                               vertical: 8,
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       ),
-  //                       const SizedBox(width: 8),
-  //                       ElevatedButton(
-  //                         onPressed: () {
-  //                           if (customItemController.text.isNotEmpty) {
-  //                             setDialogState(() {
-  //                               tempCustomItems.add(customItemController.text);
-  //                               customItemController.clear();
-  //                             });
-  //                           }
-  //                         },
-  //                         style: ElevatedButton.styleFrom(
-  //                           backgroundColor: const Color(0xFF8BC34A),
-  //                           shape: RoundedRectangleBorder(
-  //                             borderRadius: BorderRadius.circular(12),
-  //                           ),
-  //                         ),
-  //                         child: const Text('Add'),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                   const SizedBox(height: 16),
-  //                   // List of added items
-  //                   if (tempCustomItems.isNotEmpty)
-  //                     Container(
-  //                       constraints: const BoxConstraints(maxHeight: 200),
-  //                       child: ListView.builder(
-  //                         shrinkWrap: true,
-  //                         itemCount: tempCustomItems.length,
-  //                         itemBuilder: (context, index) {
-  //                           return Card(
-  //                             margin: const EdgeInsets.only(bottom: 8),
-  //                             child: ListTile(
-  //                               dense: true,
-  //                               title: Text(tempCustomItems[index]),
-  //                               trailing: IconButton(
-  //                                 icon: const Icon(
-  //                                   Icons.delete,
-  //                                   color: Colors.red,
-  //                                 ),
-  //                                 onPressed: () {
-  //                                   setDialogState(() {
-  //                                     tempCustomItems.removeAt(index);
-  //                                   });
-  //                                 },
-  //                               ),
-  //                             ),
-  //                           );
-  //                         },
-  //                       ),
-  //                     ),
-  //                 ],
-  //               ),
-  //             ),
-  //             actions: [
-  //               TextButton(
-  //                 onPressed: () => Navigator.pop(context),
-  //                 child: const Text('Cancel'),
-  //               ),
-  //               ElevatedButton(
-  //                 onPressed: () {
-  //                   setState(() {
-  //                     customMenuItems = tempCustomItems;
-  //                     selectedPackage = 'Custom Menu';
-  //                   });
-  //                   Navigator.pop(context);
-  //                   ScaffoldMessenger.of(context).showSnackBar(
-  //                     SnackBar(
-  //                       content: Text(
-  //                         '${tempCustomItems.length} custom items added',
-  //                       ),
-  //                       backgroundColor: Colors.green,
-  //                     ),
-  //                   );
-  //                 },
-  //                 style: ElevatedButton.styleFrom(
-  //                   backgroundColor: const Color(0xFF8BC34A),
-  //                 ),
-  //                 child: const Text('Done'),
-  //               ),
-  //             ],
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
-
-  // Method to show payment dialog
-  // void _showPaymentDialog() {
-  //   if (selectedPackage == null) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('Please select a package first'),
-  //         backgroundColor: Colors.red,
-  //       ),
-  //     );
-  //     return;
-  //   }
-  //
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(16),
-  //         ),
-  //         title: const Text(
-  //           'Select Payment Method',
-  //           style: TextStyle(fontWeight: FontWeight.bold),
-  //         ),
-  //         content: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             _buildPaymentOption(
-  //               'eSewa',
-  //               'assets/esewa_logo.png',
-  //               Colors.green[700]!,
-  //               () {
-  //                 Navigator.pop(context);
-  //                 _processPayment('eSewa');
-  //               },
-  //             ),
-  //             const SizedBox(height: 12),
-  //             _buildPaymentOption(
-  //               'Fonepay',
-  //               'assets/fonepay_logo.png',
-  //               Colors.blue[700]!,
-  //               () {
-  //                 Navigator.pop(context);
-  //                 _processPayment('Fonepay');
-  //               },
-  //             ),
-  //             const SizedBox(height: 12),
-  //             _buildPaymentOption(
-  //               'Khalti',
-  //               'assets/khalti_logo.png',
-  //               Colors.purple[700]!,
-  //               () {
-  //                 Navigator.pop(context);
-  //                 _processPayment('Khalti');
-  //               },
-  //             ),
-  //             const SizedBox(height: 12),
-  //             _buildPaymentOption(
-  //               'Cash on Service',
-  //               null,
-  //               Colors.orange[700]!,
-  //               () {
-  //                 Navigator.pop(context);
-  //                 _processPayment('Cash on Service');
-  //               },
-  //             ),
-  //           ],
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () => Navigator.pop(context),
-  //             child: const Text('Cancel'),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
-  // Method to process payment and navigate
-  // void _processPayment(String paymentMethod) {
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (context) => const Center(
-  //       child: CircularProgressIndicator(color: Color(0xFF8BC34A)),
-  //     ),
-  //   );
-  //
-  //   Future.delayed(const Duration(seconds: 2), () {
-  //     if (context.mounted && mounted) {
-  //       Navigator.pop(context);
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content: Text('Payment via $paymentMethod successful!'),
-  //           backgroundColor: Colors.green,
-  //         ),
-  //       );
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => const SummaryPage()),
-  //       );
-  //     }
-  //   });
-  // }
-
-  // Widget _buildPaymentOption(
-  //   String title,
-  //   String? logoPath,
-  //   Color color,
-  //   VoidCallback onTap,
-  // ) {
-  //   return InkWell(
-  //     onTap: onTap,
-  //     borderRadius: BorderRadius.circular(12),
-  //     child: Container(
-  //       padding: const EdgeInsets.all(16),
-  //       decoration: BoxDecoration(
-  //         color: color.withValues(alpha: 0.1),
-  //         borderRadius: BorderRadius.circular(12),
-  //         border: Border.all(color: color, width: 2),
-  //       ),
-  //       child: Row(
-  //         children: [
-  //           Container(
-  //             width: 50,
-  //             height: 50,
-  //             decoration: BoxDecoration(
-  //               color: Colors.white,
-  //               borderRadius: BorderRadius.circular(8),
-  //             ),
-  //             child: logoPath != null
-  //                 ? Padding(
-  //                     padding: const EdgeInsets.all(8.0),
-  //                     child: Image.asset(
-  //                       logoPath,
-  //                       fit: BoxFit.contain,
-  //                       errorBuilder: (context, error, stackTrace) {
-  //                         return Icon(Icons.payment, color: color, size: 30);
-  //                       },
-  //                     ),
-  //                   )
-  //                 : Icon(Icons.money, color: color, size: 30),
-  //           ),
-  //           const SizedBox(width: 16),
-  //           Expanded(
-  //             child: Text(
-  //               title,
-  //               style: TextStyle(
-  //                 fontSize: 16,
-  //                 fontWeight: FontWeight.bold,
-  //                 color: color,
-  //               ),
-  //             ),
-  //           ),
-  //           Icon(Icons.arrow_forward_ios, color: color, size: 20),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
+    noOfPeopleController = TextEditingController(text: selectedNoOfPeople.toString());
     return Scaffold(
       backgroundColor: const Color(0xFFB8E6B8),
       appBar: AppBar(
@@ -570,6 +286,25 @@ class _BookingPageState extends State<BookingPage> {
                 onChanged: (val) => setState(() => selectedTime = val!),
               ),
             ),
+            const SizedBox(height: 8,),
+            const Text(
+              'Select Hours',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            TextField(
+              controller: noOfPeopleController,
+
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.person),
+                border: OutlineInputBorder(),
+                fillColor: Colors.white,
+              ),
+              onChanged: (value) {
+                if (value.isNotEmpty){
+                  selectedNoOfPeople = int.tryParse(value);
+                }
+              },
+            ),
             const SizedBox(height: 20),
 
             // Select Package
@@ -627,8 +362,23 @@ class _BookingPageState extends State<BookingPage> {
               width: double.infinity,
               child: ElevatedButton(
                 // onPressed: _showPaymentDialog,
-                onPressed: () {
-
+                onPressed: () async{
+                  if (noOfPeopleController!.text.isEmpty){
+                    Helper.showError(context, "Enter number of people");
+                    return;
+                  }
+                  selectedNoOfPeople = int.tryParse(noOfPeopleController!.text);
+                  if (selectedNoOfPeople == null){
+                    Helper.showError(context, "The number of people must be a integer");
+                    return;
+                  }
+                  final booking = await BookingServices.createBooking(context, widget.chefId!, selectedEvent!, selectedDate.toString(),
+                      selectedTime, selectedNoOfPeople!, selectedPackages
+                    );
+                  if (booking == null) return;
+                  if (context.mounted){
+                    Navigator.of(context).pop();
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF8BC34A),

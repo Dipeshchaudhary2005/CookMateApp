@@ -1,3 +1,5 @@
+import 'package:cookmate/backend/model/booking.dart';
+import 'package:cookmate/backend/services/booking_services.dart';
 import 'package:cookmate/backend/services/user_services.dart';
 import 'package:cookmate/core/helper.dart';
 import 'package:cookmate/core/static.dart';
@@ -31,36 +33,14 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   bool pushNotifications = true;
 
   // Booking history data
-  final List<Map<String, dynamic>> bookingHistory = [
-    {
-      'chefName': 'Chef Marlon',
-      'eventType': 'Wedding',
-      'date': '2024-03-15',
-      'time': '4:00 PM - 8:00 PM',
-      'status': 'Completed',
-      'amount': 'NPR 15,000',
-      'rating': 4.5,
-    },
-    {
-      'chefName': 'Chef John Ray',
-      'eventType': 'Birthday Party',
-      'date': '2024-02-28',
-      'time': '12:00 PM - 4:00 PM',
-      'status': 'Completed',
-      'amount': 'NPR 8,500',
-      'rating': 5.0,
-    },
-    {
-      'chefName': 'Ms. Lani',
-      'eventType': 'Engagement Function',
-      'date': '2024-04-20',
-      'time': '8:00 PM - 12:00 AM',
-      'status': 'Upcoming',
-      'amount': 'NPR 12,000',
-      'rating': null,
-    },
-  ];
+  late List<Booking> bookingHistory;
+  late Future<List<Booking>?> bookingHistoryFuture;
 
+  @override
+  void initState() {
+    super.initState();
+    bookingHistoryFuture = BookingServices.getBookings(context, 'customer');
+  }
   // Pick image from gallery or camera
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -283,13 +263,25 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
               ),
               const Divider(),
               Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: bookingHistory.length,
-                  itemBuilder: (context, index) {
-                    final booking = bookingHistory[index];
-                    return _buildBookingCard(booking);
-                  },
+                child: FutureBuilder<List<Booking>?>(
+                  future: bookingHistoryFuture,
+                  builder: (context, asyncSnapshot) {
+                    if (asyncSnapshot.connectionState != ConnectionState.done){
+                      return const Center(child: CircularProgressIndicator(),);
+                    }
+                    if (!asyncSnapshot.hasData || asyncSnapshot.data == null){
+                      return Text("No bookings received");
+                    }
+                    bookingHistory = asyncSnapshot.data!;
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: bookingHistory.length,
+                      itemBuilder: (context, index) {
+                        final booking = bookingHistory[index];
+                        return _buildBookingCard(booking);
+                      },
+                    );
+                  }
                 ),
               ),
             ],
@@ -300,8 +292,8 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
   }
 
   // Booking card widget
-  Widget _buildBookingCard(Map<String, dynamic> booking) {
-    final isCompleted = booking['status'] == 'Completed';
+  Widget _buildBookingCard(Booking booking) {
+    final isCompleted = booking.status == BookingStatus.completed.name;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -321,7 +313,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                booking['chefName'],
+                booking.chefName ?? "No name",
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -334,7 +326,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  booking['status'],
+                  booking.status ?? "No status",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
@@ -349,7 +341,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             children: [
               const Icon(Icons.event, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              Text(booking['eventType'], style: const TextStyle(fontSize: 14)),
+              Text(booking.eventType ?? 'No event type', style: const TextStyle(fontSize: 14)),
             ],
           ),
           const SizedBox(height: 4),
@@ -357,7 +349,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             children: [
               const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              Text(booking['date'], style: const TextStyle(fontSize: 14)),
+              Text(booking.date.toString().split(' ')[0] , style: const TextStyle(fontSize: 14)),
             ],
           ),
           const SizedBox(height: 4),
@@ -365,7 +357,7 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             children: [
               const Icon(Icons.access_time, size: 16, color: Colors.grey),
               const SizedBox(width: 4),
-              Text(booking['time'], style: const TextStyle(fontSize: 14)),
+              Text(booking.timeInterval ?? "No time interval", style: const TextStyle(fontSize: 14)),
             ],
           ),
           const SizedBox(height: 8),
@@ -373,18 +365,18 @@ class _CustomerProfilePageState extends State<CustomerProfilePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                booking['amount'],
+                booking.cost.toString(),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF8BC34A),
                 ),
               ),
-              if (booking['rating'] != null)
+              if (booking.rating != null)
                 Row(
                   children: [
                     const Icon(Icons.star, color: Colors.amber, size: 16),
-                    Text(' ${booking['rating']}'),
+                    Text(' ${booking.rating}'),
                   ],
                 ),
             ],
