@@ -844,13 +844,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 );
                 break;
               case 2:
-                // Calendar - Navigate to Booking Page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const BookingPage()),
-                );
-                break;
-              case 3:
                 // Favorites - Navigate to Favorite Chef Page
                 Navigator.push(
                   context,
@@ -860,7 +853,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   ),
                 );
                 break;
-              case 4:
+              case 3:
                 // Profile
                 Navigator.push(
                   context,
@@ -876,10 +869,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             BottomNavigationBarItem(
               icon: Icon(Icons.receipt_long),
               label: 'Summary',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
-              label: 'Booking',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.favorite),

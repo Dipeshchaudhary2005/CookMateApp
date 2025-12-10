@@ -1,22 +1,23 @@
-import 'package:cookmate/Frontend/confirm_otp.dart';
+import 'package:cookmate/Frontend/new_password.dart';
 import 'package:cookmate/backend/services/user_services.dart';
 import 'package:flutter/material.dart';
 
-class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({super.key});
+class ConfirmOTP extends StatefulWidget {
+  final String email;
+  const ConfirmOTP({super.key, required this.email});
 
   @override
-  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+  State<ConfirmOTP> createState() => _ForgotPasswordPageState();
 }
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+class _ForgotPasswordPageState extends State<ConfirmOTP> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _otpController = TextEditingController();
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _otpController.dispose();
     super.dispose();
   }
 
@@ -27,21 +28,20 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       });
 
       try {
-        final email = _emailController.text;
-        final success = await UserServices.generateOTP(context, email);
-        print(success);
-        if (success) {
+        final otp = _otpController.text;
+        final token = await UserServices.verifyOTP(context, widget.email, otp);
+        if (token != null) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('OTP successfully sent to the mail'),
+                content: const Text('OTP verified. Create a new password'),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 3),
               ),
             );
-            final confirmOTP = ConfirmOTP(email: email);
+            final newPasswordPage = NewPasswordPage(token: token,);
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => confirmOTP)
+                MaterialPageRoute(builder: (context) => newPasswordPage)
             );
           }
         }
@@ -99,7 +99,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
                 const SizedBox(height: 40),
                 const Text(
-                  'Forgot Password?',
+                  'Enter the OTP',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -107,8 +107,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'No worries! Enter your email and we\'ll send you reset instructions.',
+                Text(
+                  'Enter the OTP sent to ${widget.email}.\nLook in the spam folder if not found',
                   style: TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(height: 32),
@@ -117,11 +117,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   child: Column(
                     children: [
                       TextFormField(
-                        controller: _emailController,
+                        controller: _otpController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'Enter your email',
+                          labelText: 'OTP',
+                          hintText: 'Enter the OTP',
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -132,10 +132,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!value.contains('@')) {
-                            return 'Please enter a valid email';
+                            return 'Please enter the otp';
                           }
                           return null;
                         },
@@ -154,21 +151,21 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           ),
                           child: _isLoading
                               ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
                               : const Text(
-                                  'Send Reset Link',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                            'Verify OTP',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 24),
