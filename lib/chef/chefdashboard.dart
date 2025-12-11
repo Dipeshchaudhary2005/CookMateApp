@@ -731,17 +731,6 @@ class _ChefDashboardState extends State<ChefDashboard> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.settings, color: Color(0xFF8BC34A)),
-              title: const Text('Settings'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Settings page coming soon!')),
-                );
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Logout', style: TextStyle(color: Colors.red)),
               onTap: () {
