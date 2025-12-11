@@ -1,4 +1,8 @@
+import 'package:cookmate/backend/model/chefpost.dart';
+import 'package:cookmate/backend/services/fetch_services.dart';
+import 'package:cookmate/backend/services/post_services.dart';
 import 'package:cookmate/core/helper.dart';
+import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'bookingpage.dart';
 import 'favoritechefpage.dart';
@@ -16,96 +20,19 @@ class CustomerDashboard extends StatefulWidget {
 class _CustomerDashboardState extends State<CustomerDashboard> {
   int _currentIndex = 0;
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> filteredPosts = [];
-  static List<Map<String, dynamic>> favoritePosts = [];
-
+  List<ChefPost> filteredPosts = [];
+  List<ChefPost> favoritePosts = [];
+  late Future<List<ChefPost>?> favoritePostsFuture;
+  late Future<List<ChefPost>?> chefPostsFuture;
+  late List<ChefPost> posts;
+  ChefPost? selectedPost;
   // Sample chef posts data
-  List<Map<String, dynamic>> chefPosts = [
-    {
-      'chefName': 'Ram Bhatta',
-      'chefImage': 'Resource/chef.png',
-      'specialty': 'Italian Cuisine',
-      'experience': '4 Years',
-      'rating': 4.8,
-      'cuisineTitle': 'Italian Pasta Carbonara',
-      'cuisineImage': 'Resource/pasta-carbonara.png',
-      'description':
-          'Authentic Italian pasta with creamy carbonara sauce, pancetta, and fresh parmesan cheese.',
-      'likes': 156,
-      'comments': 45,
-      'isLiked': false,
-      'price': 'NPR 650/person',
-      'isFavorite': false,
-      'commentList': [
-        {
-          'user': 'John Doe',
-          'comment': 'Looks delicious! 😋',
-          'time': '2 hours ago',
-        },
-        {
-          'user': 'Sarah Smith',
-          'comment': 'I tried this last week, amazing!',
-          'time': '1 day ago',
-        },
-      ],
-    },
-    {
-      'chefName': 'Sita Lama',
-      'chefImage': 'Resource/chef.png',
-      'specialty': 'Nepali Cuisine',
-      'experience': '6 Years',
-      'rating': 4.9,
-      'cuisineTitle': 'Traditional Thakali Set',
-      'cuisineImage': 'Resource/Dal-Bhat-Tarkari.jpg',
-      'description':
-          'Complete Thakali set with dal, bhat, tarkari, achar, and papad. Authentic taste from the mountains.',
-      'likes': 234,
-      'comments': 67,
-      'isLiked': false,
-      'price': 'NPR 550/person',
-      'isFavorite': false,
-      'commentList': [
-        {
-          'user': 'Mike Johnson',
-          'comment': 'Best Thakali set in town!',
-          'time': '3 hours ago',
-        },
-      ],
-    },
-    {
-      'chefName': 'Rajesh Tharu',
-      'chefImage': 'Resource/chef.png',
-      'specialty': 'Asian Fusion',
-      'experience': '5 Years',
-      'rating': 4.7,
-      'cuisineTitle': 'Special Momo Platter',
-      'cuisineImage': 'Resource/momo.jpg',
-      'description':
-          'Assorted momo platter with chicken, buff, and veg momos served with special chutney.',
-      'likes': 189,
-      'comments': 52,
-      'isLiked': false,
-      'price': 'NPR 450/dozen',
-      'isFavorite': false,
-      'commentList': [
-        {
-          'user': 'Emma Wilson',
-          'comment': 'Perfect for parties!',
-          'time': '5 hours ago',
-        },
-        {
-          'user': 'David Brown',
-          'comment': 'The chutney is incredible 🔥',
-          'time': '1 day ago',
-        },
-      ],
-    },
-  ];
 
   @override
   void initState() {
     super.initState();
-    filteredPosts = chefPosts;
+    chefPostsFuture = FetchServices.getRecentPosts(context, 0);
+    favoritePostsFuture = FetchServices.getFavoritePosts(context);
     _searchController.addListener(_filterPosts);
   }
 
@@ -119,51 +46,29 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     String query = _searchController.text.toLowerCase();
     setState(() {
       if (query.isEmpty) {
-        filteredPosts = chefPosts;
+        filteredPosts = posts;
       } else {
-        filteredPosts = chefPosts.where((post) {
-          return post['chefName'].toLowerCase().contains(query) ||
-              post['cuisineTitle'].toLowerCase().contains(query) ||
-              post['specialty'].toLowerCase().contains(query) ||
-              post['description'].toLowerCase().contains(query);
+        filteredPosts = posts.where((post) {
+          return (post.chef?.fullName?.toLowerCase().contains(query) ?? false) ||
+              (post.title?.toLowerCase().contains(query) ?? false) ||
+              (post.chef?.speciality?.toLowerCase().contains(query) ?? false) ||
+              (post.description?.toLowerCase().contains(query) ?? false);
         }).toList();
       }
     });
   }
 
-  void _toggleFavorite(int index) {
-    setState(() {
-      filteredPosts[index]['isFavorite'] = !filteredPosts[index]['isFavorite'];
-
-      // Update original list
-      int originalIndex = chefPosts.indexWhere(
-        (post) => post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
-      );
-      if (originalIndex != -1) {
-        chefPosts[originalIndex]['isFavorite'] =
-            filteredPosts[index]['isFavorite'];
-      }
-
+  void _toggleFavorite(String postId) async {
+      final selectedPost = posts.firstWhere((p) => p.id == postId);
       // Update favorites list
-      if (filteredPosts[index]['isFavorite']) {
-        if (!favoritePosts.any(
-          (post) =>
-              post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
-        )) {
-          favoritePosts.add(filteredPosts[index]);
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Added to favorites'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 1),
-          ),
-        );
-      } else {
-        favoritePosts.removeWhere(
-          (post) =>
-              post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
-        );
+      if (selectedPost.favorite ?? false) {
+        bool success = await PostServices.unfavoritePost(context, selectedPost.id!);
+        if (!success) return;
+        setState(() {
+          favoritePosts.removeWhere((post) => post.id == selectedPost.id);
+          selectedPost.favorite = false;
+        });
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Removed from favorites'),
@@ -171,43 +76,66 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
             duration: Duration(seconds: 1),
           ),
         );
-      }
-    });
-  }
-
-  void _toggleLike(int index) {
-    setState(() {
-      filteredPosts[index]['isLiked'] = !filteredPosts[index]['isLiked'];
-      if (filteredPosts[index]['isLiked']) {
-        filteredPosts[index]['likes']++;
       } else {
-        filteredPosts[index]['likes']--;
+        bool success = await PostServices.favoritePost(context, selectedPost.id!);
+        if (!success) return;
+        setState(() {
+          favoritePosts.add(selectedPost);
+          selectedPost.favorite = true;
+        });
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Added to favorites'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 1),
+          ),
+        );
       }
-      // Update original list
-      int originalIndex = chefPosts.indexWhere(
-        (post) => post['cuisineTitle'] == filteredPosts[index]['cuisineTitle'],
-      );
-      if (originalIndex != -1) {
-        chefPosts[originalIndex]['isLiked'] = filteredPosts[index]['isLiked'];
-        chefPosts[originalIndex]['likes'] = filteredPosts[index]['likes'];
-      }
-    });
   }
 
-  void _addComment(Map<String, dynamic> post, String comment) {
+  void refreshPage() async {
+    final newFuture = FetchServices.getRecentPosts(context, 0);
     setState(() {
-      post['commentList'].insert(0, {
-        'user': 'You',
-        'comment': comment,
-        'time': 'Just now',
-      });
-      post['comments']++;
+      chefPostsFuture = newFuture;
     });
   }
 
-  void _showCommentsDialog(Map<String, dynamic> post) {
-    final TextEditingController commentController = TextEditingController();
+  void _toggleLike(ChefPost post) async {
+    bool success = false;
+    if (post.liked ?? false){
+      success = await FetchServices.unlikePost(context, post.id!);
+    } else {
+      success = await FetchServices.likePost(context, post.id!);
+    }
+    if (success){
+      setState(() {
+        post.liked = !(post.liked ?? false);
+        if (post.liked!){
+          post.likeCount = (post.likeCount ?? 0) + 1;
+        } else {
+          post.likeCount = (post.likeCount ?? 0) - 1;
+        }
+      });
+    }
+  }
 
+  void _addComment(String postId, String comment) async {
+    bool success = await FetchServices.addComment(context, postId, comment);
+    if (success) {
+      if (!mounted) return;
+      final updatedPost = await FetchServices.getPostById(context, postId);
+      setState(() async {
+        selectedPost = updatedPost;
+      });
+    }
+  }
+
+  void _showCommentsDialog(String postId) async {
+    final TextEditingController commentController = TextEditingController();
+    selectedPost = await FetchServices.getPostById(context, postId);
+    if (selectedPost == null) return;
+    if (!mounted) return;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -245,7 +173,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Comments (${post['comments']})',
+                        'Comments (${selectedPost!.commentCount})',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -261,7 +189,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 const Divider(height: 1),
                 // Comments List
                 Expanded(
-                  child: post['commentList'].isEmpty
+                  child: selectedPost!.comments!.isEmpty
                       ? const Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -292,9 +220,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                         )
                       : ListView.builder(
                           padding: const EdgeInsets.all(16),
-                          itemCount: post['commentList'].length,
+                          itemCount: selectedPost!.comments!.length,
                           itemBuilder: (context, index) {
-                            final comment = post['commentList'][index];
+                            final comment = selectedPost!.comments![index];
                             return Container(
                               margin: const EdgeInsets.only(bottom: 16),
                               child: Row(
@@ -303,12 +231,19 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                   CircleAvatar(
                                     radius: 18,
                                     backgroundColor: const Color(0xFFB8E6B8),
-                                    child: Text(
-                                      comment['user'][0],
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
+                                    child: Image.network(
+                                      comment.userPic!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return const Center(
+                                              child: Icon(
+                                                Icons.restaurant,
+                                                size: 80,
+                                                color: Colors.grey,
+                                              ),
+                                            );
+                                          },
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -320,7 +255,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                         Row(
                                           children: [
                                             Text(
-                                              comment['user'],
+                                              comment.userName ?? "No name",
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 14,
@@ -328,7 +263,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
-                                              comment['time'],
+                                              comment.updatedAt ?? "No time",
                                               style: const TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.grey,
@@ -338,7 +273,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          comment['comment'],
+                                          comment.body ?? "No data",
                                           style: const TextStyle(fontSize: 14),
                                         ),
                                       ],
@@ -395,7 +330,10 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                           onPressed: () {
                             if (commentController.text.isNotEmpty) {
                               setModalState(() {
-                                _addComment(post, commentController.text);
+                                _addComment(
+                                  selectedPost!.id!,
+                                  commentController.text,
+                                );
                               });
                               commentController.clear();
                             }
@@ -420,7 +358,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     );
   }
 
-  void _showPostDetail(Map<String, dynamic> post) {
+  void _showPostDetail(ChefPost post) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -459,8 +397,8 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   height: 250,
                   width: double.infinity,
                   color: Colors.grey[200],
-                  child: Image.asset(
-                    post['cuisineImage'],
+                  child: Image.network(
+                    post.urlToImage ?? "null",
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Center(
@@ -480,7 +418,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                     children: [
                       // Cuisine Title
                       Text(
-                        post['cuisineTitle'],
+                        post.title!,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -498,7 +436,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          post['price'],
+                          "PRICING", //TODO
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -516,12 +454,12 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                             size: 20,
                           ),
                           const SizedBox(width: 4),
-                          Text('${post['likes']} likes'),
+                          Text('${post.likeCount} likes'),
                           const SizedBox(width: 20),
                           GestureDetector(
                             onTap: () {
                               Navigator.pop(context);
-                              _showCommentsDialog(post);
+                              _showCommentsDialog(post.id!);
                             },
                             child: const Icon(
                               Icons.comment,
@@ -533,9 +471,9 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                           GestureDetector(
                             onTap: () {
                               Navigator.pop(context);
-                              _showCommentsDialog(post);
+                              _showCommentsDialog(post.id!);
                             },
-                            child: Text('${post['comments']} comments'),
+                            child: Text('${post.commentCount} comments'),
                           ),
                         ],
                       ),
@@ -559,8 +497,8 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                               color: Colors.grey[200],
                             ),
                             child: ClipOval(
-                              child: Image.asset(
-                                post['chefImage'],
+                              child: Image.network(
+                                post.chef!.urlToImage ?? "null",
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return const Icon(Icons.person, size: 30);
@@ -574,14 +512,14 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  post['chefName'],
+                                  post.chef!.fullName ?? "No name",
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
-                                  post['specialty'],
+                                  post.chef!.speciality ?? "No speciality",
                                   style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
@@ -595,7 +533,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                       size: 16,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text('${post['rating']}'),
+                                    Text('${post.chef!.rating}'),
                                     const SizedBox(width: 12),
                                     const Icon(
                                       Icons.work,
@@ -603,7 +541,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                                       color: Colors.grey,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(post['experience']),
+                                    Text(post.chef!.experience ?? "No experience"),
                                   ],
                                 ),
                               ],
@@ -622,7 +560,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        post['description'],
+                        post.description!,
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black87,
@@ -636,10 +574,11 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.pop(context);
+                            final page = BookingPage(chefId: post.chef!.uid!,);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const BookingPage(),
+                                builder: (context) => page,
                               ),
                             );
                           },
@@ -696,7 +635,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               child: const Icon(Icons.location_on, color: Colors.red, size: 20),
             ),
           ),
-          title: const Column(
+          title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -704,7 +643,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               Text(
-                'Novaliches, QC',
+                StaticClass.currentUser?.userAddress ?? 'No location',
                 style: TextStyle(fontSize: 14, color: Colors.black),
               ),
             ],
@@ -829,48 +768,59 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
-
-                // Chef Posts List
-                filteredPosts.isEmpty
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(40),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.search_off,
-                                size: 80,
-                                color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'No results found',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
+                FutureBuilder(
+                  future: Future.wait([chefPostsFuture, favoritePostsFuture]),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      if (snapshot.hasData && snapshot.data != null && snapshot.data![0] != null) {
+                        posts = snapshot.data![0]!;
+                        favoritePosts += snapshot.data![1] ?? List.empty(growable: true);
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: posts.length,
+                          itemBuilder: (context, index) {
+                            return buildPostCard(posts[index], index);
+                          },
+                        );
+                      } else {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(40),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.search_off,
+                                  size: 80,
+                                  color: Colors.grey[400],
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Try searching with different keywords',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[500],
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No results found',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Try searching with different keywords',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      )
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: filteredPosts.length,
-                        itemBuilder: (context, index) {
-                          return _buildPostCard(filteredPosts[index], index);
-                        },
-                      ),
+                        );
+                      }
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -898,23 +848,16 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 );
                 break;
               case 2:
-                // Calendar - Navigate to Booking Page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const BookingPage()),
-                );
-                break;
-              case 3:
                 // Favorites - Navigate to Favorite Chef Page
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        FavoriteChefPage(favoritePosts: favoritePosts),
+                        FavoriteChefPage(favoritePosts: favoritePosts,),
                   ),
                 );
                 break;
-              case 4:
+              case 3:
                 // Profile
                 Navigator.push(
                   context,
@@ -932,10 +875,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               label: 'Summary',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
-              label: 'Booking',
-            ),
-            BottomNavigationBarItem(
               icon: Icon(Icons.favorite),
               label: 'Favorites',
             ),
@@ -946,7 +885,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
     );
   }
 
-  Widget _buildPostCard(Map<String, dynamic> post, int index) {
+  Widget buildPostCard(ChefPost post, int index) {
     return GestureDetector(
       onTap: () => _showPostDetail(post),
       child: Container(
@@ -978,8 +917,8 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       color: Colors.grey[200],
                     ),
                     child: ClipOval(
-                      child: Image.asset(
-                        post['chefImage'],
+                      child: Image.network(
+                        post.chef!.urlToImage ?? "null",
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(Icons.person, size: 20);
@@ -993,14 +932,14 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          post['chefName'],
+                          post.chef!.fullName!,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          post['specialty'],
+                          "${post.chef!.speciality}",
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
@@ -1014,21 +953,19 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       const Icon(Icons.star, color: Colors.amber, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        '${post['rating']}',
+                        '${post.chef!.rating}',
                         style: const TextStyle(fontSize: 12),
                       ),
                     ],
                   ),
                   IconButton(
                     icon: Icon(
-                      post['isFavorite']
-                          ? Icons.bookmark
-                          : Icons.bookmark_border,
-                      color: post['isFavorite']
+                      post.favorite! ? Icons.bookmark : Icons.bookmark_border,
+                      color: post.favorite!
                           ? const Color(0xFF8BC34A)
                           : Colors.grey,
                     ),
-                    onPressed: () => _toggleFavorite(index),
+                    onPressed: () => _toggleFavorite(post.id ?? "No id"),
                     padding: const EdgeInsets.all(8),
                   ),
                 ],
@@ -1039,8 +976,8 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               height: 200,
               width: double.infinity,
               color: Colors.grey[200],
-              child: Image.asset(
-                post['cuisineImage'],
+              child: Image.network(
+                post.urlToImage ?? "null",
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return const Center(
@@ -1056,7 +993,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    post['cuisineTitle'],
+                    post.title!,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -1064,7 +1001,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    post['description'],
+                    post.description!,
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -1073,23 +1010,23 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   Row(
                     children: [
                       GestureDetector(
-                        onTap: () => _toggleLike(index),
+                        onTap: () => _toggleLike(post),
                         child: Icon(
-                          post['isLiked']
+                          post.liked!
                               ? Icons.favorite
                               : Icons.favorite_border,
-                          color: post['isLiked'] ? Colors.red : Colors.grey,
+                          color: post.liked! ? Colors.red : Colors.grey,
                           size: 24,
                         ),
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${post['likes']}',
+                        '${post.likeCount}',
                         style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(width: 20),
                       GestureDetector(
-                        onTap: () => _showCommentsDialog(post),
+                        onTap: () => _showCommentsDialog(post.id!),
                         child: const Icon(
                           Icons.comment_outlined,
                           color: Colors.grey,
@@ -1098,7 +1035,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${post['comments']}',
+                        '${post.commentCount}',
                         style: const TextStyle(fontSize: 14),
                       ),
                       const Spacer(),
@@ -1112,7 +1049,8 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          post['price'],
+                          //TODO
+                          'PRICE TODO',
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,

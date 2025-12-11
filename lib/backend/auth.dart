@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:cookmate/core/helper.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -52,7 +53,7 @@ class Auth {
         }
         return false;
       }
-    } on Exception catch (e) {
+    } catch (e) {
       if (kDebugMode) {
         print(e.toString());
       }
@@ -62,7 +63,6 @@ class Auth {
       return false;
     }
   }
-
 
   // Email/Password Login
   static Future<bool> loginUserWithEmail(
@@ -101,7 +101,7 @@ class Auth {
         }
         return false;
       }
-    } on Exception catch (e) {
+    } catch (e) {
       if (kDebugMode) {
         print(e.toString());
       }
@@ -139,7 +139,7 @@ class Auth {
         }
         return null;
       }
-    } on Exception catch (e) {
+    } catch (e) {
       if (kDebugMode) {
         print('Error verifying jwt: $e');
       }
@@ -217,5 +217,4 @@ class Auth {
       return false;
     }
   }
-
 }

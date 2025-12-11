@@ -15,22 +15,24 @@ class Helper {
   }) async {
     // Check persistent login user type
     final storedLoginType = await storage.read(key: UserModel.userTypeField);
-    userType ??= storedLoginType != null ? UserType.fromString(storedLoginType) : null;
+    userType ??= storedLoginType != null
+        ? UserType.fromString(storedLoginType)
+        : null;
     if (userType == null) return false;
 
     // Check persistent login JSON web token
-    StaticClass.jsonWebToken ??= await storage.read(key: StaticClass.jsonWebTokenField,);
-    if (StaticClass.jsonWebToken == null || Auth.jwtIsExpired(StaticClass.jsonWebToken!)) {
+    StaticClass.jsonWebToken ??= await storage.read(
+      key: StaticClass.jsonWebTokenField,
+    );
+    if (StaticClass.jsonWebToken == null ||
+        Auth.jwtIsExpired(StaticClass.jsonWebToken!)) {
       return false;
     }
 
     // Get currentUser data for persistent login but skip if logging in
     if (StaticClass.currentUser == null) {
       if (!context.mounted) return false;
-      String? uid = await Auth.verifyToken(
-        context,
-        StaticClass.jsonWebToken!,
-      );
+      String? uid = await Auth.verifyToken(context, StaticClass.jsonWebToken!);
       if (uid == null) return false;
       if (!context.mounted) return false;
       StaticClass.currentUser = await Auth.getUserData(
@@ -40,36 +42,36 @@ class Helper {
       );
     }
 
-
     if (!StaticClass.currentUser!.userType!.contains(userType)) {
       if (context.mounted) {
-        Helper.showError(context, "The user is not registerd for the role of $userType. \nTry regestring for that role");
+        Helper.showError(
+          context,
+          "The user is not registerd for the role of $userType. \nTry regestring for that role",
+        );
       }
       return false;
     }
 
     // Direct user according to the user type
-    if (userType == UserType.chef){
-      if (context.mounted){
+    if (userType == UserType.chef) {
+      if (context.mounted) {
         Navigator.pushNamed(context, AppRoutes.chefDashboardRoute);
         await storage.write(
           key: StaticClass.jsonWebTokenField,
-          value: StaticClass.jsonWebToken
+          value: StaticClass.jsonWebToken,
         );
         await storage.write(key: UserModel.userTypeField, value: userType.name);
       }
-    }
-    else if (userType == UserType.customer){
-      if (context.mounted){
+    } else if (userType == UserType.customer) {
+      if (context.mounted) {
         Navigator.pushNamed(context, AppRoutes.customerDashboardRoute);
         await storage.write(
           key: StaticClass.jsonWebTokenField,
-          value: StaticClass.jsonWebToken
+          value: StaticClass.jsonWebToken,
         );
         await storage.write(key: UserModel.userTypeField, value: userType.name);
       }
-    }
-    else if (userType == UserType.admin){
+    } else if (userType == UserType.admin) {
       // TODO
       return false;
     }
@@ -84,7 +86,11 @@ class Helper {
     int? statusCode,
   }) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red, duration: Duration(seconds: 3),),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      ),
     );
     if (statusCode != null && statusCode == 401) {
       Auth.signOut();

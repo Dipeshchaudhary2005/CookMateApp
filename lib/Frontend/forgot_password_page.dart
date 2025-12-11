@@ -1,3 +1,5 @@
+import 'package:cookmate/Frontend/confirm_otp.dart';
+import 'package:cookmate/backend/services/user_services.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -25,7 +27,23 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       });
 
       try {
-        // TODO
+        final email = _emailController.text;
+        final success = await UserServices.generateOTP(context, email);
+        if (success) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('OTP successfully sent to the mail'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 3),
+              ),
+            );
+            final confirmOTP = ConfirmOTP(email: email);
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => confirmOTP)
+            );
+          }
+        }
       } finally {
         if (mounted) {
           setState(() {

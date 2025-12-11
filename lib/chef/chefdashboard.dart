@@ -1,10 +1,16 @@
+import 'dart:io';
+
+import 'package:cookmate/backend/model/chefpost.dart';
+import 'package:cookmate/backend/services/post_services.dart';
 import 'package:cookmate/core/helper.dart';
+import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'bookeddetailedpage.dart';
 import 'chefprofilepage.dart';
 import 'managemenuprice.dart';
 import 'calendarupdate.dart';
+import 'notification.dart'; // Import notification page
 
 class ChefDashboard extends StatefulWidget {
   const ChefDashboard({super.key});
@@ -14,58 +20,31 @@ class ChefDashboard extends StatefulWidget {
 }
 
 class _ChefDashboardState extends State<ChefDashboard> {
-  // Sample booking data for status card
   int pendingCount = 3;
   int confirmedCount = 2;
   int completedCount = 1;
+  int unreadNotifications = 5; // Track unread notifications
 
-  // Search controller and filtered list
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> filteredCuisines = [];
   bool isSearching = false;
-
-  // Sample posted cuisine images
-  List<Map<String, dynamic>> postedCuisines = [
-    {
-      'image': 'Resource/chef.png',
-      'title': 'Italian Pasta Carbonara',
-      'likes': 45,
-      'comments': 12,
-      'date': '2 days ago',
-    },
-    {
-      'image': 'Resource/chef.png',
-      'title': 'Nepalese Thakali Set',
-      'likes': 67,
-      'comments': 23,
-      'date': '5 days ago',
-    },
-    {
-      'image': 'Resource/chef.png',
-      'title': 'Special Momo Platter',
-      'likes': 89,
-      'comments': 34,
-      'date': '1 week ago',
-    },
-    {
-      'image': 'Resource/chef.png',
-      'title': 'Wedding Feast Menu',
-      'likes': 102,
-      'comments': 45,
-      'date': '2 weeks ago',
-    },
-  ];
+  late Future<List<ChefPost>?> postsFuture;
+  late List<ChefPost> posts;
+  late List<ChefPost> filteredPosts;
 
   @override
   void initState() {
     super.initState();
-    filteredCuisines = postedCuisines;
+    postsFuture = PostServices.getPostOfChef(
+      context,
+      StaticClass.currentUser!.uid!,
+    );
     _searchController.addListener(_filterCuisines);
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    filteredPosts = posts;
     super.dispose();
   }
 
@@ -73,13 +52,13 @@ class _ChefDashboardState extends State<ChefDashboard> {
     String query = _searchController.text.toLowerCase();
     setState(() {
       if (query.isEmpty) {
-        filteredCuisines = postedCuisines;
+        filteredPosts = posts;
         isSearching = false;
       } else {
         isSearching = true;
-        filteredCuisines = postedCuisines.where((cuisine) {
-          return cuisine['title'].toLowerCase().contains(query) ||
-              cuisine['date'].toLowerCase().contains(query);
+        filteredPosts = posts.where((post) {
+          return post.title!.toLowerCase().contains(query) ||
+              post.createdAt!.toLowerCase().contains(query);
         }).toList();
       }
     });
@@ -90,15 +69,29 @@ class _ChefDashboardState extends State<ChefDashboard> {
       isSearching = !isSearching;
       if (!isSearching) {
         _searchController.clear();
-        filteredCuisines = postedCuisines;
+        filteredPosts = posts;
       }
+    });
+  }
+
+  // Navigate to notification page
+  void _openNotifications() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ChefNotificationPage(),
+      ),
+    ).then((_) {
+      // Reset unread count when returning from notifications
+      setState(() {
+        unreadNotifications = 0;
+      });
     });
   }
 
   Future<void> _pickAndUploadImage(BuildContext context) async {
     final ImagePicker picker = ImagePicker();
 
-    // Show dialog to choose camera or gallery
     final source = await showDialog<ImageSource>(
       context: context,
       builder: (context) => AlertDialog(
@@ -122,13 +115,12 @@ class _ChefDashboardState extends State<ChefDashboard> {
     if (source != null) {
       final XFile? image = await picker.pickImage(source: source);
       if (image != null) {
-        // Show post creation dialog
-        _showPostCreationDialog(image.path);
+        _showPostCreationDialog(File(image.path));
       }
     }
   }
 
-  void _showPostCreationDialog(String imagePath) {
+  void _showPostCreationDialog(File image) {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
 
@@ -186,17 +178,19 @@ class _ChefDashboardState extends State<ChefDashboard> {
                     ),
                     const SizedBox(width: 12),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (titleController.text.isNotEmpty) {
+                          final newPost = await PostServices.createPost(
+                            context,
+                            image,
+                            titleController.text,
+                            descriptionController.text,
+                          );
+                          if (newPost == null) return;
                           setState(() {
-                            postedCuisines.insert(0, {
-                              'image': imagePath,
-                              'title': titleController.text,
-                              'likes': 0,
-                              'comments': 0,
-                              'date': 'Just now',
-                            });
+                            filteredPosts.add(newPost);
                           });
+                          if (!context.mounted) return;
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -223,202 +217,260 @@ class _ChefDashboardState extends State<ChefDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return  PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didPop, d) {
-          showDialog(
-            context: context,
-            builder: (context) => Helper.confirmLogOut(context),
-          );
-        },
-        child: Scaffold(
-      backgroundColor: const Color(0xFFB8E6B8),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Icon(Icons.person, color: Color(0xFF8BC34A)),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, d) {
+        showDialog(
+          context: context,
+          builder: (context) => Helper.confirmLogOut(context),
+        );
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFB8E6B8),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: StaticClass.currentUser?.urlToImage != null ?
+                        Image.network(StaticClass.currentUser!.urlToImage!, fit: BoxFit.cover,) :
+                        Icon(Icons.person, color: Color(0xFF8BC34A)),
+            ),
           ),
-        ),
-        title: isSearching
-            ? Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+          title: isSearching
+              ? Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: TextField(
+              controller: _searchController,
+              autofocus: true,
+              style: const TextStyle(color: Colors.black),
+              decoration: InputDecoration(
+                hintText: 'Search your posts...',
+                hintStyle: const TextStyle(color: Colors.grey),
+                border: InputBorder.none,
+                icon: const Icon(
+                  Icons.search,
+                  color: Colors.grey,
+                  size: 20,
+                ),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                  icon: const Icon(Icons.clear, color: Colors.grey),
+                  onPressed: () {
+                    _searchController.clear();
+                  },
+                )
+                    : null,
+              ),
+            ),
+          )
+              : Row(
+            children: [
+              Icon(Icons.location_on, color: Colors.grey[700], size: 20),
+              const SizedBox(width: 4),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    StaticClass.currentUser!.fullName ?? "No name",
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                ],
               ),
             ],
           ),
-          child: TextField(
-            controller: _searchController,
-            autofocus: true,
-            style: const TextStyle(color: Colors.black),
-            decoration: InputDecoration(
-              hintText: 'Search your posts...',
-              hintStyle: const TextStyle(color: Colors.grey),
-              border: InputBorder.none,
-              icon: const Icon(Icons.search, color: Colors.grey, size: 20),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                icon: const Icon(Icons.clear, color: Colors.grey),
-                onPressed: () {
-                  _searchController.clear();
-                },
-              )
-                  : null,
+          actions: [
+            IconButton(
+              icon: Icon(
+                isSearching ? Icons.close : Icons.search,
+                color: Colors.black,
+              ),
+              onPressed: _toggleSearch,
             ),
-          ),
-        )
-            : Row(
-          children: [
-            Icon(Icons.location_on, color: Colors.grey[700], size: 20),
-            const SizedBox(width: 4),
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Notification button with badge
+            Stack(
               children: [
-                Text('Ram Bhatta',
-                    style: TextStyle(fontSize: 16, color: Colors.black)),
+                IconButton(
+                  icon: const Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.black,
+                  ),
+                  onPressed: _openNotifications,
+                ),
+                if (unreadNotifications > 0)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        unreadNotifications > 9 ? '9+' : '$unreadNotifications',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: Icon(isSearching ? Icons.close : Icons.search, color: Colors.black),
-            onPressed: _toggleSearch,
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-            onPressed: () {
-              // Notification functionality placeholder
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Booking Status Card
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFB3D9),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Booking Status',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatusItem('$pendingCount', 'Pending'),
-                        _buildStatusItem('$confirmedCount', 'Confirmed'),
-                        _buildStatusItem('$completedCount', 'Completed'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // My Posted Cuisines Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    isSearching
-                        ? 'Search Results (${filteredCuisines.length})'
-                        : 'My Posted Cuisines',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFB3D9),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  if (!isSearching)
-                    TextButton(
-                      onPressed: () {
-                        // View all posts
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('View all posts coming soon!')),
-                        );
-                      },
-                      child: const Text('View All'),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Posted Cuisines Grid
-              filteredCuisines.isEmpty
-                  ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(40),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.search_off,
-                        size: 100,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        isSearching ? 'No posts found' : 'No posts yet',
+                      const Text(
+                        'Booking Status',
                         style: TextStyle(
                           fontSize: 18,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        isSearching
-                            ? 'Try searching with different keywords'
-                            : 'Start posting your cuisines',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatusItem('$pendingCount', 'Pending'),
+                          _buildStatusItem('$confirmedCount', 'Confirmed'),
+                          _buildStatusItem('$completedCount', 'Completed'),
+                        ],
                       ),
                     ],
                   ),
                 ),
-              )
-                  : GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.75,
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isSearching
+                          ? 'Search Results (${filteredPosts.length})'
+                          : 'My Posted Cuisines',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (!isSearching)
+                      TextButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('View all posts coming soon!'),
+                            ),
+                          );
+                        },
+                        child: const Text('View All'),
+                      ),
+                  ],
                 ),
-                itemCount: filteredCuisines.length,
-                itemBuilder: (context, index) {
-                  return _buildCuisineCard(filteredCuisines[index]);
-                },
-              ),
-            ],
+                const SizedBox(height: 12),
+                FutureBuilder(
+                  future: postsFuture,
+                  builder: (context, snapShot) {
+                    if (snapShot.connectionState == ConnectionState.done) {
+                      if (snapShot.hasData) {
+                        posts = snapShot.data!;
+                        filteredPosts = posts;
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.75,
+                          ),
+                          itemCount: filteredPosts.length,
+                          itemBuilder: (context, index) {
+                            return _buildCuisineCard(filteredPosts[index]);
+                          },
+                        );
+                      } else {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(40),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.search_off,
+                                  size: 100,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  isSearching
+                                      ? 'No posts found'
+                                      : 'No posts yet',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey[600],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  isSearching
+                                      ? 'Try searching with different keywords'
+                                      : 'Start posting your cuisines',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ),
+        bottomNavigationBar: _buildBottomNav(context),
       ),
-      bottomNavigationBar: _buildBottomNav(context),
-    ));
+    );
   }
 
   Widget _buildStatusItem(String count, String label) {
@@ -433,7 +485,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
     );
   }
 
-  Widget _buildCuisineCard(Map<String, dynamic> cuisine) {
+  Widget _buildCuisineCard(ChefPost post) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -464,8 +516,8 @@ class _ChefDashboardState extends State<ChefDashboard> {
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
               ),
-              child: Image.asset(
-                cuisine['image'],
+              child: Image.network(
+                post.urlToImage!,
                 fit: BoxFit.cover,
                 width: double.infinity,
                 errorBuilder: (context, error, stackTrace) {
@@ -487,7 +539,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
                   // Title
                   Flexible(
                     child: Text(
-                      cuisine['title'],
+                      post.title!,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -512,7 +564,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
-                              '${cuisine['likes']}',
+                              '${post.likeCount}',
                               style: const TextStyle(fontSize: 12),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -526,7 +578,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
-                              '${cuisine['comments']}',
+                              '${post.commentCount}',
                               style: const TextStyle(fontSize: 12),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -536,7 +588,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
                       const SizedBox(height: 4),
                       // Date
                       Text(
-                        cuisine['date'],
+                        post.createdAt!,
                         style: const TextStyle(
                           fontSize: 11,
                           color: Colors.grey,
@@ -629,10 +681,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'Profile Menu',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             ListTile(
@@ -677,20 +726,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const CalendarPage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings, color: Color(0xFF8BC34A)),
-              title: const Text('Settings'),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Settings page coming soon!')),
+                  MaterialPageRoute(builder: (context) => const CalendarPage()),
                 );
               },
             ),
@@ -698,84 +734,12 @@ class _ChefDashboardState extends State<ChefDashboard> {
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Logout', style: TextStyle(color: Colors.red)),
               onTap: () {
-                Navigator.pop(context);
-                _showLogoutDialog(context);
+                Helper.confirmLogOut(context);
               },
             ),
             const SizedBox(height: 16),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(Icons.logout, color: Colors.red[700]),
-            const SizedBox(width: 12),
-            const Text('Logout'),
-          ],
-        ),
-        content: const Text(
-          'Are you sure you want to logout from your account?',
-          style: TextStyle(fontSize: 16),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.grey[700],
-            ),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Close the dialog
-              Navigator.pop(context);
-
-              // Show logout confirmation
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.white),
-                      SizedBox(width: 12),
-                      Text('Logged out successfully'),
-                    ],
-                  ),
-                  backgroundColor: Colors.green,
-                  duration: Duration(seconds: 2),
-                ),
-              );
-
-              // Navigate back to login/home screen after a short delay
-              Future.delayed(const Duration(milliseconds: 500), () {
-                // Pop until reaching the root (login screen)
-                // Replace this with your actual login route
-                if (context.mounted) {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                }
-
-                // Alternative: Navigate to a specific login page
-                // Navigator.of(context).pushAndRemoveUntil(
-                //   MaterialPageRoute(builder: (context) => const LoginPage()),
-                //   (route) => false,
-                // );
-              });
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
-            child: const Text('Logout'),
-          ),
-        ],
       ),
     );
   }
