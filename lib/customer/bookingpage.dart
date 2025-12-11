@@ -6,16 +6,20 @@ import 'package:flutter/material.dart';
 class BookingPage extends StatefulWidget {
   final String? chefId;
   const BookingPage({super.key, this.chefId});
+  static const List<String> eventList = [
+    "Wedding", "Birthday", "Home Cooking", "Private"
+  ];
 
   @override
   State<BookingPage> createState() => _BookingPageState();
 }
 
 class _BookingPageState extends State<BookingPage> {
+  bool _isLoading = false;
+  num cost = 0;
   String? selectedEvent;
   DateTime selectedDate = DateTime.now();
   String selectedTime = '8:00 AM - 12:00 PM';
-  String? selectedPackage;
   int? selectedNoOfPeople = 1;
   List<String> selectedFoodItems = [];
   List<String> customMenuItems = [];
@@ -23,9 +27,7 @@ class _BookingPageState extends State<BookingPage> {
   late List<ChefPackage>? packages;
   List<ChefPackage> selectedPackages = [];
   TextEditingController? noOfPeopleController;
-  final List<String> eventList = [
-    "Wedding", "Birthday", "Home Cooking", "Private"
-  ];
+
 
   @override
   void initState() {
@@ -67,12 +69,7 @@ class _BookingPageState extends State<BookingPage> {
   // Method to show food selection dialog
   void _showFoodSelectionDialog(String packageName) {
     // Deep copy of selectedPackages
-    List<ChefPackage> tempSelected = List.from(selectedPackages
-        .map((pkg) => ChefPackage(
-      name: pkg.name,
-      dishes: List.from(pkg.dishes ?? []),
-    ))
-        .toList());
+    List<ChefPackage> tempSelected = List.from(selectedPackages);
 
     // The package the user selected
     final ChefPackage selectedPackageModel =
@@ -106,7 +103,7 @@ class _BookingPageState extends State<BookingPage> {
                     final tempPkg = tempSelected.firstWhere(
                           (p) => p.name == packageName,
                       orElse: ()  {
-                            final pkg = ChefPackage(id: selectedPackageModel.id!, name: packageName, dishes: []);
+                            final pkg = ChefPackage(id: selectedPackageModel.id!, name: packageName, dishes: [], price: selectedPackageModel.price);
                             tempSelected.add(pkg);
                             return pkg;
                             },
@@ -138,14 +135,19 @@ class _BookingPageState extends State<BookingPage> {
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    tempSelected.removeWhere((e) => e.dishes?.isEmpty ?? true);
+                    num sum = 0;
+                    for(var e in tempSelected){
+                      sum += e.price ?? 0;
+                    }
                     setState(() {
                       selectedPackages = tempSelected;
-                      selectedPackage = packageName;
+                      cost = sum * (int.tryParse(noOfPeopleController?.text ?? '1') ?? 1);
                     });
                     Navigator.pop(context);
 
                     final selectedCount = tempSelected
-                        .firstWhere((p) => p.name == packageName)
+                        .firstWhere((p) => p.name == packageName, orElse: () => ChefPackage(dishes: []))
                         .dishes!
                         .length;
 
@@ -212,7 +214,7 @@ class _BookingPageState extends State<BookingPage> {
               child: DropdownButton<String>(
                       value: selectedEvent,
                       isExpanded: true,
-                      items: eventList
+                      items: BookingPage.eventList
                           .map(
                             (e) => DropdownMenuItem(value: e, child: Text(e)),
                           )
@@ -288,7 +290,7 @@ class _BookingPageState extends State<BookingPage> {
             ),
             const SizedBox(height: 8,),
             const Text(
-              'Select Hours',
+              'Select No of People',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             TextField(
@@ -331,7 +333,7 @@ class _BookingPageState extends State<BookingPage> {
                          itemBuilder: (context, index) {
                            final package = packages![index];
 
-                           final isSelected = selectedPackage == package.name;
+                           final isSelected = selectedPackages.any((e) => e.name == package.name);
 
                            final selectedPkg = selectedPackages.firstWhere(
                                  (p) => p.name == package.name,
@@ -356,13 +358,21 @@ class _BookingPageState extends State<BookingPage> {
                    }
                   }),
             ),
-
+            SizedBox(
+              width: double.infinity,
+              child: Row(
+                children: [
+                  Text("Total Cost: NPR $cost", style:TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                ],
+              )
+            ),
+            SizedBox(height: 20,),
             // Book Now Button - Show Payment Dialog
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 // onPressed: _showPaymentDialog,
-                onPressed: () async{
+                onPressed: _isLoading ? null : () async{
                   if (noOfPeopleController!.text.isEmpty){
                     Helper.showError(context, "Enter number of people");
                     return;
@@ -372,13 +382,27 @@ class _BookingPageState extends State<BookingPage> {
                     Helper.showError(context, "The number of people must be a integer");
                     return;
                   }
+                  setState(() {
+                    _isLoading = true;
+                  });
                   final booking = await BookingServices.createBooking(context, widget.chefId!, selectedEvent!, selectedDate.toString(),
                       selectedTime, selectedNoOfPeople!, selectedPackages
                     );
+                  setState(() {
+                    _isLoading = false;
+                  });
                   if (booking == null) return;
                   if (context.mounted){
                     Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Booking made successfully"),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
                   }
+
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF8BC34A),
@@ -387,7 +411,7 @@ class _BookingPageState extends State<BookingPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
+                child: _isLoading ? const CircularProgressIndicator() : const Text(
                   'Book Now',
                   style: TextStyle(
                     fontSize: 16,

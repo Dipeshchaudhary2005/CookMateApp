@@ -1,16 +1,29 @@
+import 'package:cookmate/backend/model/booking.dart';
+import 'package:cookmate/backend/services/booking_services.dart';
 import 'package:flutter/material.dart';
 
 class RatingPage extends StatefulWidget {
-  const RatingPage({super.key});
+  final Booking currentBooking;
+  const RatingPage({super.key, required this.currentBooking});
 
   @override
   State<RatingPage> createState() => _RatingPageState();
 }
 
 class _RatingPageState extends State<RatingPage> {
-  double rating = 0;
+  bool _isLoading = false;
+  int rating = 0;
   final TextEditingController reviewController = TextEditingController();
-
+  @override
+  void initState() {
+    super.initState();
+    if (widget.currentBooking.rating != null){
+      rating = int.parse(widget.currentBooking.rating.toString());
+    }
+    if (widget.currentBooking.review != null) {
+      reviewController.text = widget.currentBooking.review!;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,22 +68,22 @@ class _RatingPageState extends State<RatingPage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.grey[200],
-                        image: const DecorationImage(
-                          image: AssetImage('assets/chef_ram.png'),
+                        image: DecorationImage(
+                          image: widget.currentBooking.chefUrlToImage != null ? NetworkImage(widget.currentBooking.chefUrlToImage!) : AssetImage('assets/chef_ram.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Ram Bhatta',
+                    Text(
+                      widget.currentBooking.chefName ?? "No name",
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Text(
-                      'Italian Cuisine Specialist',
+                    Text(
+                      '${widget.currentBooking.chefSpeciality} Specialist',
                       style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ],
@@ -95,7 +108,7 @@ class _RatingPageState extends State<RatingPage> {
                     ),
                     onPressed: () {
                       setState(() {
-                        rating = index + 1.0;
+                        rating = index + 1;
                       });
                     },
                   );
@@ -133,15 +146,26 @@ class _RatingPageState extends State<RatingPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: _isLoading ? null : () async {
+                    _isLoading = true;
                     if (rating > 0) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Review submitted successfully!'),
-                        ),
-                      );
-                      Navigator.pop(context);
-                    }
+                      final success = await BookingServices.rateBooking(context, widget.currentBooking.id!, rating: rating, review: reviewController.text);
+                      if (!success) {
+                        _isLoading = false;
+                        return;
+                      }
+                        if (!context.mounted) {
+                          _isLoading = false;
+                          return;
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Review submitted successfully!'),
+                          ),
+                        );
+                        _isLoading = false;
+                        Navigator.pop(context);
+                      }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF8BC34A),
@@ -150,7 +174,7 @@ class _RatingPageState extends State<RatingPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
+                  child: _isLoading ? const CircularProgressIndicator() : const Text(
                     'Submit Review',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
