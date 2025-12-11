@@ -29,7 +29,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       try {
         final email = _emailController.text;
         final success = await UserServices.generateOTP(context, email);
-        print(success);
         if (success) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

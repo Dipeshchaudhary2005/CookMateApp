@@ -1,5 +1,6 @@
 import 'package:cookmate/backend/model/chefpost.dart';
 import 'package:flutter/material.dart';
+import '../backend/services/post_services.dart';
 import 'bookingpage.dart';
 
 class FavoriteChefPage extends StatefulWidget {
@@ -13,10 +14,12 @@ class FavoriteChefPage extends StatefulWidget {
 
 class _FavoriteChefPageState extends State<FavoriteChefPage> {
   void _removeFavorite(int index) {
+    String postId = widget.favoritePosts[index].id!;
     setState(() {
       widget.favoritePosts[index].favorite = false;
       widget.favoritePosts.removeAt(index);
     });
+    PostServices.unfavoritePost(context, postId);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Removed from favorites'),

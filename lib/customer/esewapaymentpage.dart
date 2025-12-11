@@ -1,4 +1,5 @@
 import 'package:cookmate/core/static.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
@@ -54,15 +55,21 @@ class _EsewaPaymentPageState extends State<EsewaPaymentPage> {
           // After redirecting to eSewa, listen for result
           // using deep linking
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${body["error"]}")),
-        );
+        if (mounted){
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error: ${body["error"]}")),
+          );
+        }
       }
     } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to start payment")),
-      );
+      if (kDebugMode) {
+        print(e);
+      }
+      if (mounted){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to start payment")),
+        );
+      }
     } finally {
       setState(() => isLoading = false);
     }

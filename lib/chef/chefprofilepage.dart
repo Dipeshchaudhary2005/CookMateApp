@@ -1026,7 +1026,7 @@ class _SettingsPageState extends State<SettingsPage> {
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
       secondary: Icon(icon, color: const Color(0xFF8BC34A)),
       value: value,
-      activeColor: const Color(0xFF8BC34A),
+      activeThumbColor: const Color(0xFF8BC34A),
       onChanged: onChanged,
     );
   }
@@ -1056,12 +1056,12 @@ class PaymentAnalysisSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalIncome = monthlyIncome.reduce((a, b) => a + b);
-    final avgIncome = totalIncome / monthlyIncome.length;
-    final currentMonth = DateTime
-        .now()
-        .month - 1;
-    final currentIncome = monthlyIncome[currentMonth];
+    // final totalIncome = monthlyIncome.reduce((a, b) => a + b);
+    // final avgIncome = totalIncome / monthlyIncome.length;
+    // final currentMonth = DateTime
+    //     .now()
+    //     .month - 1;
+    // final currentIncome = monthlyIncome[currentMonth];
 
     return Container(
       height: MediaQuery
@@ -1210,7 +1210,7 @@ class PaymentAnalysisSheet extends StatelessWidget {
                             dotData: FlDotData(show: true),
                             belowBarData: BarAreaData(
                               show: true,
-                              color: const Color(0xFF8BC34A).withOpacity(0.2),
+                              color: const Color(0xFF8BC34A).withValues(alpha: 0.2),
                             ),
                           ),
                         ],
@@ -1314,9 +1314,9 @@ class PaymentAnalysisSheet extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha:  0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
