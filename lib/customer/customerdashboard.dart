@@ -2,6 +2,7 @@ import 'package:cookmate/backend/model/chefpost.dart';
 import 'package:cookmate/backend/services/fetch_services.dart';
 import 'package:cookmate/backend/services/post_services.dart';
 import 'package:cookmate/core/helper.dart';
+import 'package:cookmate/core/static.dart';
 import 'package:flutter/material.dart';
 import 'bookingpage.dart';
 import 'favoritechefpage.dart';
@@ -20,7 +21,8 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
   int _currentIndex = 0;
   final TextEditingController _searchController = TextEditingController();
   List<ChefPost> filteredPosts = [];
-  static List<ChefPost> favoritePosts = [];
+  List<ChefPost> favoritePosts = [];
+  late Future<List<ChefPost>?> favoritePostsFuture;
   late Future<List<ChefPost>?> chefPostsFuture;
   late List<ChefPost> posts;
   ChefPost? selectedPost;
@@ -30,6 +32,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
   void initState() {
     super.initState();
     chefPostsFuture = FetchServices.getRecentPosts(context, 0);
+    favoritePostsFuture = FetchServices.getFavoritePosts(context);
     _searchController.addListener(_filterPosts);
   }
 
@@ -632,7 +635,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               child: const Icon(Icons.location_on, color: Colors.red, size: 20),
             ),
           ),
-          title: const Column(
+          title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -640,7 +643,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               Text(
-                'Novaliches, QC',
+                StaticClass.currentUser?.userAddress ?? 'No location',
                 style: TextStyle(fontSize: 14, color: Colors.black),
               ),
             ],
@@ -765,12 +768,13 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
-                FutureBuilder<List<ChefPost>?>(
-                  future: chefPostsFuture,
+                FutureBuilder(
+                  future: Future.wait([chefPostsFuture, favoritePostsFuture]),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.done) {
-                      if (snapshot.hasData && snapshot.data != null) {
-                        posts = snapshot.data!;
+                      if (snapshot.hasData && snapshot.data != null && snapshot.data![0] != null) {
+                        posts = snapshot.data![0]!;
+                        favoritePosts += snapshot.data![1] ?? List.empty(growable: true);
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -849,7 +853,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        FavoriteChefPage(favoritePosts: favoritePosts),
+                        FavoriteChefPage(favoritePosts: favoritePosts,),
                   ),
                 );
                 break;

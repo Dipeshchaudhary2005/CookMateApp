@@ -89,6 +89,47 @@ class FetchServices {
     }
   }
 
+  static Future<List<ChefPost>?> getFavoritePosts(
+      BuildContext context,
+      ) async {
+    try {
+      final url = Uri.https(
+        StaticClass.serverBaseURL,
+        '${StaticClass.serverApiURL}/posts/favorite',
+      );
+      var response = await http.get(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          'Accept': 'application/json',
+          'Authorization': StaticClass.jsonWebToken!,
+        },
+      );
+      if (response.statusCode.toString().contains('20')) {
+        final json = jsonDecode(response.body);
+        if (json['posts'] == null) return null;
+        final posts = (json['posts'] as List)
+            .map((e) => ChefPost.fromJSON(e))
+            .toList();
+        return posts;
+      } else {
+        final data = jsonDecode(response.body);
+        if (context.mounted) {
+          Helper.showError(context, data['error']);
+        }
+        return null;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      if (context.mounted) {
+        Helper.showError(context, "Internal Error");
+      }
+      return null;
+    }
+  }
+
   static Future<ChefPost?> getPostById(
     BuildContext context,
     String postId,
