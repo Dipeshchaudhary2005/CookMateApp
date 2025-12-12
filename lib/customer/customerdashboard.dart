@@ -20,7 +20,7 @@ class CustomerDashboard extends StatefulWidget {
 class _CustomerDashboardState extends State<CustomerDashboard> {
   int _currentIndex = 0;
   final TextEditingController _searchController = TextEditingController();
-  List<ChefPost> filteredPosts = [];
+  late List<ChefPost> filteredPosts = posts;
   List<ChefPost> favoritePosts = [];
   late Future<List<ChefPost>?> favoritePostsFuture;
   late Future<List<ChefPost>?> chefPostsFuture;
@@ -44,6 +44,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
   void _filterPosts() {
     String query = _searchController.text.toLowerCase();
+    print(query);
     setState(() {
       if (query.isEmpty) {
         filteredPosts = posts;
@@ -54,6 +55,7 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               (post.chef?.speciality?.toLowerCase().contains(query) ?? false) ||
               (post.description?.toLowerCase().contains(query) ?? false);
         }).toList();
+        print(filteredPosts.length);
       }
     });
   }
@@ -775,12 +777,13 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       if (snapshot.hasData && snapshot.data != null && snapshot.data![0] != null) {
                         posts = snapshot.data![0]!;
                         favoritePosts += snapshot.data![1] ?? List.empty(growable: true);
-                        filteredPosts = posts;
+
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: filteredPosts.length,
                           itemBuilder: (context, index) {
+                            print(filteredPosts.length);
                             return buildPostCard(filteredPosts[index], index);
                           },
                         );
