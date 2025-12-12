@@ -734,7 +734,11 @@ class _ChefDashboardState extends State<ChefDashboard> {
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Logout', style: TextStyle(color: Colors.red)),
               onTap: () {
-                Helper.confirmLogOut(context);
+                Navigator.pop(context); // Close the bottom sheet first
+                showDialog(
+                  context: context,
+                  builder: (context) => Helper.confirmLogOut(context),
+                );
               },
             ),
             const SizedBox(height: 16),
