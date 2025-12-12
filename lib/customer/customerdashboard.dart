@@ -44,7 +44,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
 
   void _filterPosts() {
     String query = _searchController.text.toLowerCase();
-    print(query);
     setState(() {
       if (query.isEmpty) {
         filteredPosts = posts;
@@ -55,7 +54,6 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
               (post.chef?.speciality?.toLowerCase().contains(query) ?? false) ||
               (post.description?.toLowerCase().contains(query) ?? false);
         }).toList();
-        print(filteredPosts.length);
       }
     });
   }
