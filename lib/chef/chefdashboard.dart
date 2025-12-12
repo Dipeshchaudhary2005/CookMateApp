@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:cookmate/backend/model/booking.dart';
 import 'package:cookmate/backend/model/chefpost.dart';
+import 'package:cookmate/backend/services/booking_services.dart';
 import 'package:cookmate/backend/services/post_services.dart';
 import 'package:cookmate/core/helper.dart';
 import 'package:cookmate/core/static.dart';
@@ -20,9 +22,9 @@ class ChefDashboard extends StatefulWidget {
 }
 
 class _ChefDashboardState extends State<ChefDashboard> {
-  int pendingCount = 3;
-  int confirmedCount = 2;
-  int completedCount = 1;
+  int pendingCount = 0;
+  int confirmedCount = 0;
+  int completedCount = 0;
   int unreadNotifications = 5; // Track unread notifications
 
   final TextEditingController _searchController = TextEditingController();
@@ -30,7 +32,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
   late Future<List<ChefPost>?> postsFuture;
   late List<ChefPost> posts;
   late List<ChefPost> filteredPosts;
-
+  late Future<List<Booking>?> bookingsFuture;
   @override
   void initState() {
     super.initState();
@@ -38,6 +40,7 @@ class _ChefDashboardState extends State<ChefDashboard> {
       context,
       StaticClass.currentUser!.uid!,
     );
+    bookingsFuture = BookingServices.getBookings(context, 'chef');
     _searchController.addListener(_filterCuisines);
   }
 
@@ -345,33 +348,51 @@ class _ChefDashboardState extends State<ChefDashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFB3D9),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Booking Status',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                FutureBuilder(
+                  future: bookingsFuture,
+                  builder: (context, asyncSnapshot) {
+                    if (asyncSnapshot.connectionState != ConnectionState.done){
+                      return const Center(child: CircularProgressIndicator(),);
+                    }
+                    if (asyncSnapshot.hasData && asyncSnapshot.data != null){
+                      final bookings = asyncSnapshot.data!;
+                      final pendingBookings = bookings.where((e) => e.status == BookingStatus.pending.name).toList();
+                      final confirmedBookings = bookings.where((e) => e.status == BookingStatus.upcoming.name).toList();
+                      final cancelledBookings = bookings.where((e) => e.status == BookingStatus.cancelled.name).toList();
+                      final completedBookings = bookings.where((e) => e.status == BookingStatus.completed.name).toList();
+                      pendingCount = pendingBookings.length;
+                      confirmedCount = confirmedBookings.length;
+                      completedCount = completedBookings.length;
+                    }
+                    return Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFB3D9),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildStatusItem('$pendingCount', 'Pending'),
-                          _buildStatusItem('$confirmedCount', 'Confirmed'),
-                          _buildStatusItem('$completedCount', 'Completed'),
+                          const Text(
+                            'Booking Status',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildStatusItem('$pendingCount', 'Pending'),
+                              _buildStatusItem('$confirmedCount', 'Confirmed'),
+                              _buildStatusItem('$completedCount', 'Completed'),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
-                  ),
+                    );
+                  }
                 ),
                 const SizedBox(height: 20),
                 Row(
