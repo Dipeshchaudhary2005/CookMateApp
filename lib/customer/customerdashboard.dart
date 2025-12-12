@@ -775,12 +775,13 @@ class _CustomerDashboardState extends State<CustomerDashboard> {
                       if (snapshot.hasData && snapshot.data != null && snapshot.data![0] != null) {
                         posts = snapshot.data![0]!;
                         favoritePosts += snapshot.data![1] ?? List.empty(growable: true);
+                        filteredPosts = posts;
                         return ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: posts.length,
+                          itemCount: filteredPosts.length,
                           itemBuilder: (context, index) {
-                            return buildPostCard(posts[index], index);
+                            return buildPostCard(filteredPosts[index], index);
                           },
                         );
                       } else {
